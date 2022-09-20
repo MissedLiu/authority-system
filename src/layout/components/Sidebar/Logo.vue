@@ -24,8 +24,8 @@ export default {
   },
   data() {
     return {
-      title: 'Vue Element Admin',
-      logo: 'https://wpimg.wallstcn.com/69a1c46c-eb1c-4b46-8bd4-e9e686ef5251.png'
+      title: '牛牛健身',
+      logo: 'https://img0.baidu.com/it/u=3893459393,1108140718&fm=253&fmt=auto&app=138&f=JPEG?w=632&h=500'
     }
   }
 }

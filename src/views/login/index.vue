@@ -154,7 +154,7 @@ export default {
 
 <style lang="scss">
 
-$bg:#283443;
+$bg:#757a7d;
 $light_gray:#fff;
 $cursor: #fff;
 
@@ -206,6 +206,8 @@ $light_gray:#eee;
   min-height: 100%;
   width: 100%;
   background-color: $bg;
+  background-image: url('https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg9.51tietu.net%2Fpic%2F2019-091400%2F4wubfblkry34wubfblkry3.jpg&refer=http%3A%2F%2Fimg9.51tietu.net&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1666146899&t=c19b7ce1395e97165cca311eeb99bac3');
+  background-size:cover;
   overflow: hidden;
 
   .login-form {
