@@ -1,5 +1,7 @@
 import Vue from 'vue'
 
+import 'default-passive-events'
+
 import Cookies from 'js-cookie'
 
 import 'normalize.css/normalize.css' // a modern alternative to CSS resets

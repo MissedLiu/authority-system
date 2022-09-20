@@ -146,7 +146,6 @@ export default {
         return acc
       }, {})
     }
-   
   }
 }
 </script>
