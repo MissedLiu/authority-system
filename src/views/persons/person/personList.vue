@@ -1,5 +1,5 @@
 <template>
-    <p>供应商管理</p>
+    <p>个人中心</p>
 </template>
 <script>
 

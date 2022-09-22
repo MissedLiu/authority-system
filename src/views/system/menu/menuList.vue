@@ -4,7 +4,7 @@
         <el-button type="success" size="small" @click="openAddwindow()" icon="el-icon-plus">新增</el-button>
         <!-- 数据表格 -->
         <el-table :data="menuList" :height="tableHeight" style="width: 100%; margin-top: 20px;" row-key="id" border
-            default-expand-all :tree-props="{ children: 'children' }">
+  :tree-props="{ children: 'children' }">
             <el-table-column prop="label" label="菜单名称"></el-table-column>
             <el-table-column prop="type" label="菜单类型" align="center ">
                 <template slot-scope="scope">

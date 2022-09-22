@@ -195,7 +195,7 @@
                 },
                 //打开添加窗口
                 openAddwindow(){
-                    //
+                    //导入清空表单数据脚本
                     this.$restForm("deptForm",this.dept);
                     //设置属性
                     this.deptDialog.title='新增部门',
