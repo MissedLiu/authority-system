@@ -43,6 +43,7 @@
             </template>
     </el-table-column>
     </el-table>
+    
     <!-- 添加和修改窗口 -->
     <system-dialog 
     :title="deptDialog.title" 
@@ -63,8 +64,7 @@
         </el-form-item>
             <el-form-item label="部门电话">
             <el-input v-model="dept.phone"></el-input>
-        </el-form-item>
-            
+        </el-form-item>   
          <el-form-item label="序号">
             <el-input v-model="dept.orderNun"></el-input>
         </el-form-item>
@@ -73,6 +73,8 @@
     
     </div>
     </system-dialog>
+
+
     <!-- 选择所属部门的窗口 -->
     <system-dialog
         :title="parentDialog.title" 
@@ -186,6 +188,7 @@
                 async search(){
                     //发送查询请求
                     let res=await departmentApi.getDetpartmentlist(this.searchModel)
+                    console.log(res);
                     //判断是否成功
                     if(res.success){
                         console.log(res.data)
@@ -221,7 +224,7 @@
                                 //发送修改请求
                                 res = await departmentApi.updateDept(this.dept)
                             }
-                         
+                            
                             //判断是否成功
                             if(res.success){
                                 //提示成功
@@ -232,8 +235,7 @@
                                 this.deptDialog.visible=false
                             }else{
                                 //提示失败
-                                  this.$message.error(res.message)
-                                 
+                                  this.$message.error(res.message) 
                             }
                    
                         }
@@ -293,7 +295,7 @@
                         //提示警告不能删除
                         this.$message.warning(result.message)
                     }else{
-                        //提示是否确认删除
+                       //提示是否确认删除
                         let confirm=await this.$myconfirm("确定要删除该数据嘛?")//await代表同步
                         if(confirm){
                             //发送删除请求
@@ -308,7 +310,7 @@
                                 //提示失败
                                 this.$message.error(res.message)
                             }
-                        }
+                        } 
                     }
                 }
     

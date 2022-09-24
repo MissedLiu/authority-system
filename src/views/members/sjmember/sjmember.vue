@@ -32,8 +32,18 @@
             <el-table-column prop="memberPhone" label="会员电话"></el-table-column>
             <el-table-column prop="memberDate" label="出生日期"></el-table-column>
             <el-table-column prop="memberAddress" label="地址"></el-table-column>
-            <el-table-column label="操作" width="200" align="center">
+            <el-table-column prop="memberType" label="状态"></el-table-column>
+           
+            <el-table-column label="操作" width="300" align="center">
                 <template slot-scope="scope">
+                    <el-button
+                        icon="el-icon-edit-outline"
+                        type="primary"
+                        size="small"
+                        @click="ss(scope.row.memberId)"
+                    >
+                    查看套餐
+                    </el-button>
                     <el-button
                         icon="el-icon-edit-outline"
                         type="primary"
@@ -63,30 +73,35 @@ import MemberApi from '@/api/member'
         name: 'department',
         data() {
             return {
-                tableData: []//表格数据列表
+                tableData: [],//表格数据列表
+                searchModel:{
+                    memberType:"私教",
+                },
             }
         },
-        mounted(){
-            this.search();//需要触发的函数
+        created(){
+            this.search();
         },
         methods: {
             async search() {
                 //发送查询请求
-                let res = await MemberApi.getMemberList();
+                let res = await MemberApi.getPtMemberList(this.searchModel);
                 console.log(res);
                 //判断是否存在数据
                 if (res.success) {
                     //获取数据
                     this.tableData = res.data;
-                    console.log(res.data);
-                }else{
-                    console.log("xxxx");
+                    for(let i=0;i<res.data.length;i++){
+                        res.data[i].memberSex=res.data[i].memberSex==0 ? '女':'男'
+                        res.data[i].memberType=res.data[i].memberType==0 ? '体验会员':'正式会员'
+                    }
                 }
             },
+            async ss(id){
+                console.log(id);
+            }
 
         },
-    created() {
-    }
     }
 
 </script>
