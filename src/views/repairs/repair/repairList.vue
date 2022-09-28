@@ -1,5 +1,5 @@
 <template>
-    <p>999999999管理</p>
+    <p>报修记录管理</p>
 </template>
 <script>
 

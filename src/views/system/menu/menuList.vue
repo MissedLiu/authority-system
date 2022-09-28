@@ -1,10 +1,10 @@
 <template>
     <el-main>
         <!-- 新增按钮 -->
-        <el-button type="success" size="small" @click="openAddwindow()" icon="el-icon-plus">新增</el-button>
+        <el-button type="success" size="small" @click="openAddwindow()" icon="el-icon-plus" v-if="hasPermission('sys:menu:add')">新增</el-button>
         <!-- 数据表格 -->
         <el-table :data="menuList" :height="tableHeight" style="width: 100%; margin-top: 20px;" row-key="id" border
-            default-expand-all :tree-props="{ children: 'children' }">
+  :tree-props="{ children: 'children' }">
             <el-table-column prop="label" label="菜单名称"></el-table-column>
             <el-table-column prop="type" label="菜单类型" align="center ">
                 <template slot-scope="scope">
@@ -25,8 +25,8 @@
             <el-table-column prop="url" label="组件路径"></el-table-column>
             <el-table-column label="操作" align="center">
                  <template slot-scope="scope">
-                    <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handleEdit(scope.row)" >编辑 </el-button >
-                    <el-button icon="el-icon-close" type="danger"  size="small" @click="handleDelete(scope.row)" >删除 </el-button >
+                    <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handleEdit(scope.row)" v-if="hasPermission('sys:menu:edit')" >编辑 </el-button >
+                    <el-button icon="el-icon-close" type="danger"  size="small" @click="handleDelete(scope.row)" v-if="hasPermission('sys:menu:delete')" >删除 </el-button >
                 </template>
             </el-table-column>
         </el-table>

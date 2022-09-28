@@ -9,7 +9,7 @@
                 <el-button type="primary" icon="el-icon-search" @click="search()">查询</el-button>
                 <el-button icon="el-icon-refresh-right " @click="resetValue()">重置</el-button>
                 <el-button type="success" icon="el-icon-plus" @click="openAddwindow"
-                
+                v-if="hasPermission('sys:department:add')"
                  >新增</el-button>
             </el-form-item>
         </el-form>
@@ -35,10 +35,10 @@
             <el-table-column label="操作" width="200" align="center">
             <template slot-scope="scope">
             <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handleEdit(scope.row)" 
-           
+            v-if="hasPermission('sys:department:edit')"
             >编辑 </el-button >
             <el-button icon="el-icon-close" type="danger"  size="small" @click="handleDelete(scope.row)" 
-           
+            v-if="hasPermission('sys:department:delete')"
             >删除 </el-button >
             </template>
     </el-table-column>
@@ -191,14 +191,14 @@
                     console.log(res);
                     //判断是否成功
                     if(res.success){
-                        console.log(res.data)
+                        console.log(res)
                           console.log(res.data)
                         this.tableData=res.data
                     }
                 },
                 //打开添加窗口
                 openAddwindow(){
-                    //
+                    //导入清空表单数据脚本
                     this.$restForm("deptForm",this.dept);
                     //设置属性
                     this.deptDialog.title='新增部门',

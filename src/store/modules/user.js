@@ -11,20 +11,32 @@ const state = {
 };
 
 const mutations = {
+  //设置token
   SET_TOKEN: (state, token) => {
     state.token = token;
   },
+  //设置个人介绍
   SET_INTRODUCTION: (state, introduction) => {
     state.introduction = introduction;
   },
+  //设置用户的姓名
   SET_NAME: (state, name) => {
     state.name = name;
+  },
+   //设置用户的头像
+   SET_AVATAR: (state, avatar) => {
+    state.avatar = avatar
   },
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar;
   },
+    //设置用户的角色信息
   SET_ROLES: (state, roles) => {
     state.roles = roles;
+  },
+  //将用户id保存到store当中
+  SET_USERUID: (state, userId) => {
+    state.userId = userId
   },
 };
 
@@ -61,8 +73,8 @@ const actions = {
           if (!data) {
             reject("Verification failed, please Login again.");
           }
-
-          const { roles, name, avatar, introduction } = data;
+            //从后端返回的数据中解构出用户相关的信息
+          const { roles, name, avatar, introduction ,id } = data;
 
           // roles must be a non-empty array
           if (!roles || roles.length <= 0) {
@@ -73,6 +85,9 @@ const actions = {
           commit("SET_NAME", name);
           commit("SET_AVATAR", avatar);
           commit("SET_INTRODUCTION", introduction);
+          commit('SET_USERUID', id)//用户id  
+          //将权限字段保存到sessionStorage中
+        sessionStorage.setItem("codeList",JSON.stringify(roles));
           resolve(data);
         })
         .catch((error) => {
