@@ -30,5 +30,10 @@ export default{
     //采购完成，将数据插入已购物品表
     async toPo(params){
         return await http.post("/api/plan/toPo",params)
+    },
+
+    //获取未执行的计划
+    async getNotExecuted(params){
+        return await http.get("/api/plan/getNotExecuted",params)
     }
 }

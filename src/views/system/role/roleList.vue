@@ -89,6 +89,7 @@ import leafUtils from '@/utils/leaf'
                    userId:this.$store.getters.userId,//当前登录用户Id
                 },
                  roleList:[],//角色列表
+                 
                     tableHeight:0,//表格高度
                     pageNo:1,//当前页码
                     total:0,//数据总数量

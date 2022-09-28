@@ -7,6 +7,7 @@
     :width="width + 'px'"
     :before-close="onClose"
     :close-on-click-modal="false"
+    
     >
 <div class="container" :style="{height:height+'px'}">
 <slot name="content"></slot>

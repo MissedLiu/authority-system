@@ -6,9 +6,10 @@
                 <el-input v-model="searchModel.scheduleName" placeholder="请输入计划采购的物品名"/>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" icon="el-icon-search" @click="search()">查询</el-button>
-                <el-button icon="el-icon-refresh-right " @click="resetValue()">重置</el-button>
-                <el-button type="success" icon="el-icon-plus" @click="openAddwindow">新增</el-button>
+                <el-button type="primary" icon="el-icon-search" @click="search(pageNo,pageSize)">查询</el-button>
+                <el-button icon="el-icon-refresh-right" @click="resetValue()">重置</el-button>
+                <el-button type="success" icon="el-icon-plus" @click="openAddwindow()">新增</el-button>
+                <el-button type="primary" icon="el-icon-search" @click="getNotExecuted(pageNo,pageSize)">查看未执行的计划</el-button>
             </el-form-item>
         </el-form>
         <!-- 
@@ -34,7 +35,7 @@
             <el-table-column prop="scheduleAddress" label="供货地址"/>
             <el-table-column prop="scheduleNum" label="数量"/>
             <el-table-column prop="schedulePrice" label="单价"/>
-            <el-table-column prop="brand" label="单位"/>
+            <el-table-column prop="brand" label="品牌"/>
             <el-table-column prop="scheduleTime" label="创建时间"/>
             <el-table-column prop="scheduleState" label="状态"/>
             <el-table-column label="操作" width="300" align="center">
@@ -127,18 +128,22 @@
         <el-form-item label="物品品牌" prop="brand">
             <el-input v-model="plan.brand"></el-input>
         </el-form-item>
-       
     </el-form>
-    
     </div>
     </system-dialog>
+
+    <!-- 分页工具栏 -->
+    <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange"
+            :current-page="pageNo" :page-sizes="[10, 20, 30, 40, 50]" :page-size="10"
+            layout="total, sizes, prev, pager, next, jumper" :total="total">
+        </el-pagination>
     </el-main>
     
     </template>
 
 <script>
     //导入department.js脚本文件
-    import planApi from "@/api/plan"
+    import planApi from "@/api/planApi"
     //先导入systemDialog组件
     import SystemDialog from "@/components/system/SystemDialog.vue";
         export default {
@@ -151,8 +156,16 @@
                 return{
                     searchModel:{
                         scheduleName:"",//库存物品名
+                        pageNo:1,//当前页码
+                        pageSize:10,//每页显示条数
                     },
                     tableData:[],//表格数据
+
+                    //分页组件所需的属性
+                    pageNo:1,//当前页码
+                    total:0,//数据总数量
+                    pageSize:10,//每页显示数量
+
                     //新增或编辑的表单属性
                     planDialog:{
                         title:"",//窗口标题
@@ -201,25 +214,62 @@
                  /**
             * 重置查询条件
             */
-            resetValue() {
-                //清空数据
-                this.searchModel.scheduleName="";
-                //调用查询方法
-                this.search()
-            },
+                resetValue() {
+                    //清空数据
+                    this.searchModel.scheduleName="";
+                    //调用查询方法
+                    this.search()
+                },
+            
+                handleSizeChange(size) {
+                    //修改每页显示数量
+                    this.pageSize=size
+                    //调用查询方法
+                    this.search(this.pageNo,size)
+                },
+
                 /**
-                 * 查询部门列表
+                * 当页码发生变化时触发该事件
+                */
+                handleCurrentChange(page) {
+                    //修改当前页码
+                    this.pageNo=page
+                    //调用查询方法
+                    this.search(page,this.pageSize)
+                },
+
+                /**
+                 * 查询采购计划列表
                  */
-                async search(){
+                async search(pageNo,pageSize){ 
+                    //修改当前页码
+                    this.searchModel.pageNo=pageNo
+                    //修改每页显示条数
+                    this.searchModel.pageSize=pageSize
                     //发送查询请求
                     let res=await planApi.getPlanList(this.searchModel)
                     //判断是否成功
                     if(res.success){
-                        console.log(res.data)
-                          console.log(res.data)
-                        this.tableData=res.data
+                        this.tableData=res.data.records
+                        this.total=res.data.total;
                     }
                 },
+
+                async getNotExecuted(pageNo,pageSize){ 
+                    //修改当前页码
+                    this.searchModel.pageNo=pageNo
+                    //修改每页显示条数
+                    this.searchModel.pageSize=pageSize
+                    //发送查询请求
+                    let res=await planApi.getNotExecuted(this.searchModel)
+                    //判断是否成功
+                    if(res.success){
+                        this.tableData=res.data.records
+                        this.total=res.data.total;
+                    }
+                },
+
+                
                 //打开添加窗口
                 openAddwindow(){
                     //
@@ -288,9 +338,9 @@
                             //判断是否发送成功
                             if(res.success){
                                 //提示成功
-                                this.$message.success(res.message )
+                                this.$message.success(res.message)
                                 //刷新数据
-                                this.search()
+                                this.search(this.pageNo,this.pageSize)
                             }else{
                                 //提示失败
                                 this.$message.error(res.message)
@@ -308,9 +358,8 @@
                     this.toPoDialog.readOnly=true
     
                 },
-
+            // 将采购计划表的数据插入已购表中
               async  PlanToPo(){
-
                     let res=await planApi.toPo(this.plan)
                     console.log(res)
                     if(res.success){

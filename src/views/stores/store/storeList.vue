@@ -3,12 +3,11 @@
         <!-- 条件查询区 -->
         <el-form  ref="searchForm" label-width="80px" :inline="true" size="small">
             <el-form-item >
-                <el-input v-model="searchModel.stockInName" placeholder="请输入库存物品名"/>
+                <el-input v-model="searchModel.stockinName" placeholder="请输入库存物品名"/>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" icon="el-icon-search" @click="search()">查询</el-button>
+                <el-button type="primary" icon="el-icon-search" @click="search(pageNo,pageSize)">查询</el-button>
                 <el-button icon="el-icon-refresh-right " @click="resetValue()">重置</el-button>
-                <el-button type="success" icon="el-icon-plus" @click="openAddwindow">新增</el-button>
             </el-form-item>
         </el-form>
         <!-- 
@@ -28,59 +27,52 @@
             default-expand-all
              >
             <el-table-column prop="stockinName" label="物品名称"/>
-            <el-table-column prop="stockinNum"  label="物品数量"/>
+            <el-table-column prop="stockinNum"  label="最近入库数量"/>
             <el-table-column prop="storeNum" label="库存数量"/>
             <el-table-column prop="stockinType" label="物品类型"/>
             <el-table-column prop="brand" label="品牌"/>
+            <el-table-column prop="stockinTime" label="最近入库时间"/>
             <el-table-column label="操作" width="200" align="center">
             <template slot-scope="scope">
-            <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handleEdit(scope.row)" 
-           
-            >编辑 </el-button >
+            <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handleToOutStock(scope.row)" 
+            >出库 </el-button >
             <el-button icon="el-icon-close" type="danger"  size="small" @click="handleDelete(scope.row)" 
-           
-            >删除 </el-button >
+           >删除 </el-button >
             </template>
     </el-table-column>
     </el-table>
-    <!-- 添加和修改窗口 -->
+
     <system-dialog 
     :title="storeDialog.title" 
     :visible="storeDialog.visible" 
     :width="storeDialog.width" 
     :height="storeDialog.height" 
     @onClose="onClose" 
-    @onConfirm="onConfirm"
+    @onConfirm="toOutStock"
+    
     >
     <div slot="content">
-    <el-form :model="store" ref="storeForm" :rules="rules" label-width="80px" :inline="true" size="small">
-        <el-form-item label="物品编号" prop="poId" >
-            <el-input v-model="store.poId"></el-input>
-        </el-form-item>
-           <el-form-item label="物品名称" prop="stockinName"> 
-            <el-input v-model="store.stockinName"></el-input>
-        </el-form-item>
-            <el-form-item label="物品数量" prop="stockinNum">
-            <el-input v-model="store.stockinNum"></el-input>
-        </el-form-item>
-         <el-form-item label="物品类型" prop="stockinType">
-            <el-input v-model="store.stockinType"></el-input>
-        </el-form-item>
-        <el-form-item label="物品品牌" prop="brand">
-            <el-input v-model="store.brand"></el-input>
-        </el-form-item>
-       
+    <el-form :model="store" ref="storeForm"  label-width="80px" :inline="true" size="small">
+           <el-form-item label="出库数量" prop="outStockNum" > 
+            <el-input v-model="store.outStockNum"></el-input>
+        </el-form-item> 
+            
     </el-form>
-    
     </div>
     </system-dialog>
+
+    <!-- 分页工具栏 -->
+    <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange"
+            :current-page="pageNo" :page-sizes="[10, 20, 30, 40, 50]" :page-size="10"
+            layout="total, sizes, prev, pager, next, jumper" :total="total">
+        </el-pagination>
     </el-main>
     
     </template>
 
 <script>
     //导入department.js脚本文件
-    import storeApi from "@/api/store"
+    import storeApi from "@/api/storeApi"
     //先导入systemDialog组件
     import SystemDialog from "@/components/system/SystemDialog.vue";
         export default {
@@ -92,14 +84,21 @@
             data(){
                 return{
                     searchModel:{
-                        stockInName:"",//库存物品名
+                        stockinName:"",//库存物品名
+                        pageNo:1,
+                        pageSize:10,
                     },
                     tableData:[],//表格数据
+
+                    pageNo:1,//当前页码
+                    total:0,//数据总数量
+                    pageSize:10,//每页显示数量
+
                     storeDialog:{
                         title:"",//窗口标题
                         visible:false,//是否显示窗口
                         width:560,//窗口宽度
-                        height:170//窗口高度
+                        height:50//窗口高度
     
                     },
                     store:{
@@ -109,19 +108,14 @@
                         stockinNum:"",//物品数量
                         storeNum:"",//库存数量
                         stockinType:"",//物品类型
-                        brand:""//品牌      
-    
+                        brand:"",//品牌      
+                        stockinTime:"",//最后一次操作时间
+                        outStockNum:""//出库数量
                     },
-                    rules:{
-                         poId: [{ required: true,message: '请输入物品编号',trigger: 'blur',}],
-                         stockinName: [{ required: true,message: '请输入物品名称',trigger: 'blur',}],
-                         stockinNum: [{ required: true,message: '请输入物品数量',trigger: 'blur',}],
-                         stockinType: [{ required: true,message: '请输入物品类型',trigger: 'blur',}],
-                         brand: [{ required: true,message: '请输入品牌',trigger: 'blur',}],
-                    },
+
                     //选择所属部门的属性
                     parentDialog:{
-                        title:"选择所属部门",//窗口标题
+                        title:"",//窗口标题
                         visible:false,//是否显示窗口
                         width:300,//窗口宽度
                         height:400//窗口高度
@@ -139,54 +133,64 @@
             */
             resetValue() {
                 //清空数据
-                this.searchModel.stockInName="";
+                this.searchModel.stockinName="";
                 //调用查询方法
                 this.search()
             },
+
+            handleSizeChange(size) {
+                    //修改每页显示数量
+                    this.pageSize=size
+                    //调用查询方法
+                    this.search(this.pageNo,size)
+                },
+
                 /**
-                 * 查询部门列表
+                * 当页码发生变化时触发该事件
+                */
+                handleCurrentChange(page) {
+                    //修改当前页码
+                    this.pageNo=page
+                    //调用查询方法
+                    this.search(page,this.pageSize)
+                },
+                
+                /**
+                 * 查询库存列表
                  */
-                async search(){
+                async search(pageNo,pageSize){
+                     //修改当前页码
+                     this.searchModel.pageNo=pageNo
+                    //修改每页显示条数
+                    this.searchModel.pageSize=pageSize
                     //发送查询请求
                     let res=await storeApi.getStoreList(this.searchModel)
                     //判断是否成功
                     if(res.success){
-                        console.log(res.data)
-                          console.log(res.data)
-                        this.tableData=res.data
+                        console.log(res.data.records)
+                        this.tableData=res.data.records
+                        this.total=res.data.total;
+
                     }
-                },
-                //打开添加窗口
-                openAddwindow(){
-                    //
-                    this.$restForm("storeForm",this.store);
-                    //设置属性
-                    this.storeDialog.title='新增库存',
-                    this.storeDialog.visible=true
                 },
                 //窗口关闭事件
                 onClose(){
                  this.storeDialog.visible=false
                 },
-                //窗口确认事件
-                onConfirm(){
-                    //进行表单验证
-                    this.$refs.storeForm.validate(async (valid)=>{
-                        //如果验证通过
-                        if(valid){
-                              let res =null;
-                           
-                            //判断是添加还是修改操作(依据id是否为空,为空则为添加操作)
-                            if(this.store.id===""){
-                                 //发送添加请求
-                                res = await storeApi.addstore(this.store)
-                            }else{
-                                //发送修改请求
-                                res = await store.updatestore(this.store)
-                            }
-                         
-                            //判断是否成功
-                            if(res.success){
+
+                handleToOutStock(row){
+                    //数据回显
+                    this.$objCopy(row,this.store)
+                    //设置窗口标题
+                    this.storeDialog.title='请输入出库数量'
+                    //显示窗口
+                    this.storeDialog.visible=true
+    
+                },
+                toOutStock(){
+                    console.log(this.store)
+                    storeApi.toOutStock(this.store).then(res=>{
+                        if(res.success){
                                 //提示成功
                                 this.$message.success(res.message)
                                 //刷新数据
@@ -195,27 +199,30 @@
                                 this.storeDialog.visible=false
                             }else{
                                 //提示失败
-                                  this.$message.error(res.message)
-                                 
+                                this.$message.error(res.message)
                             }
-                   
-                        }
+                            this.search(this.pageNo,this.pageSize)
                     })
-                  
                 },
-                //修改按钮实现
-                handleEdit(row){
-                    //数据回显
-                    this.$objCopy(row,this.store)
-                    //设置窗口标题
-                    this.storeDialog.title='编辑库存'
-                    //显示窗口
-                    this.storeDialog.visible=true
-    
+                 //删除按钮实现
+                async handleDelete(row){
+                    let confirm=await this.$myconfirm("确定要删除该数据嘛?")
+                    if(confirm){
+                            //发送删除请求
+                            let res=await storeApi.deleteStore({storeId:row.storeId})
+                            //判断是否发送成功
+                            if(res.success){
+                                //提示成功
+                                this.$message.success(res.message)
+                                //刷新数据
+                                this.search(this.pageNo,this.pageSize)
+                            }else{
+                                //提示失败
+                                this.$message.error(res.message)
+                            }
+                        }
                 },
-                //删除操作
-               
-    
+
             }
     
         }
