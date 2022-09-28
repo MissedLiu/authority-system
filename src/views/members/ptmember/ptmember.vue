@@ -19,12 +19,12 @@
             <el-table-column prop="memberPhone" label="会员电话"></el-table-column>
             <el-table-column prop="memberAddress" label="地址"></el-table-column>
             <el-table-column prop="memberType" label="状态"></el-table-column>
-            <el-table-column prop="mealId" label="套餐编号" ></el-table-column>
+            <el-table-column prop="mealName" label="套餐名称" ></el-table-column>
             <el-table-column prop="mealType" label="套餐类型" ></el-table-column>
             <el-table-column prop="mmTime" label="办理时间"  ></el-table-column>
             <el-table-column prop="mmDate" label="到期时间" ></el-table-column>
 
-            <el-table-column label="套餐操作" width="300" align="center">
+            <el-table-column label="套餐操作" width="200" align="center">
                 <template slot-scope="scope">
                     <el-button icon="el-icon-edit-outline" type="primary" size="small"
                         @click="selectCommonMeal(scope.row)">
@@ -124,8 +124,7 @@
 </template>
 
 <script>
-import MemberApi from '@/api/member'
-import MealApi from '@/api/meal'
+import CommonMember from '@/api/commonMember'
 //导入对话框组件
 import SystemDialog from '@/components/system/SystemDialog.vue';
 export default {
@@ -139,13 +138,8 @@ export default {
             //表格数据列表
             tableData: [
             ],
-            //查询列表参数
-            searchModel: {
-                memberType: "普通",
-            },
             //电话查询参数
             phone: {
-                mealType: "普通",
                 memberPhone: null,
             },
             ptmbDialog: {
@@ -208,7 +202,7 @@ export default {
             //清空输入框
             this.phone.memberPhone = null;
             //发送查询请求
-            let res = await MemberApi.getPtMemberList(this.searchModel);
+            let res = await CommonMember.getFindCommentMemberList();
             console.log(res);
             //判断是否存在数据
             if (res.success) {
@@ -223,13 +217,13 @@ export default {
         //通过电话和类型查会员
         async selectOne() {
             //发送查询请求
-            console.log("xxxxxxxx");
             if (this.phone.memberPhone != null) {
-                let res = await MemberApi.getMemberByPhoneAndvMealtype(this.phone);
+                let res = await CommonMember.getFindCommentMembeByPhone(this.phone);
                 //判断是否存在数据
                 if (res.success) {
                     //获取数据
                     this.tableData = res.data;
+                    console.log( this.tableData);
                     for (let i = 0; i < res.data.length; i++) {
                         res.data[i].memberSex = res.data[i].memberSex == 0 ? '女' : '男'
                         res.data[i].memberType = res.data[i].memberType == 0 ? '体验会员' : '正式会员'
@@ -261,10 +255,8 @@ export default {
                 if (valid) {
                     let res = null;
                     //发送添加请求
-                    console.log("添加");
-                    this.member.mealType = "普通"
                     console.log(this.member);
-                    res = await MemberApi.getAddPtMember(this.member)
+                    res = await CommonMember.getAddCommonMember(this.member)
                     //判断是否成功
                     if (res.success) {
                         //提示成功
@@ -285,7 +277,7 @@ export default {
         //打开套餐选择的窗口
         async openCommonMealWindow() {
             this.parentDialog.visible = true
-            let res = await MealApi.getCommenMealList();
+            let res = await CommonMember.getCommenMealList();
             console.log(res)
             //判断是否成功
             if (res.success) {
@@ -312,7 +304,7 @@ export default {
             let confirm = await this.$myconfirm("确定要删除该数据嘛?")//await代表同步
             if (confirm) {
                 //发送删除请求
-                let res = await MemberApi.delMemberMealById({ mmId: row.mmId })
+                let res = await CommonMember.delCommonMemberById({ mmId: row.mmId })
                 //判断是否发送成功
                 if (res.success) {
                     //提示成功
@@ -328,7 +320,7 @@ export default {
         //查看套餐详情窗口
         async selectCommonMeal(row) {
             this.mealDialog.visible = true 
-            let res=await MealApi.getselectCommenMeal({id:row.mealId});
+            let res=await CommonMember.getFindCommenMeal({id:row.mealId});
             console.log(res.data);
             //判断是否成功
             if(res.success){

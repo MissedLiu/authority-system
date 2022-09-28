@@ -21,8 +21,11 @@
             <el-table-column prop="memberAge" label="年龄"></el-table-column>
             <el-table-column prop="memberAddress" label="地址"></el-table-column>
             <el-table-column prop="memberType" label="状态"></el-table-column>
-            <el-table-column label="操作" width="300" align="center">
+            <el-table-column label="操作" width="350" align="center">
                 <template slot-scope="scope">
+                    <el-button icon="el-icon-close" type="danger" size="small" @click="upd(scope.row)">
+                        加入黑名单
+                    </el-button>
                     <el-button icon="el-icon-edit-outline" type="primary" size="small"
                         @click="selectCommonMeal(scope.row)">
                         修改
@@ -60,34 +63,36 @@
                     <el-form-item label="住址" prop="memberAddress">
                         <el-input v-model="member.memberAddress"></el-input>
                     </el-form-item>
-                    <el-form-item label="会员类型" prop="memberType">
-                        <el-select v-model="member.memberType" placeholder="Select">
-                            <el-option :value="1" label="正式会员"></el-option>
-                            <el-option :value="0" label="体验会员"></el-option>
-                        </el-select>
-                    </el-form-item>
                 </el-form>
-
             </div>
         </system-dialog>
 
 
-        <!-- 查看详情窗口 -->
+        <!-- 修改窗口 -->
         <system-dialog :title="mealDialog.title" :visible="mealDialog.visible" :width="mealDialog.width"
             :height="mealDialog.height" @onClose="pageClose()" @onConfirm="pageConfirm()">
             <div slot="content">
                 <el-form  ref="memberForm"  label-width="80px" size="small">
-                    <el-form-item label="套餐编号">
-                        <el-input v-model="mealSJ.cmId"></el-input>
+                    <el-form-item label="会员姓名">
+                        <el-input v-model="mealSJ.memberName"></el-input>
                     </el-form-item>
-                    <el-form-item label="套餐名称">
-                        <el-input v-model="mealSJ.cmName"></el-input>
+                    <el-form-item label="会员性别" prop="memberSex">
+                        <el-select v-model="mealSJ.memberSex" placeholder="Select">
+                            <el-option :value="1" label="男">男</el-option>
+                            <el-option :value="0" label="女">女</el-option>
+                        </el-select>
                     </el-form-item>
-                    <el-form-item label="套餐时长">
-                        <el-input v-model="mealSJ.cmTime"></el-input>
+                    <el-form-item label="出生日期">
+                        <el-input v-model="mealSJ.memberDate"></el-input>
                     </el-form-item>
-                    <el-form-item label="套餐价格">
-                        <el-input v-model="mealSJ.cmPrice"></el-input>
+                    <el-form-item label="电话">
+                        <el-input readonly v-model="mealSJ.memberPhone"></el-input>
+                    </el-form-item>
+                    <el-form-item label="年龄">
+                        <el-input v-model="mealSJ.memberAge"></el-input>
+                    </el-form-item>
+                    <el-form-item label="住址">
+                        <el-input v-model="mealSJ.memberAddress"></el-input>
                     </el-form-item>
                 </el-form>    
             </div>
@@ -134,9 +139,6 @@ export default {
                 memberPhone: "",//电话号码
                 memberAge: "",//年龄
                 memberAddress: "",//住址
-                memberType: "",//会员类型 
-                mealId: "",//套餐编号
-                mealType: "",//套餐类型
             },
             //验证
             mbrules: {
@@ -154,10 +156,14 @@ export default {
                 width: 500,//窗口宽度
                 height: 400//窗口高度
             },
-             //详情数据
+             //存放数据
              mealSJ: {
 
              },
+             //修改数据存放
+                          mealSJ2: {
+
+},
 
 
 
@@ -167,7 +173,7 @@ export default {
         this.search();
     },
     methods: {
-        //查询普通会员列表
+        //查询会员列表
         async search() {
             //清空输入框
             this.phone.memberPhone = null;
@@ -182,7 +188,6 @@ export default {
                     res.data[i].memberSex = res.data[i].memberSex == 0 ? '女' : '男'
                     res.data[i].memberType = res.data[i].memberType == 0 ? '体验会员' : '正式会员'
                 }
-
             }
         },
 
@@ -190,7 +195,7 @@ export default {
         async selectOne() {
             //发送查询请求
             if (this.phone.memberPhone != null) {
-                let res = await MemberApi.getSelectMemberByPhone(this.phone);
+                let res = await MemberApi.getFindMemberByPhone(this.phone);
                 console.log(res);
                 //判断是否存在数据
                 if (res.success) {
@@ -206,15 +211,14 @@ export default {
                     console.log(this.tableData);
                 }
             }
-
         },
 
         //打开添加窗口
         openAddwindow() {
             this.$restForm("memberForm", this.member);
             //设置属性
-            this.ptmbDialog.title = '新增普通会员',
-                this.ptmbDialog.visible = true
+            this.ptmbDialog.title = '新增会员',
+            this.ptmbDialog.visible = true
         },
         //窗口关闭事件
         onClose() {
@@ -225,15 +229,11 @@ export default {
             //进行表单验证
             console.log(this.member);
             this.$refs.memberForm.validate(async (valid) => {
-                console.log("xxx");
                 //如果验证通过
                 if (valid) {
                     let res = null;
                     //发送添加请求
-                    console.log("添加");
-                    this.member.mealType = "普通"
-                    console.log(this.member);
-                    res = await MemberApi.getAddPtMember(this.member)
+                    res = await MemberApi.getAddMember(this.member)
                     //判断是否成功
                     if (res.success) {
                         //提示成功
@@ -251,14 +251,17 @@ export default {
             })
 
         },
-       
-        //根据会员办理套餐id删除
-        async del(row) {
-            //提示是否确认删除
-            let confirm = await this.$myconfirm("确定要删除该数据嘛?")//await代表同步
+
+
+        //加入黑名单
+        async upd(row){
+             //提示是否确认删除
+             let confirm = await this.$myconfirm("确定加入黑名单?")//await代表同步
             if (confirm) {
                 //发送删除请求
-                let res = await MemberApi.delMemberMealById({ mmId: row.memberMeals[0].mmId })
+                row.memberSex = row.memberSex == '男' ? 1 : 0
+                row.memberType = row.memberType == '体验会员' ? 0 : 1
+                let res = await MemberApi.updMemberState(row)
                 //判断是否发送成功
                 if (res.success) {
                     //提示成功
@@ -272,25 +275,62 @@ export default {
             }
 
         },
-        //查看套餐详情窗口
+       
+        //根据会员id删除
+        async del(row) {
+            //提示是否确认删除
+            let confirm = await this.$myconfirm("确定要删除该数据嘛?")//await代表同步
+            if (confirm) {
+                //发送删除请求
+                let res = await MemberApi.delMemberByMemberId({ memberId: row.memberId })
+                //判断是否发送成功
+                if (res.success) {
+                    //提示成功
+                    this.$message.success(res.message)
+                    //刷新数据
+                    this.search()
+                } else {
+                    //提示失败
+                    this.$message.error(res.message)
+                }
+            }
+
+        },
+        //修改窗口
         async selectCommonMeal(row) {
             this.mealDialog.visible = true 
-            console.log(row.memberMeals[0].mealId);
-            let res=await MealApi.getselectCommenMeal({id:row.memberMeals[0].mealId});
-            console.log(res.data);
-            //判断是否成功
-            if(res.success){
-                this.mealSJ=res.data
-            }
-            
+            this.mealSJ=row
         },
-        //查看套餐详情窗口关闭事件 
+        //修改窗口关闭事件 
         pageClose() {
             this.mealDialog.visible = false
+            this.search()
         },
-        //查看套餐详情窗口确认事件
-        pageConfirm() {
-            this.mealDialog.visible = false
+        //修改窗口确认事件
+        async pageConfirm() {
+            console.log(this.mealSJ);
+            //提示是否确认修改
+            this.mealSJ.memberSex = this.mealSJ.memberSex == '男' ? 1 : 0
+            this.mealSJ.memberType = this.mealSJ.memberType == '体验会员' ? 0 : 1
+            let confirm = await this.$myconfirm("确定要修改该数据嘛?")
+            console.log(this.mealSJ.memberSex);
+            if (confirm) {
+                //发送修改请求
+                let res = await MemberApi.updataMemberByMemberPhone(this.mealSJ)
+                //判断是否发送成功
+                if (res.success) {
+                    //提示成功
+                    this.$message.success(res.message)
+                    //刷新数据
+                    this.search()
+                    this.mealDialog.visible = false
+                } else {
+                    //提示失败
+                    this.$message.error(res.message)
+                    this.search()
+                }
+            }
+            
         },
     },
 }
