@@ -11,7 +11,7 @@ return await http.login("/api/user/login",data)
 * @returns
 */
 export async function getInfo(){
-return await http.get("/api/sysUser/getInfo")
+  return await http.get("/api/sysUser/getInfo")
 }
 /**
 * 退出登录

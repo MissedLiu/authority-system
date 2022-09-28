@@ -19,11 +19,11 @@
             <el-table-column prop="remark" label="角色备注"></el-table-column>
             <el-table-column label="操作" align="center" width="290">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-edit" type="primary" size="small" @click="handleEdit(scope.row)">编辑
+                    <el-button icon="el-icon-edit" type="primary" size="small" @click="handleEdit(scope.row)" v-if="hasPermission('sys:role:edit')" >编辑
                     </el-button>
-                    <el-button icon="el-icon-delete" type="danger" size="small" @click="handleDelete(scope.row)">删除
+                    <el-button icon="el-icon-delete" type="danger" size="small" @click="handleDelete(scope.row)"  v-if="hasPermission('sys:role:delete')">删除
                     </el-button>
-                    <el-button icon="el-icon-setting" type="primary" size="small" @click="assignRole(scope.row)">分配权限
+                    <el-button icon="el-icon-setting" type="primary" size="small" @click="assignRole(scope.row)" v-if="hasPermission('sys:role:assign')" >分配权限
                     </el-button>
                 </template>
             </el-table-column>
@@ -205,35 +205,38 @@ import leafUtils from '@/utils/leaf'
             * 窗口确认事件
             */
             onConfirm() {
-                // //表单验证
-                // this.$refs.roleForm.validate(async (valid) => {
-                //     if (valid) {
-                //          let res =null;
-                //         //判断是添加还是修改操作(依据id是否为空,为空则为添加操作)
-                //         if(this.role.id===""){
-                //              //发送添加请求
-                //             res = await addRole(this.role)
-                //         }else{
-                //             //发送修改请求
-                //             res = await updateRole(this.role)
-                //         }
+                //表单验证
+                this.$refs.roleForm.validate(async (valid) => {
+                    if (valid) {
+                         let res =null;
+                        //判断是添加还是修改操作(依据id是否为空,为空则为添加操作)
+                        if(this.role.id===""){
+                             //发送添加请求
+                          //获取当前系统的登录账号id
+                             this.role.createUser=this.$store.getters.userId;
+                             console.log("userIrole",this.role);
+                            res = await roleApi.add(this.role)
+                        }else{
+                            //发送修改请求
+                            res = await roleApi.update(this.role)
+                        }
                      
-                //         //判断是否成功
-                //         if(res.success){
-                //             //提示成功
-                //             this.$message.success(res.message)
-                //             //刷新数据
-                //             this.search(this.pageNo,this.pageSize)
-                //               //关闭窗口事件
-                //             this.roleDialog.visible=false
-                //         }else{
-                //             //提示失败
-                //               this.$message.error(res.message)
+                        //判断是否成功
+                        if(res.success){
+                            //提示成功
+                            this.$message.success(res.message)
+                            //刷新数据
+                            this.search(this.pageNo,this.pageSize)
+                              //关闭窗口事件
+                            this.roleDialog.visible=false
+                        }else{
+                            //提示失败
+                              this.$message.error(res.message)
                              
-                //         }
+                        }
                
-                //     }
-                // });
+                    }
+                });
             },
         /**
         * 打开编辑窗口
@@ -248,17 +251,19 @@ import leafUtils from '@/utils/leaf'
         },
         //打开分配权限窗口
        async assignRole(row){
-        console.log(row)
+      
             //将roleId赋值
             this.roleId=row.id
-            console.log("row.id",row.id)
+           
             //构建查询参数
             let params={
                 roleId:row.id,//角色ID
                 userId:this.$store.getters.userId,//用户ID
             }
+           
             //发送查询分配权限菜单请求
             let res=await roleApi.getRolePermisson(params);
+            console.log(res);
             //判断是否成功
             if(res.success){
                 //获取当前登录用户所拥有的所有菜单权限
