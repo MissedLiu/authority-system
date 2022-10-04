@@ -27,7 +27,7 @@
             default-expand-all
              >
             <el-table-column prop="stockinName" label="物品名称"/>
-            <el-table-column prop="storeNum"  label="库中物品数量"/>
+            <el-table-column prop="storeNum"  label="现有出库物品数量"/>
             <el-table-column prop="outNum" label="出库数量"/>
             <el-table-column prop="outIs" label="状态"/>
             <el-table-column prop="stockinType" label="物品类型"/>
