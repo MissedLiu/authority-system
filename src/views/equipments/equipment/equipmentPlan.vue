@@ -34,6 +34,11 @@
             </el-table-column>
         </el-table>
 
+        <!-- 分页工具栏 -->
+        <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange"
+            :current-page="pageNo" :page-sizes="[10, 20, 30, 40, 50]" :page-size="10"
+            layout="total, sizes, prev, pager, next, jumper" :total="total">
+        </el-pagination>
         
 
     </el-main>
