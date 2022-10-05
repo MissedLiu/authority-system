@@ -4,19 +4,13 @@ import request from "@/utils/request";
 
 export default {
     /**
-   * 通过套餐类型会员列表
+   * 会员列表
    * @returns
    */
   async getPtMemberList(params) {
     return await request.get("/api/ptMember/PtMemberList", params);
   },
-    /**
-   * 通过电话查私教会员
-   * @returns
-   */
-     async getFindPtMemberByPhone(params) {
-      return await request.get("/api/ptMember/findPtMemberByPhone", params);
-    },
+
      /**
    * 添加私教会员
    * @returns

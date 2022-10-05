@@ -37,11 +37,5 @@ export default {
   async updataMemberByMemberPhone(params) {
     return await request.put("/api/member/updataMemberByMemberPhone", params);
   },
-    /**
-   * 根据会员id加入黑名单
-   * @returns
-   */
-     async updMemberState(params) {
-      return await request.put("/api/member/updMemberState", params);
-    },
+
 };

@@ -4,19 +4,13 @@ import request from "@/utils/request";
 
 export default {
   /**
-   * 通过套餐类型会员列表
+   * 会员列表
    * @returns
    */
   async getTeamMemberList(params) {
     return await request.get("/api/teamMember/teamMemberList", params);
   },
-  /**
-   * 通过电话查团操会员
-   * @returns
-   */
-  async getFindTeamMemberByPhone(params) {
-    return await request.get("/api/teamMember/findTeamMemberByPhone", params);
-  },
+
   /**
    * 添加团操会员
    * @returns

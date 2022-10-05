@@ -6,9 +6,9 @@
                 <el-input placeholder="请输入电话" v-model="phone.memberPhone"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" icon="el-icon-search" @click="selectOne()">查询</el-button>
+                <el-button type="primary" icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
                 <el-button type="success" icon="el-icon-plus" @click="openAddwindow">新增</el-button>
-                <el-button icon="el-icon-refresh-right" @click="search()">返回</el-button>
+                <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
             </el-form-item>
         </el-form>
         <!-- 数据表格 -->
@@ -26,8 +26,7 @@
             <el-table-column prop="mmDate" label="到期时间"></el-table-column>
             <el-table-column label="套餐操作" width="200" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-edit-outline" type="primary" size="small"
-                        @click="selectPtMeal(scope.row)">
+                    <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="selectPtMeal(scope.row)">
                         详情
                     </el-button>
                     <el-button icon="el-icon-close" type="danger" size="small" @click="del(scope.row)">
@@ -37,6 +36,12 @@
             </el-table-column>
         </el-table>
 
+        <!-- 分页组件 -->
+        <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange"
+            :current-page="pageNo" :page-sizes="[10, 20, 30, 40, 50]" :page-size="10"
+            layout="total, sizes, prev, pager, next, jumper" :total="total">
+        </el-pagination>
+
         <!-- 添加窗口 -->
         <system-dialog :title="ptmbDialog.title" :visible="ptmbDialog.visible" :width="ptmbDialog.width"
             :height="ptmbDialog.height" @onClose="onClose" @onConfirm="onConfirm">
@@ -45,38 +50,17 @@
                     <el-form-item label="会员姓名" prop="memberName">
                         <el-input v-model="member.memberName"></el-input>
                     </el-form-item>
-                    <el-form-item label="会员性别" prop="memberSex">
-                        <el-select v-model="member.memberSex" placeholder="Select">
-                            <el-option :value="1" label="男">男</el-option>
-                            <el-option :value="0" label="女">女</el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item label="出生日期">
-                        <el-input v-model="member.memberDate"></el-input>
-                    </el-form-item>
                     <el-form-item label="电话" prop="memberPhone">
                         <el-input v-model="member.memberPhone"></el-input>
                     </el-form-item>
-                    <el-form-item label="年龄" prop="memberAge">
-                        <el-input v-model="member.memberAge"></el-input>
-                    </el-form-item>
-                    <el-form-item label="住址" prop="memberAddress">
-                        <el-input v-model="member.memberAddress"></el-input>
-                    </el-form-item>
-                    <el-form-item label="会员类型" prop="memberType">
-                        <el-select v-model="member.memberType" placeholder="Select">
-                            <el-option :value="1" label="正式会员"></el-option>
-                            <el-option :value="0" label="体验会员"></el-option>
-                        </el-select>
-                    </el-form-item>
                     <el-form-item label="套餐选择" prop="mealId" :readonly="true" @click.native="openPtMealWindow()">
-                        <el-input v-model="member.mealId"></el-input>
+                        <el-input v-model="member.mealName"></el-input>
                     </el-form-item>
-                    <el-form-item label="教练选择" prop="mealId" :readonly="true" @click.native="openPtCoachWindow()">
-                        <el-input v-model="member.empId"></el-input>
+                    <el-form-item label="教练选择" prop="empId" :readonly="true" @click.native="openPtCoachWindow()">
+                        <el-input v-model="member.empName"></el-input>
                     </el-form-item>
-                    <el-form-item label="项目选择" prop="mealId" :readonly="true" @click.native="openPtProjectWindow()">
-                        <el-input v-model="member.projectId"></el-input>
+                    <el-form-item label="项目选择" prop="projectId" :readonly="true" @click.native="openPtProjectWindow()">
+                        <el-input v-model="member.projectName"></el-input>
                     </el-form-item>
 
                 </el-form>
@@ -156,10 +140,10 @@
 
 
         <!-- 查看套餐详情窗口 -->
-        <system-dialog :title="mealDialog.title" :visible="mealDialog.visible" :width="mealDialog.width" 
+        <system-dialog :title="mealDialog.title" :visible="mealDialog.visible" :width="mealDialog.width"
             :height="mealDialog.height" @onClose="pageClose()" @onConfirm="pageConfirm()">
             <div slot="content">
-                <el-form ref="memberForm" label-width="80px" size="small" :inline="true">
+                <el-form ref="memberFormXQ" label-width="80px" size="small" :inline="true">
                     <el-form-item label="套餐编号">
                         <el-input readonly v-model="mealSJ.ptId"></el-input>
                     </el-form-item>
@@ -198,29 +182,29 @@
 </template>
 
 <script>
-import MemberApi from '@/api/member'
 import PtMemberApi from '@/api/ptMember'
-import MealApi from '@/api/meal'
 //导入对话框组件
 import SystemDialog from '@/components/system/SystemDialog.vue';
 export default {
-    name: 'department',
+    name: 'sjmember',
     //注册组件
     components: {
         SystemDialog
     },
     data() {
         return {
+            //分页组件所需的属性
+            pageNo: 1,//当前页码
+            total: 0,//数据总数量
+            pageSize: 10,//每页显示数量
             //表格数据列表
             tableData: [
             ],
-            //查询列表参数
-            searchModel: {
-                memberType: "私教",
-            },
-            //电话查询参数
+            //查询参数
             phone: {
-                memberPhone: null,
+                memberPhone: "",
+                pageNo: 1,//当前页码
+                pageSize: 10,//每页显示数量
             },
             ptmbDialog: {
                 title: "",//窗口标题
@@ -228,28 +212,25 @@ export default {
                 width: 560,//窗口宽度
                 height: 500//窗口高度
             },
+            // 新增窗口绑定数据
             member: {
                 memberName: "",//会员姓名
-                memberSex: "",//会员性别
-                memberDate: "",//出生日期
                 memberPhone: "",//电话号码
-                memberAge: "",//年龄
-                memberAddress: "",//住址
-                memberType: "",//会员类型 
                 mealId: "",//套餐编号
-                mealType: "",//套餐类型
+                mealName: "",//套餐名称
                 empId: "",//教练编号
+                empName: "",//教练名称
                 projectId: "",//项目id
+                projectName: "",//项目名称
             },
             //验证
             mbrules: {
                 memberName: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
-                memberSex: [{ required: true, message: '请选择性别', trigger: 'change' }],
-                memberPhone: [{ required: true, message: '请输入电话', trigger: 'blur' }],
-                memberAge: [{ required: true, message: '请输入年龄', trigger: 'blur' }],
-                memberAddress: [{ required: true, message: '请输入地址', trigger: 'blur' }],
+                memberPhone: [{ required: true, message: '请输入电话', trigger: 'blur' },
+                { pattern: new RegExp(/^((1[34578]\d{9}))$/), message: '请正确输入电话号码' }],
                 mealId: [{ required: true, message: '请选择套餐', trigger: 'change' }],
-                memberType: [{ required: true, message: '请选择类型', trigger: 'blur' }]
+                empId: [{ required: true, message: '请选择教练', trigger: 'change' }],
+                projectId: [{ required: true, message: '请选择项目', trigger: 'change' }],
             },
             //选择套餐框的属性
             ptMealDialog: {
@@ -261,7 +242,6 @@ export default {
             },
             //私教套餐数据
             ptMeal: [],
-
             //选择教练框的属性
             ptCoachDialog: {
                 title: "选择教练",//窗口标题
@@ -271,7 +251,6 @@ export default {
             },
             //私教教练数据
             ptCoach: [],
-
             //选择项目框的属性
             ptProjectDialog: {
                 title: "选择项目",//窗口标题
@@ -281,8 +260,6 @@ export default {
             },
             //私教套餐项目数据
             ptProject: [],
-
-
             //套餐详情的属性
             mealDialog: {
                 title: "套餐详情",//窗口标题
@@ -292,12 +269,11 @@ export default {
             },
             //详情数据
             mealSJ: {},
-
             //详情参数
-            XQ:{ 
+            XQ: {
                 mealId: "",//套餐id
-                empId:""//教练id
-             }
+                empId: ""//教练id
+            }
 
         }
     },
@@ -306,41 +282,26 @@ export default {
     },
     methods: {
         //查询私教会员列表
-        async search() {
-            //清空输入框
-            this.phone.memberPhone = null;
+        async search(pageNo, pageSize) {
+            //修改当前页码
+            this.phone.pageNo = pageNo
+            //修改每页显示条数
+            this.phone.pageSize = pageSize
             //发送查询请求
-            let res = await PtMemberApi.getPtMemberList();
+            let res = await PtMemberApi.getPtMemberList(this.phone);
             console.log(res);
             //判断是否存在数据
             if (res.success) {
                 //获取数据
-                for (let i = 0; i < res.data.length; i++) {
-                    res.data[i].memberSex = res.data[i].memberSex == 0 ? '女' : '男'
-                    res.data[i].memberType = res.data[i].memberType == 0 ? '体验会员' : '正式会员'
+                this.tableData = res.data.records;
+                for (let i = 0; i < this.tableData.length; i++) {
+                    this.tableData[i].memberSex = this.tableData[i].memberSex == 0 ? '女' : '男'
+                    this.tableData[i].memberType = this.tableData[i].memberType == 0 ? '体验会员' : '正式会员'
                 }
-                this.tableData = res.data;
+                //当前数据数量
+                this.total = res.data.total;
             }
         },
-        //通过电话查会员
-        async selectOne() {
-            //发送查询请求
-            if (this.phone.memberPhone != null) {
-                let res = await PtMemberApi.getFindPtMemberByPhone(this.phone);
-                //判断是否存在数据
-                if (res.success) {
-                    //获取数据
-                    this.tableData = res.data;
-                    for (let i = 0; i < res.data.length; i++) {
-                        res.data[i].memberSex = res.data[i].memberSex == 0 ? '女' : '男'
-                        res.data[i].memberType = res.data[i].memberType == 0 ? '体验会员' : '正式会员'
-
-                    }
-                }
-            }
-
-        },
-
         //打开添加窗口
         openAddwindow() {
             this.$restForm("memberForm", this.member);
@@ -357,7 +318,6 @@ export default {
             //进行表单验证
             console.log(this.member);
             this.$refs.memberForm.validate(async (valid) => {
-                console.log("xxx");
                 //如果验证通过
                 if (valid) {
                     let res = null;
@@ -368,10 +328,10 @@ export default {
                     if (res.success) {
                         //提示成功
                         this.$message.success(res.message)
-                        //刷新数据
-                        this.search()
                         //关闭窗口事件
                         this.ptmbDialog.visible = false
+                        //刷新数据
+                        this.search(this.pageNo, this.size)
                     } else {
                         //提示失败
                         this.$message.error(res.message)
@@ -385,7 +345,6 @@ export default {
             this.ptMealDialog.visible = true
             //获取私教套餐
             let res = await PtMemberApi.getPtMealList();
-            console.log(res)
             //判断是否成功
             if (res.success) {
                 this.ptMeal = res.data
@@ -394,7 +353,6 @@ export default {
 
         //套餐选择取消事件 
         ptMealClose() {
-            console.log("xxx");
             this.ptMealDialog.visible = false
         },
         //套餐选择确认事件
@@ -409,6 +367,7 @@ export default {
             this.member.empId = "";
             this.member.ptpId = "";
             this.member.mealId = row.ptId
+            this.member.mealName = row.ptName
             this.ptMealDialog.visible = false
         },
 
@@ -442,6 +401,7 @@ export default {
         //选择教练
         addEmpId(row) {
             this.member.empId = row.empId
+            this.member.empName = row.empName
             this.ptCoachDialog.visible = false
         },
 
@@ -471,8 +431,9 @@ export default {
         ptProjectConfirm() {
             this.ptProjectDialog.visible = false
         },
-        //选择教练
+        //选择项目
         addPtpId(row) {
+            this.member.projectName = row.ptpName
             this.member.projectId = row.ptpId
             this.ptProjectDialog.visible = false
         },
@@ -491,7 +452,7 @@ export default {
                     //提示成功
                     this.$message.success(res.message)
                     //刷新数据
-                    this.search()
+                    this.search(this.pageNo, this.size)
                 } else {
                     //提示失败
                     this.$message.error(res.message)
@@ -502,8 +463,8 @@ export default {
         //查看套餐详情窗口
         async selectPtMeal(row) {
             this.mealDialog.visible = true
-            this.XQ.mealId=row.mealId
-            let res = await PtMemberApi.getselectPtMeal({mmId : row.mmId});
+            this.XQ.mealId = row.mealId
+            let res = await PtMemberApi.getselectPtMeal({ mmId: row.mmId });
             console.log(res.data);
             //判断是否成功
             if (res.success) {
@@ -524,6 +485,24 @@ export default {
         },
 
 
+        /**
+        * 当页码发生变化时触发该事件
+        */
+        handleCurrentChange(page) {
+            //修改当前页码
+            this.pageNo = page
+            //调用查询方法
+            this.search(page, this.pageSize)
+        },
+        /**
+    * 重置查询条件
+    */
+        resetValue() {
+            //清空数据
+            this.phone.memberPhone = "";
+            //调用查询方法
+            this.search()
+        },
 
 
 

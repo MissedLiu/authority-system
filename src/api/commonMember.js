@@ -4,19 +4,12 @@ import request from "@/utils/request";
 
 export default {
       /**
-   * 通过套餐类型会员列表
+   * 会员列表
    * @returns
    */
   async getFindCommentMemberList(params) {
     return await request.get("/api/commonMember/commentListAll", params);
   },
-    /**
-   * 通过电话查普通会员
-   * @returns
-   */
-     async getFindCommentMembeByPhone(params) {
-        return await request.get("/api/commonMember/findCommentMemberByPhone", params);
-      },
  /**
    * 新增普通会员
    * @returns
