@@ -20,15 +20,23 @@
             <el-table-column prop="qq" label="QQ"></el-table-column>
             <el-table-column prop="emil" label="邮箱"></el-table-column>
             <el-table-column prop="weix" label="微信"></el-table-column>
-            <el-table-column label="操作" width="300" align="center">
+            <el-table-column label="操作" width="550" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-close" type="danger" size="small"
+                    <el-button icon="el-icon-edit-outline" type="primary" size="small"
                         @click="openmemberMessageDialog(scope.row)">
                         分配会员
                     </el-button>
                     <el-button icon="el-icon-edit-outline" type="primary" size="small"
                         @click="openprosperctDialog(scope.row)">
                         分配潜在用户
+                    </el-button>
+                    <el-button type="primary" icon="el-icon-search" size="small"
+                        @click="openmemberMessageDialog2(scope.row)">
+                        查看会员
+                    </el-button>
+                    <el-button type="primary" icon="el-icon-search" size="small"
+                        @click="openprosperctDialog2(scope.row)">
+                        查看潜在用户
                     </el-button>
                 </template>
             </el-table-column>
@@ -68,15 +76,68 @@
                     @selection-change="handleSelectionChange2">
                     <el-table-column type='selection' width="55" />
 
+                    <el-table-column label="潜在用户编号" align="center" prop="prospectId">
+                    </el-table-column>
+                    <el-table-column label="潜在用户名称" align="center" prop="prospectName">
+                    </el-table-column>
+                    <el-table-column label="潜在用户性别" align="center" prop="prospectSex">
+                    </el-table-column>
+                    <el-table-column label="潜在用户电话" align="center" prop="prospectPhone">
+                    </el-table-column>
+                    <el-table-column label="状态" align="center" prop="type">
+                    </el-table-column>
+                </el-table>
+            </div>
+        </system-dialog>
+
+        <!-- 会员分配查看框 -->
+        <system-dialog :title="memberMessageDialog2.title" :visible=" memberMessageDialog2.visible"
+            :width=" memberMessageDialog2.width" :height="memberMessageDialog2.height"
+            @onClose="openmemberMessageDialog2Close" @onConfirm="openmemberMessageDialog2Confirm">
+            <div slot="content">
+                <el-table border style="margin-top: 50px;" :data="memberMessagelook">
+                    <el-table-column label="会员编号" align="center" prop="memberId">
+                    </el-table-column>
+                    <el-table-column label="会员名称" align="center" prop="memberName">
+                    </el-table-column>
+                    <el-table-column label="会员性别" align="center" prop="memberSex" :formatter="playbackFormat">
+                    </el-table-column>
+                    <el-table-column label="会员电话" align="center" prop="memberPhone">
+                    </el-table-column>
+                    <el-table-column label="操作" width="150" align="center">
+                        <template slot-scope="scope">
+                            <el-button icon="el-icon-close" type="danger" size="small" @click="deletemember(scope.row)">
+                                移除分配
+                            </el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+        </system-dialog>
+
+        <!-- 潜在用户分配查看框 -->
+        <system-dialog :title="prosperctMessageDialog2.title" :visible=" prosperctMessageDialog2.visible"
+            :width="prosperctMessageDialog2.width" :height="prosperctMessageDialog2.height" @onClose="prosperctClose2"
+            @onConfirm="prosperctConfirm2">
+            <div slot="content">
+                <el-table border style="margin-top: 50px;" :data="prosperctMessagelook">
                     <el-table-column label="会员编号" align="center" prop="prospectId">
                     </el-table-column>
                     <el-table-column label="会员名称" align="center" prop="prospectName">
                     </el-table-column>
-                    <el-table-column label="会员性别" align="center" prop="prospectSex" >
+                    <el-table-column label="会员性别" align="center" prop="prospectSex">
                     </el-table-column>
                     <el-table-column label="会员电话" align="center" prop="prospectPhone">
                     </el-table-column>
                     <el-table-column label="状态" align="center" prop="type">
+                    </el-table-column>
+                    <el-table-column label="操作" width="150" align="center">
+                        <template slot-scope="scope">
+                            <el-button icon="el-icon-close" type="danger" size="small"
+                                @click="deleteProspect(scope.row)">
+                                移除分配
+                            </el-button>
+                        </template>
                     </el-table-column>
                 </el-table>
             </div>
@@ -116,6 +177,20 @@ export default {
                 width: 800,//窗口宽度
                 height: 500//窗口高度
             },
+            //会员查看框参数
+            memberMessageDialog2: {
+                title: "",//窗口标题
+                visible: false,//是否显示窗口
+                width: 700,//窗口宽度
+                height: 500//窗口高度
+            },
+            //会员查看框接收
+            memberMessagelook: [],
+            //会员移除参数
+            memberMessagedelete: {
+                empId: "",
+                memberId: "",
+            },
             //潜在用户分配框参数
             prosperctMessageDialog: {
                 title: "",//窗口标题
@@ -123,6 +198,20 @@ export default {
                 width: 800,//窗口宽度
                 height: 500//窗口高度
             },
+            //潜在用户查看框参数
+            prosperctMessageDialog2: {
+                title: "",//窗口标题
+                visible: false,//是否显示窗口
+                width: 800,//窗口宽度
+                height: 500//窗口高度
+            },
+            //潜在用户移除参数
+            prosperctMessagedelete: {
+                empId: "",
+                prospectId: "",
+            },
+            //潜在用户查看框接收
+            prosperctMessagelook: [],
             //查询会员数据列表
             memberMessage: [],
             //查询潜在用户数据列表
@@ -198,23 +287,71 @@ export default {
                 this.$message.success(res.message)
                 //关闭窗口事件
                 this.memberMessageDialog.visible = false
-                //刷新数据
             } else {
                 //提示失败
                 this.$message.error(res.message)
             }
         },
-        
-
         //会员分配框窗口取消事件
         memberClose() {
             this.memberMessageDialog.visible = false
         },
 
+        //打开会员查看窗口
+        async openmemberMessageDialog2(row) {
+            this.memberMessageDialog2.title = "已分配会员查看"
+            this.memberMessageDialog2.visible = true
+            this.memberMessagedelete.empId = row.empId
+            //发送查询请求
+            let empId = {
+                empId: row.empId
+            }
+            let res = await messageApi.findMemberByEmpIds(empId);
+            //判断是否存在数据
+            if (res.success) {
+                //获取数据
+                this.memberMessagelook = res.data
+            }
+        },
+        //会员查看窗口
+        openmemberMessageDialog2Close() {
+            this.memberMessageDialog2.visible = false
+        },
+        //会员查看窗口
+        openmemberMessageDialog2Confirm() {
+            this.memberMessageDialog2.visible = false
+        },
+        //移除会员
+        async deletemember(row) {
+            //提示是否确认移除
+            let confirm = await this.$myconfirm("确定要移除该数据嘛?")//await代表同步
+            if (confirm) {
+                this.memberMessagedelete.memberId = row.memberId
+                //发送请求
+                let res = await messageApi.deletemember(this.memberMessagedelete)
+                //判断是否成功
+                if (res.success) {
+                    //刷新数据
+                    let re = await messageApi.findMemberByEmpIds({ empId: this.memberMessagedelete.empId });
+                    //判断是否存在数据
+                    if (re.success) {
+                        //获取数据
+                        this.memberMessagelook = re.data
+                    }
+
+                    //提示成功
+                    this.$message.success(res.message)
+                } else {
+                    //提示失败
+                    this.$message.error(res.message)
+                }
+            }
+        },
+
+
 
         //潜在用户窗口打开事件
         async openprosperctDialog(row) {
-            console.log("++++++++++++++++=",row);
             this.prosperctMessageDialog.title = "分配潜在用户"
             this.prosperctMessageDialog.visible = true
             this.empId = row.empId
@@ -232,8 +369,8 @@ export default {
                 empId: this.empId,
                 memberId: this.members
             }
-            console.log("----------",params);
-           let res = await messageApi.allocationProspect(params);
+            console.log("----------", params);
+            let res = await messageApi.allocationProspect(params);
             //判断是否成功
             if (res.success) {
                 //提示成功
@@ -250,7 +387,57 @@ export default {
             this.prosperctMessageDialog.visible = false
         },
 
+        //打开潜在用户查看框
+        async openprosperctDialog2(row) {
+            this.prosperctMessageDialog2.title = "已分配潜在用户查看"
+            this.prosperctMessageDialog2.visible = true
+            this.prosperctMessagedelete.empId=row.empId
+            //发送查询请求
+            let empId = {
+                empId: row.empId
+            }
+            let res = await messageApi.findProspectByEmpIds(empId);
+            //判断是否存在数据
+            if (res.success) {
+                //获取数据
+                this.prosperctMessagelook = res.data
+            }
+        },
+        //潜在用户移除
+        async deleteProspect(row) {
+             //提示是否确认移除
+             let confirm = await this.$myconfirm("确定要移除该数据嘛?")//await代表同步
+            if (confirm) {
+                this.prosperctMessagedelete.prospectId = row.prospectId
+                console.log("ssssssssssssss",this.prosperctMessagedelete);
+                //发送请求
+                let res = await messageApi.deleteProspect(this.prosperctMessagedelete)
+                //判断是否成功
+                if (res.success) {
+                    // //刷新数据
+                    let re = await messageApi.findProspectByEmpIds({ empId: this.prosperctMessagedelete.empId });
+                    //判断是否存在数据
+                    if (re.success) {
+                        //获取数据
+                        this.prosperctMessagelook = re.data
+                    }
 
+                    //提示成功
+                    this.$message.success(res.message)
+                } else {
+                    //提示失败
+                    this.$message.error(res.message)
+                }
+            }
+        },
+        //关闭事件
+        prosperctClose2() {
+            this.prosperctMessageDialog2.visible = false
+        },
+        //确认事件
+        prosperctConfirm2() {
+            this.prosperctMessageDialog2.visible = false
+        },
 
 
 

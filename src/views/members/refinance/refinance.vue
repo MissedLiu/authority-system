@@ -194,7 +194,6 @@ export default {
         },
         //打开添加窗口
         openAddwindow() {
-            //重置
             this.$restForm("memberForm", this.member);
             //设置属性
             this.ptmbDialog.title = '新增会员',
@@ -294,7 +293,6 @@ export default {
         },
         //打开修改窗口
         async selectCommonMeal(row) {
-            this.$restForm("memberForm", this.member);
             this.ptmbDialog.title = "修改"
             this.ptmbDialog.visible = true
             this.member = row
@@ -303,6 +301,7 @@ export default {
         pageClose() {
             this.ptmbDialog.visible = false
         },
+
         handleSizeChange(size) {
             //修改每页显示数量
             this.pageSize = size

@@ -2,6 +2,13 @@ import request from "@/utils/request";
 
 export default {
   /***********************************会员接口***************************************************/
+   /**
+   * 查询会员列表无分页
+   * @returns
+   */
+    async getlistAllNoPage(params) {
+      return await request.get("/api/member/listAllNoPage",params);
+    },
   /**
    * 查询会员列表ok
    * @returns
