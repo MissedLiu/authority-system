@@ -22,8 +22,8 @@
             <el-table-column prop="salesman" label="业务员"></el-table-column>
             <el-table-column label="操作" width="200" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-close" type="danger" size="small" @click="">
-                        查看合同原件图片
+                    <el-button type="primary" icon="el-icon-search" size="small" @click="detialwindow(scope.row)">
+                        合同详情
                     </el-button>
                 </template>
             </el-table-column>
@@ -56,7 +56,7 @@
                         <template slot-scope="scope">
                             <el-button icon="el-icon-close" type="danger" size="small"
                                 @click="signingwindow(scope.row)">
-                                签约
+                                签订合同
                             </el-button>
                         </template>
                     </el-table-column>
@@ -91,16 +91,14 @@
                     <el-form-item label="业务员" prop="memberAddress">
                         <el-input v-model="signing.salesman"></el-input>
                     </el-form-item>
-                    
-
                     <el-form-item label="图片">
-                            <el-upload :show-file-list="false" :on-success="handleAvatarSuccess"
-                                :before-upload="beforeAvatarUpload" class="avatar-uploader" :data="uploadHeader"
-                                action="http://localhost:8888/api/oss/file/upload?module=avatar">
-                                <img v-if="signing.avatar" :src="signing.avatar">
-                                <i v-else class="el-icon-plus avatar-uploader-icon" />
-                            </el-upload>
-                        </el-form-item>
+                        <el-upload :show-file-list="false" :on-success="handleAvatarSuccess"
+                            :before-upload="beforeAvatarUpload" class="avatar-uploader" :data="uploadHeader"
+                            action="http://localhost:8888/api/oss/file/upload?module=photoAddress">
+                            <img v-if="signing.photoAddress" :src="signing.photoAddress">
+                            <i v-else class="el-icon-plus avatar-uploader-icon" />
+                        </el-upload>
+                    </el-form-item>
                 </el-form>
             </div>
         </system-dialog>
@@ -129,16 +127,23 @@
             </div>
         </system-dialog>
 
-
+        <!-- 选择套餐的窗口 -->
+        <system-dialog :title="detialDialog.title" :visible="detialDialog.visible" :width="detialDialog.width"
+            :height="detialDialog.height" @onClose="closedetial" @onConfirm="closedetial">
+            <div slot="content">
+                <img :src=this.src style="width:650px;height:400px" >
+            </div>
+        </system-dialog>
     </el-main>
 </template>
-  
   
 <script>
 import contractApi from "@/api/contract"
 import memberApi from "@/api/member"
 //导入对话框组件
 import SystemDialog from "@/components/system/SystemDialog.vue";
+//导入token
+import { getToken } from '@/utils/auth'
 export default {
     name: "contract",
     //注册组件
@@ -163,6 +168,8 @@ export default {
             compactPhone: {
                 memberPhone: ""
             },
+            //  //上传需要携带的数据
+            uploadHeader: { "token": getToken() },
             //合同签订窗口的属性
             compactDialog: {
                 title: "签订合同",//窗口标题
@@ -189,7 +196,7 @@ export default {
                 createDate: "",
                 endDate: "",
                 salesman: "",
-                avatar:"",//员工头像
+                photoAddress: "",//合同详情
 
             },
             //选择套餐的窗口属性
@@ -202,18 +209,21 @@ export default {
             //套餐数据
             mealList: [],
 
-
-
-
-
-
+            //合同详情属性
+            detialDialog: {
+                title: "",//窗口标题
+                visible: false,//是否显示窗口
+                width: 700,//窗口宽度
+                height: 500//窗口高度
+            },
+            src:"",
         };
     },
     created() {
         this.search();
     },
     methods: {
-       
+
         async search(pageNo, pageSize) {
             //修改当前页码
             this.phone.pageNo = pageNo;
@@ -230,6 +240,18 @@ export default {
                 this.total = res.data.total;
             }
         },
+        //打开查看合同详情窗口
+        async detialwindow(row) {
+            //发送请求
+            this.detialDialog.title="合同原件"
+            this.detialDialog.visible=true
+            this.src=row.photoAddress
+            console.log("xxxx", row);
+        },
+         //关闭查看合同详情窗口
+         closedetial(){
+            this.detialDialog.visible=false
+         },
 
 
 
@@ -278,30 +300,29 @@ export default {
         },
         //签约框确定事件
         async signingConfirm() {
-            let perom={
-                memberId:this.signing.memberId,
-                createDate:this.signing.createDate,
-                endDate:this.signing.endDate,
-                photoAddress:"",
-                compactType:this.signing.compactType,
-                salesman:this.signing.salesman,
-                mmId:this.signing.meal
+            let perom = {
+                memberId: this.signing.memberId,
+                createDate: this.signing.createDate,
+                endDate: this.signing.endDate,
+                photoAddress: this.signing.photoAddress,
+                compactType: this.signing.compactType,
+                salesman: this.signing.salesman,
+                mmId: this.signing.meal
             }
             //发送请求
-            let res = await contractApi.addCompact(perom) 
+            console.log(perom)
+            let res = await contractApi.addCompact(perom)
             if (res.success) {
-                    //提示成功
-                    this.$message.success(res.message)
-                    //关闭窗口事件
-                    this.signingDialog.visible = false
-                    //刷新数据
-                    this.search(this.pageNo, this.pageSize);
-                } else {
-                    //提示失败
-                    this.$message.error(res.message)
-                }
-
-            
+                //提示成功
+                this.$message.success(res.message)
+                //关闭窗口事件
+                this.signingDialog.visible = false
+                //刷新数据
+                this.search(this.pageNo, this.pageSize);
+            } else {
+                //提示失败
+                this.$message.error(res.message)
+            }
         },
 
 
@@ -335,24 +356,24 @@ export default {
 
 
 
-         //上传成功回调
-         handleAvatarSuccess(res, file){
-                this.signing.avatar = res.data
-                // 强制重新渲染
-                this.$forceUpdate()
-            },
-            //上传校验
-            beforeAvatarUpload(file){
-                const isJPG = file.type === 'image/jpeg'
-                const isLt2M = file.size / 1024 / 1024 < 2
-                if (!isJPG) {
-                    this.$message.error('上传头像图片只能是 JPG 格式!')
-                }
-                if (!isLt2M) {
-                    this.$message.error('上传头像图片大小不能超过 2MB!')
-                }
-                return isJPG && isLt2M
-            },
+        //上传成功回调
+        handleAvatarSuccess(res, file) {
+            this.signing.photoAddress = res.data
+            // 强制重新渲染
+            this.$forceUpdate()
+        },
+        //上传校验
+        beforeAvatarUpload(file) {
+            const isJPG = file.type === 'image/jpeg'
+            const isLt2M = file.size / 1024 / 1024 < 2
+            if (!isJPG) {
+                this.$message.error('上传头像图片只能是 JPG 格式!')
+            }
+            if (!isLt2M) {
+                this.$message.error('上传头像图片大小不能超过 2MB!')
+            }
+            return isJPG && isLt2M
+        },
 
 
 
@@ -387,7 +408,35 @@ export default {
 };
 </script>
   
-<style lang="scss" scoped>
 
+
+<style lang="scss">
+//用户头像
+.avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9 !important;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+}
+
+.avatar-uploader .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+}
+
+.avatar-uploader img {
+    width: 178px;
+    height: 178px;
+    display: block;
+}
 </style>
   
