@@ -61,6 +61,12 @@ async assignRoleSave(params){
      async checkEmpName(params){
         return await http.getRestApi("/api/user/checkEmpName",params)
     },
+      /**
+     * 根据账号id查询员工信息
+     */
+       async empByUserId(params){
+        return await http.getRestApi("/api/user/empByUserId",params)
+    },
 }
   /**
 * 刷新token

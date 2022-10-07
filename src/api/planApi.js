@@ -35,5 +35,35 @@ export default{
     //获取未执行的计划
     async getNotExecuted(params){
         return await http.get("/api/plan/getNotExecuted",params)
-    }
+    },
+    //查询所属部门为财务部的所有员工
+    async findcaiwuEmp(){
+        return await http.get("/api/plan/findCaiWuEmp")
+    },
+    /**
+     * 保存审核分配
+     */
+    async addCaiGouSh(params){
+        return await http.post("/api/plan/addCaiGouShenHe",params)
+    },
+    /**
+     * 检查该计划是否发起审核了
+     */
+     async checkCaiGou(params){
+        return await http.getRestApi("/api/plan/checkShenqing",params)
+    },
+    /**
+     * 
+     * 判断编辑按钮是否可用
+     */
+     async checkJihua(params){
+        return await http.getRestApi("/api/plan/checkJihua",params)
+    },
+     /**
+     * 
+     * 撤销申请
+     */
+      async chexiao(params){
+        return await http.getRestApi("/api/plan/chexiao",params)
+    },
 }

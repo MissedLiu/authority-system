@@ -79,10 +79,11 @@
                     </el-form-item>
 
                     <el-form-item label="状态" prop="edState">
-                        <el-select v-model="details.edState">
-                            <el-option label="使用中" value="1" />
-                            <el-option label="未使用" value="0" />
-                        </el-select>
+                        <el-radio-group v-model="details.edState">
+                            <el-radio-button label="使用中" />
+                            <el-radio-button label="未使用" />
+                        </el-radio-group>
+                        
                     </el-form-item>
                 </el-form>
             </div>
@@ -210,7 +211,7 @@ export default {
                     for (let i = 0; i < this.tableData.length; i++) {
                         if (this.tableData[i].edState == 1) {
                             this.tableData[i].edState = "使用中";
-                        } else {
+                        } else if (this.tableData[i].edState == 0) {
                             this.tableData[i].edState = "未使用";
                         }
                     }
@@ -221,22 +222,23 @@ export default {
         },
 
         //编辑器材状态、备注、标识编码
-        async editDetails() {
+        async editDetails(row) {
             console.log(this.details)
             this.$refs.detailsForm.validate(async (valid) => {
                 if (valid) {
-                    await detailsApi.updateDetails(this.details).then(res=>{
+                    this.details.edState =   this.details.edState =="使用中" ? 1 : 0;
+                    await detailsApi.updateDetails(this.details).then(res => {
                         if (res.success) {
-                        //提示成功
-                        this.$message.success(res.message);
-                        //刷新数据
-                        this.search();
-                        //关闭窗口事件
-                        this.editDetailsDialog.visible = false;
-                    } else {
-                        //提示失败
-                        this.$message.error(res.message);
-                    }
+                            //提示成功
+                            this.$message.success(res.message);
+                            //刷新数据
+                            this.search();
+                            //关闭窗口事件
+                            this.editDetailsDialog.visible = false;
+                        } else {
+                            //提示失败
+                            this.$message.error(res.message);
+                        }
                     })
 
                 }

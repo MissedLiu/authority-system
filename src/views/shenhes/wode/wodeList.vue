@@ -1,10 +1,14 @@
-<template>
-    <p>个人中心</p>
-</template>
-<script>
 
+<template>
+  <h1>wwwww</h1>
+</template>
+
+<script>
+export default {
+
+}
 </script>
 
-<style scoped>
+<style>
 
 </style>

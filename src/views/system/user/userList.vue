@@ -112,8 +112,8 @@
                         </el-form-item>
                         <el-form-item prop="empSex" label="性别">
                             <el-radio-group v-model="emp.empSex">
-                                <el-radio :label="'0'">男</el-radio>
-                                <el-radio :label="'1'">女</el-radio>
+                                <el-radio-button label="男" />
+                                <el-radio-button label="女" />
                             </el-radio-group>
                         </el-form-item>
 
@@ -210,8 +210,7 @@
 import departmentApi from "@/api/department"
 //导入empApi.js脚本文件
 import empApi from "@/api/empApi"
-//导入userApi.js脚本文件
-import userApi from "@/api/userApi"
+
 //导入对话框组件
 import SystemDialog from '@/components/system/SystemDialog.vue'
 //导入token

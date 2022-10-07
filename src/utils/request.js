@@ -27,7 +27,7 @@ const service = axios.create({
 let isRefresh=false
 // 请求前进行拦截
 service.interceptors.request.use(
-  (config) => {
+  config => {
     //获取当前系统时间
     let currentTime=new Date().getTime();
     //获取token过期时间
@@ -92,12 +92,12 @@ service.interceptors.response.use(
         duration: 5 * 1000,
       });
       // 50008: Illegal token; 50012: Other clients logged in; 50014: Token
-      expired;
+     
       if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
         // 重新登录
         MessageBox.confirm("用户登录信息过期,请重新登录", "系统提示", {
-          confirmButtonText: "登录1",
-          cancelButtonText: "取消1",
+          confirmButtonText: "登录",
+          cancelButtonText: "取消",
           type: "warning",
         }).then(() => {
           store.dispatch("user/resetToken").then(() => {
@@ -115,7 +115,6 @@ service.interceptors.response.use(
     }
   },
   (error) => {
-    console.log("err" + error); // for debug
     //失败则清空缓存sessionStorage
     clearStorage();
     //清空token的过期时间

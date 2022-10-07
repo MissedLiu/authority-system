@@ -55,8 +55,6 @@ const actions = {
           commit("SET_TOKEN", token);
           //将token信息保存到cookie中
           setToken(token);
-          //将token信息保存到cookie中
-          setToken(token) 
           //设置token过期时间
           setTokenTime(expireTime);
           resolve();
@@ -79,7 +77,7 @@ const actions = {
           }
             //从后端返回的数据中解构出用户相关的信息
           const { roles, name, avatar, introduction ,id } = data;
-
+            console.log(roles)
           // roles must be a non-empty array
           if (!roles || roles.length <= 0) {
             reject("getInfo: roles must be a non-null array!");
