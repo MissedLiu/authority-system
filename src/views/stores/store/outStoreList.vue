@@ -23,14 +23,15 @@
             border
             stripe
             style="width: 100%; margin-bottom: 20px"
-            row-key="storeId"
+            
             default-expand-all
              >
             <el-table-column prop="stockinName" label="物品名称"/>
-            <el-table-column prop="storeNum"  label="库中物品数量"/>
+            <el-table-column prop="storeNum"  label="物品数量"/>
             <el-table-column prop="outNum" label="出库数量"/>
             <el-table-column prop="outIs" label="状态"/>
             <el-table-column prop="stockinType" label="物品类型"/>
+            <el-table-column prop="brand" label="品牌"/>
             <el-table-column prop="stockoutTime" label="出库时间"/>
             <el-table-column label="操作" width="200" align="center">
             <template slot-scope="scope">
@@ -79,6 +80,7 @@
                         height:170//窗口高度
     
                     },
+                    // storeId:"",//库存编号
                     store:{
                         outId:"",//物品出库编号
                         storeId:"",//库存编号
@@ -137,6 +139,7 @@
                     stockOutApi.getStockOutList(this.searchModel).then(res=>{
                         if(res.success){
                         this.tableData=res.data.records
+                        console.log( this.tableData)
                         this.total=res.data.total;
                         for(let i =0;i<this.tableData.length;i++){
                             if(this.tableData[i].outIs==1){

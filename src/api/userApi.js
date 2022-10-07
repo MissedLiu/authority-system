@@ -62,3 +62,10 @@ async assignRoleSave(params){
         return await http.getRestApi("/api/user/checkEmpName",params)
     },
 }
+  /**
+* 刷新token
+* @returns
+*/
+export async function refreshTokenApi(params){
+    return await http.post("/api/sysUser/refreshToken",params);
+    }

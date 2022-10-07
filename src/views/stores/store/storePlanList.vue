@@ -272,7 +272,6 @@
                 
                 //打开添加窗口
                 openAddwindow(){
-                    //
                     this.$restForm("planForm",this.plan);
                     //设置属性
                     this.planDialog.title='新增采购计划',

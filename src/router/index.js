@@ -42,6 +42,19 @@ export const constantRoutes = [
       }
     ]
   },
+   {
+    path: '/persons',
+    component: Layout,
+    redirect: '/persons',
+    children: [
+      {
+        path: 'persons',
+        component: () => import('@/views/persons/personList'),
+        name: 'persons',
+        meta: { title: '个人中心', icon: ' el-icon-user', affix: true }
+      }
+    ]
+  },
 
   {
     path: '/profile',

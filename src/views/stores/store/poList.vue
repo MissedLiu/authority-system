@@ -46,10 +46,12 @@
         <system-dialog :title="poDialog.title" :visible="poDialog.visible" :width="poDialog.width"
             :height="poDialog.height" @onClose="onClose" @onConfirm="toStock">
             <div slot="content">
+                
                 <el-form :model="po" ref="poForm" :rules="rules" label-width="80px" :inline="true" size="small">
                     <el-form-item label="物品报损" prop="changeLose">
                         <el-input v-model="po.changeLose"></el-input>
                     </el-form-item>
+
                     <el-form-item label="物品报溢" prop="changeMore">
                         <el-input v-model="po.changeMore" ></el-input>
                     </el-form-item>
