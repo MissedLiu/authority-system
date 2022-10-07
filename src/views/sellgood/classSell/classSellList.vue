@@ -446,12 +446,19 @@ export default {
             //发送查询请求
             let res = await salesApi.findAllSales(this.searchModel);
             //判断是否成功
+
             if (res.success) {
                 console.log(res.data);
                 this.tableData = res.data.records;
                 this.salesPage.total = res.data.total;
                 for (let i = 0; i < res.data.records.length; i++) {
-                    res.data.records[i].state = res.data.records[i].state == 0 ? "待购中" : "已购买";
+                    if(res.data.records[i].state==0){
+                        res.data.records[i].state="待购中"
+                    }else if(res.data.records[i].state==1){
+                        res.data.records[i].state="已购买"
+                    }else {
+                        res.data.records[i].state="已统计"
+                    }
                 }
             }
 
@@ -619,6 +626,7 @@ export default {
             this.ptShuju.memberName = this.buyPtTowList.memberName;
             this.ptShuju.memberPhone = this.buyPtTowList.memberPhone;
             //进行表单验证
+            console.log(this.ptShuju)
             this.$refs.buyptTowForm.validate(async (valid) => {
                 //如果验证通过
                 if (valid) {
