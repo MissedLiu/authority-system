@@ -81,28 +81,9 @@
         <system-dialog :title="ptMealDialog.title" :visible=" ptMealDialog.visible" :width=" ptMealDialog.width"
             :height="ptMealDialog.height" @onClose="ptMealClose" @onConfirm="ptMealConfirm">
             <div slot="content">
-
-                <el-table border style="margin-top: 50px;" :data="ptMealData" @selection-change="handleSelectionChange">
-                    <el-table-column prop="date" label="未分配私教套餐" width="150">
-                        <el-table-column label="套餐编号" align="center" prop="ptId">
-                        </el-table-column>
-                        <el-table-column label="套餐名称" align="center" prop="ptName">
-                        </el-table-column>
-                        <el-table-column label="套餐价格" align="center" prop="ptPrice">
-                        </el-table-column>
-                        <el-table-column label="套餐时长" align="center" prop="ptTime">
-                        </el-table-column>
-                        <el-table-column label="操作" align="center" prop="ptTime">
-                            <el-button type="primary" icon="el-icon-search" >
-                                新增
-                            </el-button>
-                        </el-table-column>
-                    </el-table-column>
-                </el-table>
-            </div>
-            <div slot="content">
-                <el-table border style="margin-top: 50px;" :data="ptMealData" @selection-change="handleSelectionChange">
-                    <el-table-column prop="date" label="已分配私教套餐" width="150">
+                <el-table border style="margin-top: 50px;" ref="ptMealTable" :data="ptMealData" stripe
+                    @selection-change="handleSelectionChange">
+                    <el-table-column type="selection" width="55" align="center"></el-table-column>
                     <el-table-column label="套餐编号" align="center" prop="ptId">
                     </el-table-column>
                     <el-table-column label="套餐名称" align="center" prop="ptName">
@@ -111,14 +92,29 @@
                     </el-table-column>
                     <el-table-column label="套餐时长" align="center" prop="ptTime">
                     </el-table-column>
-                    <el-table-column label="操作" align="center" prop="ptTime">
-                            <el-button icon="el-icon-close" type="danger" size="small" >
-                                移除
-                            </el-button>
-                        </el-table-column>
+                </el-table>
+            </div>
+
+        </system-dialog>
+
+        <!-- 分配团操套餐框 -->
+        <system-dialog :title="teamMealDialog.title" :visible=" teamMealDialog.visible" :width=" teamMealDialog.width"
+            :height="teamMealDialog.height" @onClose="teamMealClose" @onConfirm="teamMealConfirm">
+            <div slot="content">
+                <el-table border style="margin-top: 50px;" ref="teamMealTable" :data="teamMealData" stripe
+                    @selection-change="handleSelectionChange2">
+                    <el-table-column type="selection" width="55" align="center"></el-table-column>
+                    <el-table-column label="套餐编号" align="center" prop="teamId">
+                    </el-table-column>
+                    <el-table-column label="套餐名称" align="center" prop="teamName">
+                    </el-table-column>
+                    <el-table-column label="套餐价格" align="center" prop="teamPrice">
+                    </el-table-column>
+                    <el-table-column label="套餐时长" align="center" prop="teamTime">
                     </el-table-column>
                 </el-table>
             </div>
+
         </system-dialog>
 
     </el-main>
@@ -192,14 +188,31 @@ export default {
             },
             //私教套餐数据
             ptMealData: [],
-            //私教出入参数
+            //教练私教数据
+            ptAndEmpDate: [],
+            //私教传入入参数
             ptAndEmp: {
                 empId: "",
-                ptMeal: [],
+                ptMealId: [],
             },
-            //团操套餐数据暂存
-            teamMealData: [],
+            empId: "",
 
+            //团操套餐窗口
+             teamMealDialog: {
+                title: "",//窗口标题
+                visible: false,//是否显示窗口
+                width: 700,//窗口宽度
+                height: 500//窗口高度
+            },
+            //团操套餐数据
+            teamMealData: [],
+            //教练团操数据
+            teamAndEmpDate: [],
+            //团操传入入参数
+            teamAndEmp: {
+                empId: "",
+                teamMealId: [],
+            },
 
         }
     },
@@ -223,6 +236,25 @@ export default {
                 this.total = res.data.total;
             }
         },
+        /**
+            * 复选框选中事件
+            * @param  rows 
+            */
+        handleSelectionChange(rows) {
+            //拿到选中的ID 值
+            this.ptAndEmp.ptMealId = rows.map(item => item.ptId);
+            console.log(this.ptAndEmp.ptMealId);
+            console.log(this.ptAndEmp.empId);
+        },
+                /**
+            * 复选框选中事件
+            * @param  rows 
+            */
+            handleSelectionChange2(rows) {
+            //拿到选中的ID 值
+            this.teamAndEmp.teamMealId = rows.map(item => item.teamId);
+        },
+
 
         //打开修改窗口
         openupdwindow(row) {
@@ -257,27 +289,115 @@ export default {
         //打开分配私教套餐窗口
         async openPtMealWindow(row) {
             this.ptMealDialog.title = "私教套餐分配"
+
             this.ptMealDialog.visible = true
+            //给新增时参数赋值            
             this.ptAndEmp.empId = row.empId
+            console.log("empid=", row.empId);
+            //查询时新增参数
+            this.empId = row.empId
             //查询私教套餐
             let rew = await ptMemberApi.getPtMealList();
+            console.log("ptMeal=", rew.data);
             if (rew.success) {
                 this.ptMealData = rew.data
             }
-
-            // }else if(mealType=='team'){
-            //     let row= await teamMemberApi.getTeamMealList();
-            //     console.log("----------",row);
-            // }
+            //通过empid查询私教教练关联表数据
+            let emps = await CoachApi.findPtAndEmp({ empId: this.empId });
+            console.log("emps=", emps.data);
+            if (emps.success) {
+                this.ptAndEmpDate = emps.data
+                this.ptAndEmpDate.forEach((key) => {
+                    //套餐
+                    this.ptMealData.forEach((item) => {
+                        console.log(key)
+                        console.log(item)
+                        console.log(item.ptId)
+                        if (key.ptId === item.ptId) {
+                            //如果相等则复选框选中
+                            this.$refs.ptMealTable.toggleRowSelection(item, true)
+                        }
+                    })
+                })
+            }
         },
         //取消分配私教套餐窗口
         ptMealClose() {
             this.ptMealDialog.visible = false
         },
         //确定分配私教套餐窗口
-        ptMealConfirm() {
-
+        async ptMealConfirm() {
+            //发送请求
+            let res = await CoachApi.addEmpAndPtMeal(this.ptAndEmp);
+            if (res.success) {
+                //提示成功
+                this.$message.success(res.message)
+                //关闭窗口事件
+                this.ptMealDialog.visible = false
+            } else {
+                //提示失败
+                this.$message.error(res.message)
+            }
         },
+
+
+
+
+
+        //打开分配团操套餐窗口
+        async openTeamMealWindow(row) {
+            this.teamMealDialog.title = "团操套餐分配"
+
+            this.teamMealDialog.visible = true
+            //给新增时参数赋值            
+            this.teamAndEmp.empId = row.empId
+            console.log("empid=", row.empId);
+            //查询时新增参数
+            this.empId = row.empId
+            //查询团操套餐
+            let rew = await teamMemberApi.getTeamMealList();
+            console.log("teamMeal=", rew.data);
+            if (rew.success) {
+                this.teamMealData = rew.data
+            }
+            //通过empid查询团操教练关联表数据
+            let emps = await CoachApi.findTeamAndEmp({ empId: this.empId });
+            console.log("emps=", emps.data);
+            if (emps.success) {
+                this.teamAndEmpDate = emps.data
+                this.teamAndEmpDate.forEach((key) => {
+                    //套餐
+                    this.teamMealData.forEach((item) => {
+                        console.log(key)
+                        console.log(item)
+                        console.log(item.teamId)
+                        if (key.teamId === item.teamId) {
+                            //如果相等则复选框选中
+                            this.$refs.teamMealTable.toggleRowSelection(item, true)
+                        }
+                    })
+                })
+            }
+        },
+        //取消分配团操套餐窗口
+        teamMealClose() {
+            this.teamMealDialog.visible = false
+        },
+        //确定分配团操套餐窗口
+        async teamMealConfirm() {
+            //发送请求
+            let res = await CoachApi.addEmpAndTeamMeal(this.teamAndEmp);
+            if (res.success) {
+                //提示成功
+                this.$message.success(res.message)
+                //关闭窗口事件
+                this.teamMealDialog.visible = false
+            } else {
+                //提示失败
+                this.$message.error(res.message)
+            }
+        },
+
 
 
 

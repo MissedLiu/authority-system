@@ -122,13 +122,12 @@ export default {
         this.search();
     },
     methods: {
-        //查询会员列表
+        //查询失物列表
         async search(pageNo, pageSize) {
             //修改当前页码
             this.lose.pageNo = pageNo
             //修改每页显示条数
             this.lose.pageSize = pageSize
-            console.log("------------------", this.lose.itemName);
             //发送查询请求
             let res = await LoseApi.selectLose(this.lose)
             //判断是否存在数据
@@ -145,7 +144,7 @@ export default {
         },
         //添加窗口确定事件
         async onConfirm() {
-
+            console.log("----------------",this.addlose);
             //发送添加请求
             let res = await LoseApi.addLose(this.addlose);
             //判断是否成功
