@@ -42,22 +42,23 @@
             <el-input v-model="commonMeal.cmName"></el-input>
           </el-form-item>
           <el-form-item label="套餐时长" prop="cmTime">
-            <el-input v-model="commonMeal.cmTime"></el-input>
+            <el-select v-model="commonMeal.cmTime" placeholder="请选择时长">
+              <el-option v-for="time in times" :label="time.name" :value="time.name" :key="time.name"></el-option>
+            </el-select>
           </el-form-item>
           <el-form-item label="套餐价格" prop="cmPrice">
             <el-input v-model="commonMeal.cmPrice"></el-input>
           </el-form-item>
           <el-form-item label="状态" prop="cmIs">
             <el-radio-group v-model="commonMeal.cmIs">
-                <el-radio-button label="启用" />
-                <el-radio-button label="禁用" />
-              </el-radio-group>
-            
+              <el-radio-button label="启用" />
+              <el-radio-button label="禁用" />
+            </el-radio-group>
           </el-form-item>
         </el-form>
       </div>
     </system-dialog>
-    
+
   </el-main>
 </template>
 
@@ -88,7 +89,7 @@ export default {
       commonDialog: {
         title: "普通套餐信息", //窗口标题
         visible: false, //是否显示窗口
-        width: 560, //窗口宽度
+        width: 570, //窗口宽度
         height: 170, //窗口高度
       },
       commonMeal: {
@@ -99,11 +100,77 @@ export default {
         cmName: "", //套餐名称
       },
       rules: {
-        cmName: [{ required: true,message: '请输入套餐名称',trigger: 'blur',}],
-        cmIs: [{ required: true,message: '请选择状态',trigger: 'change',}],
-        cmPrice: [{ required: true,message: '请输入套餐价格',trigger: 'blur',}],
-        cmTime: [{ required: true,message: '请输入套餐时长',trigger: 'blur',}]
+        cmName: [{ required: true, message: '请输入套餐名称', trigger: 'blur', }],
+        cmIs: [{ required: true, message: '请选择状态', trigger: 'change', }],
+        cmPrice: [{ required: true, message: '请输入套餐价格', trigger: 'blur', }],
+        cmTime: [{ required: true, message: '请输入套餐时长', trigger: 'blur', }]
       },
+      //添加套餐时长
+      times: [
+        {
+          name: "一天"
+        },
+        {
+          name: "两天"
+        },
+        {
+          name: "三天"
+        },
+        {
+          name: "四天"
+        },
+        {
+          name: "五天"
+        },
+        {
+          name: "六天"
+        },
+        {
+          name: "一周"
+        },
+        {
+          name: "两周"
+        },
+        {
+          name: "三周"
+        },
+        {
+          name: "一个月"
+        },
+        {
+          name: "两个月"
+        },
+        {
+          name: "三个月"
+        },
+        {
+          name: "四个月"
+        },
+        {
+          name: "五个月"
+        },
+        {
+          name: "六个月"
+        },
+        {
+          name: "七个月"
+        },
+        {
+          name: "八个月"
+        },
+        {
+          name: "九个月"
+        },
+        {
+          name: "十个月"
+        },
+        {
+          name: "十一个月"
+        },
+        {
+          name: "一年"
+        },
+      ]
     };
   },
   //初始化时调用
@@ -123,9 +190,9 @@ export default {
     /**
      * 查询部门列表
      */
-    async search(pageNo,pageSize) {
-      this.searchModel.pageNo=pageNo;
-      this,this.searchModel.pageSize=pageSize;
+    async search(pageNo, pageSize) {
+      this.searchModel.pageNo = pageNo;
+      this, this.searchModel.pageSize = pageSize;
       //发送查询请求
       let res = await commonApi.getCommonMeallist(this.searchModel);
       //判断是否成功
@@ -133,7 +200,7 @@ export default {
         console.log(res.data);
         console.log(res.data);
         this.tableData = res.data.records;
-        this.total=res.data.total;
+        this.total = res.data.total;
 
         for (let i = 0; i < res.data.records.length; i++) {
           res.data.records[i].cmIs = res.data.records[i].cmIs == 0 ? "启用" : "禁用";
@@ -160,8 +227,8 @@ export default {
         //如果验证通过
         if (valid) {
           let res = null;
-          this.commonMeal.cmIs= this.commonMeal.cmIs=="启用" ? 0:1
-          console.log( this.commonMeal)
+          this.commonMeal.cmIs = this.commonMeal.cmIs == "启用" ? 0 : 1
+          console.log(this.commonMeal)
           //判断是添加还是修改操作(依据id是否为空,为空则为添加操作)
           if (this.commonMeal.cmId === "") {
             //发送添加请求
@@ -176,7 +243,7 @@ export default {
             //提示成功
             this.$message.success(res.message);
             //刷新数据
-            this.search(this.pageNo,this.pageSize);
+            this.search(this.pageNo, this.pageSize);
             //关闭窗口事件
             this.commonDialog.visible = false;
           } else {
@@ -216,7 +283,7 @@ export default {
           //提示成功
           this.$message.success(res.message);
           //刷新数据
-          this.search(this.pageNo,this.pageSize);
+          this.search(this.pageNo, this.pageSize);
         } else {
           //提示失败
           this.$message.error(res.message);

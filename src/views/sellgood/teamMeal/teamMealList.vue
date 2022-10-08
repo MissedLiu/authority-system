@@ -44,7 +44,9 @@
             <el-input v-model="teamMeal.teamName"></el-input>
           </el-form-item>
           <el-form-item label="套餐时长" prop="teamTime">
-            <el-input v-model="teamMeal.teamTime"></el-input>
+            <el-select v-model="teamMeal.teamTime" placeholder="请选择时长">
+              <el-option v-for="time in times" :label="time.name" :value="time.name" :key="time.name"></el-option>
+            </el-select>
           </el-form-item>
           <el-form-item label="套餐价格" prop="teamPrice">
             <el-input v-model="teamMeal.teamPrice"></el-input>
@@ -107,7 +109,7 @@ export default {
       teamDialog: {
         title: "团操套餐信息", //窗口标题
         visible: false, //是否显示窗口
-        width: 560, //窗口宽度
+        width: 570, //窗口宽度
         height: 170, //窗口高度
       },
       teamMeal: {
@@ -146,6 +148,72 @@ export default {
             assignHeight: 500, //分配角色表格高度
             selectedIds: [], //被选中的团操项目id
             selectedteamId: "", //被分配团操套餐ID
+            //添加套餐时长
+      times: [
+        {
+          name: "一天"
+        },
+        {
+          name: "两天"
+        },
+        {
+          name: "三天"
+        },
+        {
+          name: "四天"
+        },
+        {
+          name: "五天"
+        },
+        {
+          name: "六天"
+        },
+        {
+          name: "一周"
+        },
+        {
+          name: "两周"
+        },
+        {
+          name: "三周"
+        },
+        {
+          name: "一个月"
+        },
+        {
+          name: "两个月"
+        },
+        {
+          name: "三个月"
+        },
+        {
+          name: "四个月"
+        },
+        {
+          name: "五个月"
+        },
+        {
+          name: "六个月"
+        },
+        {
+          name: "七个月"
+        },
+        {
+          name: "八个月"
+        },
+        {
+          name: "九个月"
+        },
+        {
+          name: "十个月"
+        },
+        {
+          name: "十一个月"
+        },
+        {
+          name: "一年"
+        },
+      ]
     };
   },
   //初始化时调用
