@@ -44,7 +44,9 @@
             <el-input v-model="ptMeal.ptName"></el-input>
           </el-form-item>
           <el-form-item label="套餐时长" prop="ptTime">
-            <el-input v-model="ptMeal.ptTime"></el-input>
+            <el-select v-model="ptMeal.ptTime" placeholder="请选择时长">
+            <el-option v-for="time in times" :label="time.name" :value="time.name" :key="time.name"></el-option>
+          </el-select>
           </el-form-item>
           <el-form-item label="套餐价格" prop="ptPrice">
             <el-input v-model="ptMeal.ptPrice"></el-input>
@@ -103,7 +105,7 @@ export default {
       ptDialog: {
         title: "普通套餐信息", //窗口标题
         visible: false, //是否显示窗口
-        width: 560, //窗口宽度
+        width: 570, //窗口宽度
         height: 170, //窗口高度
       },
       ptMeal: {
@@ -129,24 +131,90 @@ export default {
         }],
         ptIs: [{ required: true, trigger: 'change', message: '请选择状态' }]
       },
-       //分配权限窗口属性
-       assignPtDialog: {
-                title: '',
-                visible: false,
-                height: 450,
-                width: 600
-            },
-             //角色对象
-             PtVo: {
-                pageNo: 1,
-                pageSize: 10,
-                PtId: "",
-                total: 0,
-            },
-            assignPtList: [], //角色列表
-            assignHeight: 500, //分配角色表格高度
-            selectedIds: [], //被选中的角色id
-            selectedPtId: "", //被分配角色的用户ID
+      //分配权限窗口属性
+      assignPtDialog: {
+        title: '',
+        visible: false,
+        height: 450,
+        width: 600
+      },
+      //角色对象
+      PtVo: {
+        pageNo: 1,
+        pageSize: 10,
+        PtId: "",
+        total: 0,
+      },
+      assignPtList: [], //角色列表
+      assignHeight: 500, //分配角色表格高度
+      selectedIds: [], //被选中的角色id
+      selectedPtId: "", //被分配角色的用户ID
+      //添加套餐时长
+      times: [
+        {
+          name: "一天"
+        },
+        {
+          name: "两天"
+        },
+        {
+          name: "三天"
+        },
+        {
+          name: "四天"
+        },
+        {
+          name: "五天"
+        },
+        {
+          name: "六天"
+        },
+        {
+          name: "一周"
+        },
+        {
+          name: "两周"
+        },
+        {
+          name: "三周"
+        },
+        {
+          name: "一个月"
+        },
+        {
+          name: "两个月"
+        },
+        {
+          name: "三个月"
+        },
+        {
+          name: "四个月"
+        },
+        {
+          name: "五个月"
+        },
+        {
+          name: "六个月"
+        },
+        {
+          name: "七个月"
+        },
+        {
+          name: "八个月"
+        },
+        {
+          name: "九个月"
+        },
+        {
+          name: "十个月"
+        },
+        {
+          name: "十一个月"
+        },
+        {
+          name: "一年"
+        },
+      ]
     };
   },
   //初始化时调用
@@ -265,130 +333,130 @@ export default {
       this.pageNo = page;
       this.search(page, this.pageSize);
     },
-     /**
-        * 分配角色取消事件
-        */
-        onAssignClose() {
-            //隐藏窗口
-            this.assignPtDialog.visible = false;
-        },
-        
-       
-        /**
-         * 当每页数量发生变化时触发该事件
-         * @param  size 
-         */
-        assignSizeChange(size) {
-            this.PtVo.pageSize = size; //将每页显示的数量交给成员变量
-            this.getAssignPtList(this.PtVo.pageNo, size);
+    /**
+       * 分配角色取消事件
+       */
+    onAssignClose() {
+      //隐藏窗口
+      this.assignPtDialog.visible = false;
+    },
 
-        },
-        /**
-         *  当页码发生变化时触发该事件
-         * @param page 
-         */
-        assignCurrentChange(page) {
-            this.PtVo.pageNo = page;
-            //调用查询方法
-            this.getAssignPtList(page, this.PtVo.pageSize);
 
-        },
-        
-        //分配角色
-        async assignPt(row) {
-             console.log("row=", row)
-            //防止回显出现问题
-            this.selectedIds = [];
-            //被分配用户的id
-            this.selectedPtId = row.ptId;
-              this.PtVo.PtId =row.ptId;           
-                //显示窗口
-                this.assignPtDialog.visible = true;
-                //设置标题
-                this.assignPtDialog.title = `给【${row.ptName}】分配角色`;
-                //调用查询角色列表
-                // await this.getAssignRoleList();
-                await this.getAssignPtList();
-                //封装查询条件
-                let params = { PtId: row.ptId }
-                //发送根据私教套餐ID查询套餐项目列表的请求
-                let res = await ptApi.getPtpIdByPtId(params);
-                console.log("角色列表=", res.data);
-                // /如果存在相关的角色数据
-                if (res.success) {
-                    //将查询道德角色Id列表赋值给选中的角色数组
-                    this.selectedIds = res.data;
-                    //循环遍历
-                    //查询数据库中已存在的角色id
-                    this.selectedIds.forEach((key) => {
-                        //查询表格显示的角色id
-                        this.assignPtList.forEach((item) => {
-                          console.log(key )
-                          console.log(item)
-                          console.log(item.id)
-                            if (key === item.ptpId) {
-                                //如果相等则复选框选中
-                                this.$refs.assignPtTable.toggleRowSelection(item, true)
-                            }
-                        })
-                    })
-                }
-            },
-        
-         /**
-         * 查询当前用户所拥有的角色信息
-         * @param {*} pageNo 
-         * @param {*} pageSize 
-         */
-         async getAssignPtList(pageNo = 1, pageSize = 10) {
-            //封装查询条件
-            // this.ptVo.PtId = this.$store.getters.userId;
-            this.PtVo.pageNo = pageNo;
-            this.PtVo.pageSize = pageSize;
-            //发送查询请求
-            let res = await ptApi.getAssignPtList(this.PtVo);
-            if (res.success) {
-                //赋值
-                this.assignPtList = res.data.records;
-                this.PtVo.total = res.data.total;
-                console.log("=", res.data.records);
+    /**
+     * 当每页数量发生变化时触发该事件
+     * @param  size 
+     */
+    assignSizeChange(size) {
+      this.PtVo.pageSize = size; //将每页显示的数量交给成员变量
+      this.getAssignPtList(this.PtVo.pageNo, size);
+
+    },
+    /**
+     *  当页码发生变化时触发该事件
+     * @param page 
+     */
+    assignCurrentChange(page) {
+      this.PtVo.pageNo = page;
+      //调用查询方法
+      this.getAssignPtList(page, this.PtVo.pageSize);
+
+    },
+
+    //分配角色
+    async assignPt(row) {
+      console.log("row=", row)
+      //防止回显出现问题
+      this.selectedIds = [];
+      //被分配用户的id
+      this.selectedPtId = row.ptId;
+      this.PtVo.PtId = row.ptId;
+      //显示窗口
+      this.assignPtDialog.visible = true;
+      //设置标题
+      this.assignPtDialog.title = `给【${row.ptName}】分配角色`;
+      //调用查询角色列表
+      // await this.getAssignRoleList();
+      await this.getAssignPtList();
+      //封装查询条件
+      let params = { PtId: row.ptId }
+      //发送根据私教套餐ID查询套餐项目列表的请求
+      let res = await ptApi.getPtpIdByPtId(params);
+      console.log("角色列表=", res.data);
+      // /如果存在相关的角色数据
+      if (res.success) {
+        //将查询道德角色Id列表赋值给选中的角色数组
+        this.selectedIds = res.data;
+        //循环遍历
+        //查询数据库中已存在的角色id
+        this.selectedIds.forEach((key) => {
+          //查询表格显示的角色id
+          this.assignPtList.forEach((item) => {
+            console.log(key)
+            console.log(item)
+            console.log(item.id)
+            if (key === item.ptpId) {
+              //如果相等则复选框选中
+              this.$refs.assignPtTable.toggleRowSelection(item, true)
             }
-        },
-            /**
-            * 分配项目确认事件
-            */
-           async  onAssignConfirm() {
-                //判断当前是否有选中项目
-                if(this.selectedIds.length=== 0){
-                    this.$message.warning("请选择要分配的私教项目!")
-                    return
-                }
+          })
+        })
+      }
+    },
 
-                let params={
-                    ptId:this.selectedPtId,
-                    ptpId:this.selectedIds
-                }
-                console.log(params)
-                //发送保存分配项目数据的请求
-                let res=await ptApi.assignPtProjectSave(params)
-                //判断是否成功
-                if(res.success){
-                    this.$message.success(res.message);
-                     //隐藏窗口
-                this.assignPtDialog.visible = false;
-                }else{
-                     this.$message.error(res.message);
-                }
-               
-            },
-            /**
-             * 复选框选中事件
-             * @param  rows 
-             */
-            handleSelectionChange(rows){
-               //拿到选中的ID 值
-               this.selectedIds=rows.map(item=>item.ptpId);     
-            },
+    /**
+    * 查询当前用户所拥有的角色信息
+    * @param {*} pageNo 
+    * @param {*} pageSize 
+    */
+    async getAssignPtList(pageNo = 1, pageSize = 10) {
+      //封装查询条件
+      // this.ptVo.PtId = this.$store.getters.userId;
+      this.PtVo.pageNo = pageNo;
+      this.PtVo.pageSize = pageSize;
+      //发送查询请求
+      let res = await ptApi.getAssignPtList(this.PtVo);
+      if (res.success) {
+        //赋值
+        this.assignPtList = res.data.records;
+        this.PtVo.total = res.data.total;
+        console.log("=", res.data.records);
+      }
+    },
+    /**
+    * 分配项目确认事件
+    */
+    async onAssignConfirm() {
+      //判断当前是否有选中项目
+      if (this.selectedIds.length === 0) {
+        this.$message.warning("请选择要分配的私教项目!")
+        return
+      }
+
+      let params = {
+        ptId: this.selectedPtId,
+        ptpId: this.selectedIds
+      }
+      console.log(params)
+      //发送保存分配项目数据的请求
+      let res = await ptApi.assignPtProjectSave(params)
+      //判断是否成功
+      if (res.success) {
+        this.$message.success(res.message);
+        //隐藏窗口
+        this.assignPtDialog.visible = false;
+      } else {
+        this.$message.error(res.message);
+      }
+
+    },
+    /**
+     * 复选框选中事件
+     * @param  rows 
+     */
+    handleSelectionChange(rows) {
+      //拿到选中的ID 值
+      this.selectedIds = rows.map(item => item.ptpId);
+    },
   },
 };
 </script>
