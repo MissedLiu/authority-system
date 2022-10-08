@@ -133,7 +133,7 @@ export default {
               this.loading = false
             })
         } else {
-          console.log('error submit!!')
+          
           return false
         }
       })
@@ -146,6 +146,7 @@ export default {
         return acc
       }, {})
     }
+   
   }
 }
 </script>
