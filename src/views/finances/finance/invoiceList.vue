@@ -78,7 +78,7 @@ export default {
 
             tjType: "",
             xinxi: "",
-            sumPrice: "",
+            sumPrice: "0",
 
             options: [
                 {
