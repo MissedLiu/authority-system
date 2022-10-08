@@ -169,7 +169,7 @@ export default {
         this.total=res.data.total;
         console.log(this.total)
         for (let i = 0; i < res.data.records.length; i++) {
-          res.data.records[i].tpIs = res.data.records[i].tpIs == 1 ? "启用" : "禁用";
+          res.data.records[i].tpIs = res.data.records[i].tpIs == 0 ? "启用" : "禁用";
         }
       }
     },
@@ -209,7 +209,7 @@ export default {
         //如果验证通过
         if (valid) {
           let res = null;
-          this.tpPro.tpIs =   this.tpPro.tpIs =="启用" ? 1 : 0;
+          this.tpPro.tpIs =   this.tpPro.tpIs =="启用" ? 0 : 1;
           //判断是添加还是修改操作(依据id是否为空,为空则为添加操作)
           if (this.tpPro.tpId === "") {
             //发送添加请求

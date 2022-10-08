@@ -136,7 +136,7 @@ export default {
         this.total=res.data.total;
 
         for (let i = 0; i < res.data.records.length; i++) {
-          res.data.records[i].cmIs = res.data.records[i].cmIs == 1 ? "启用" : "禁用";
+          res.data.records[i].cmIs = res.data.records[i].cmIs == 0 ? "启用" : "禁用";
         }
       }
     },
@@ -160,7 +160,7 @@ export default {
         //如果验证通过
         if (valid) {
           let res = null;
-          this.commonMeal.cmIs= this.commonMeal.cmIs=="启用" ? 1:0
+          this.commonMeal.cmIs= this.commonMeal.cmIs=="启用" ? 0:1
           console.log( this.commonMeal)
           //判断是添加还是修改操作(依据id是否为空,为空则为添加操作)
           if (this.commonMeal.cmId === "") {

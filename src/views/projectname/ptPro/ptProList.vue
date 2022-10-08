@@ -158,7 +158,7 @@ export default {
         this.total=res.data.total;
         this.tableData = res.data.records;
         for (let i = 0; i < res.data.records.length; i++) {
-          res.data.records[i].ptpIs = res.data.records[i].ptpIs == 1 ? "启用" : "禁用";
+          res.data.records[i].ptpIs = res.data.records[i].ptpIs == 0 ? "启用" : "禁用";
         }
       }
     },
@@ -190,7 +190,7 @@ export default {
         //如果验证通过
         if (valid) {
           let res = null;
-          this.ptProject.ptpIs =   this.ptProject.ptpIs =="启用" ? 1 : 0;
+          this.ptProject.ptpIs =   this.ptProject.ptpIs =="启用" ? 0 : 1;
           console.log(  this.ptProject.ptpIs)
           //判断是添加还是修改操作(依据id是否为空,为空则为添加操作)
           if (this.ptProject.ptpId === "") {

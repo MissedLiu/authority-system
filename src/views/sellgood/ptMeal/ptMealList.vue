@@ -179,7 +179,7 @@ export default {
         this.tableData = res.data.records
         this.total = res.data.total;
         for (let i = 0; i < res.data.records.length; i++) {
-          res.data.records[i].ptIs = res.data.records[i].ptIs == 1 ? "启用" : "禁用";
+          res.data.records[i].ptIs = res.data.records[i].ptIs == 0 ? "启用" : "禁用";
         }
       }
     },
@@ -202,7 +202,7 @@ export default {
         //如果验证通过
         if (valid) {
           let res = null;
-          this.ptMeal.ptIs = this.ptMeal.ptIs == "启用" ? 1 : 0;
+          this.ptMeal.ptIs = this.ptMeal.ptIs == "启用" ? 0 : 1;
           //判断是添加还是修改操作(依据id是否为空,为空则为添加操作)
           if (this.ptMeal.ptId === "") {
             //发送添加请求
