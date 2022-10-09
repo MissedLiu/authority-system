@@ -317,6 +317,7 @@ export default {
             //存储数据返回到后台
             CommonShuju: {
                 cmId: "",
+                mealId:"",
                 mealName: "",
                 salesPrice: "",
                 mealTime: "",
@@ -543,8 +544,9 @@ export default {
         },
         //普通套餐购买窗口打开事件
         commonbuy(row) {
-
+                console.log("11",row)
             this.CommonShuju = row
+            this.CommonShuju.mealId=row.cmId;
             this.CommonShuju.salesPrice = row.cmPrice;
             this.CommonShuju.mealTime = row.cmTime;
             this.CommonShuju.mealName = row.cmName;

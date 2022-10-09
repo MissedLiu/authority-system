@@ -10,5 +10,8 @@ export default{
     },
     async toSumPrice(params){
         return await http.getRestApi("/api/invoice/toSumPrice",params)
+    },
+    async deleteInvoice(params){
+        return await http.delete("/api/invoice/delete",params)
     }
 }
