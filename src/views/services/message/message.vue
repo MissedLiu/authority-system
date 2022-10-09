@@ -6,7 +6,7 @@
                 <el-input placeholder="请输入姓名" v-model="message.empName"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
+                <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
                 <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
             </el-form-item>
         </el-form>
@@ -20,21 +20,21 @@
             <el-table-column prop="qq" label="QQ"></el-table-column>
             <el-table-column prop="emil" label="邮箱"></el-table-column>
             <el-table-column prop="weix" label="微信"></el-table-column>
-            <el-table-column label="操作" width="550" align="center">
+            <el-table-column label="操作" width="510" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-edit-outline" type="primary" size="small"
+                    <el-button icon="el-icon-edit-outline" plain  type="primary" size="small"
                         @click="openmemberMessageDialog(scope.row)">
                         分配会员
                     </el-button>
-                    <el-button icon="el-icon-edit-outline" type="primary" size="small"
+                    <el-button icon="el-icon-edit-outline" plain  type="primary" size="small"
                         @click="openprosperctDialog(scope.row)">
                         分配潜在用户
                     </el-button>
-                    <el-button type="primary" icon="el-icon-search" size="small"
+                    <el-button type="success" plain icon="el-icon-search" size="small"
                         @click="openmemberMessageDialog2(scope.row)">
                         查看会员
                     </el-button>
-                    <el-button type="primary" icon="el-icon-search" size="small"
+                    <el-button type="success" plain icon="el-icon-search" size="small"
                         @click="openprosperctDialog2(scope.row)">
                         查看潜在用户
                     </el-button>
@@ -106,7 +106,7 @@
                     </el-table-column>
                     <el-table-column label="操作" width="150" align="center">
                         <template slot-scope="scope">
-                            <el-button icon="el-icon-close" type="danger" size="small" @click="deletemember(scope.row)">
+                            <el-button icon="el-icon-minus" type="danger" plain size="small" @click="deletemember(scope.row)">
                                 移除分配
                             </el-button>
                         </template>
@@ -133,7 +133,7 @@
                     </el-table-column>
                     <el-table-column label="操作" width="150" align="center">
                         <template slot-scope="scope">
-                            <el-button icon="el-icon-close" type="danger" size="small"
+                            <el-button icon="el-icon-minus" type="danger" plain size="small"
                                 @click="deleteProspect(scope.row)">
                                 移除分配
                             </el-button>
@@ -236,7 +236,7 @@ export default {
             console.log(this.members)
         },
 
-        playbackFormat(row, column) {
+        playbackFormat(row) {
             if (row.memberSex == 0) {
                 return '女'
             } else if (row.memberSex == 1) {

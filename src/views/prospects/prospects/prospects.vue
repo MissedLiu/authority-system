@@ -6,8 +6,8 @@
                 <el-input placeholder="请输入电话" v-model="phone.prospectPhone"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
-                <el-button type="success" icon="el-icon-plus" @click="openAddwindow">新增</el-button>
+                <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
+                <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow">新增</el-button>
                 <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
             </el-form-item>
         </el-form>
@@ -18,15 +18,15 @@
             <el-table-column prop="prospectSex" label="性别"></el-table-column>
             <el-table-column prop="prospectPhone" label="电话"></el-table-column>
             <el-table-column prop="prospectAge" label="年龄"></el-table-column>
-            <el-table-column prop="type" label="状态" ></el-table-column>
+            <el-table-column prop="type" label="状态"></el-table-column>
             <el-table-column prop="prospectIs" label="是否分配" :formatter="playbackFormat"></el-table-column>
             <el-table-column label="操作" width="200" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-edit-outline" type="primary" size="small"
+                    <el-button icon="el-icon-edit-outline" type="primary" plain size="small"
                         @click="selectCommonMeal(scope.row)">
                         修改
                     </el-button>
-                    <el-button icon="el-icon-close" type="danger" size="small" @click="del(scope.row)">
+                    <el-button icon="el-icon-close" type="danger" plain size="small" @click="del(scope.row)">
                         删除
                     </el-button>
                 </template>
@@ -100,15 +100,15 @@ export default {
                 width: 400,//窗口宽度
                 height: 300//窗口高度
             },
-           // 添加窗口绑定数据
+            // 添加窗口绑定数据
             prospect: {
-                prospectId:"",
-                prospectName:"",
-                prospectSex:"",
-                prospectPhone:"",
-                prospectAge:"",
-                prospectAddress:"",
-                type:"",
+                prospectId: "",
+                prospectName: "",
+                prospectSex: "",
+                prospectPhone: "",
+                prospectAge: "",
+                prospectAddress: "",
+                type: "",
             },
             //查询传递数据
             phone: {
@@ -126,7 +126,7 @@ export default {
                 { pattern: new RegExp(/^(?:[1-9][0-9]?|1[01][0-9]|100)$/), message: '请正确输入年龄' }],
                 prospectAddress: [{ required: true, message: '请输入地址', trigger: 'blur' }],
                 type: [{ required: true, message: '请选择状态', trigger: 'blur' }],
-    
+
             },
         }
     },
@@ -169,15 +169,15 @@ export default {
         //打开添加窗口
         openAddwindow() {
             //清空表单数据
-            // this.$restForm("prospectForm", this.prospect);
+            this.$restForm("prospectForm", this.prospect);
             //设置属性
             this.ptmbDialog.title = '新增潜在用户',
-            this.ptmbDialog.visible = true
+                this.ptmbDialog.visible = true
         },
         //窗口关闭事件
         onClose() {
             this.ptmbDialog.visible = false
-            
+
         },
         //窗口确认事件
         onConfirm() {
@@ -211,9 +211,9 @@ export default {
             })
         },
 
-      
 
-         //根据会员id删除
+
+        //根据会员id删除
         async del(row) {
             //提示是否确认删除
             let confirm = await this.$myconfirm("确定要删除该数据嘛?")//await代表同步
@@ -235,18 +235,17 @@ export default {
         },
         //打开修改窗口
         async selectCommonMeal(row) {
-            //清空表单数据
-           // this.$restForm("prospectForm", this.prospect);
+            //数据回显
+            this.$objCopy(row, this.prospect);
             this.ptmbDialog.title = "修改"
             this.ptmbDialog.visible = true
-            this.prospect = row
         },
         //修改窗口关闭事件 
         pageClose() {
             this.ptmbDialog.visible = false
-           
+
         },
-        
+
         handleSizeChange(size) {
             //修改每页显示数量
             this.pageSize = size

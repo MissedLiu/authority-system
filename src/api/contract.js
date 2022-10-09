@@ -12,7 +12,11 @@ export default {
   //新增记录
   async addCompact(params){
     return await request.post("/api/compact/addCompact",params);
-  }
+  },
+  //删除记录
+  async delDetial(params){
+    return await request.delete("/api/compact/delDetial",params);
+  },
 
 
 }

@@ -24,6 +24,14 @@ export default {
   async delCommonMemberById(params) {
     return await request.delete("/api/commonMember/delCommonMemberById", params);
   },
+  
+   /**
+   * 续费
+   * @returns
+   */
+    async renewCommonMember(params) {
+      return await request.put("/api/commonMember/renew", params);
+    },
 /**************************/
   /**
    * 查询未禁用的普通套餐列表

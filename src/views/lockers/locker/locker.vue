@@ -6,9 +6,10 @@
         <el-input placeholder="请输入电话" v-model="phone.memberPhone"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" @click="search(pageNo, pageSize)">电话查询</el-button>
-        <el-button type="primary" icon="el-icon-search" @click="selectNullLocker(pageNo, pageSize)">查询空储物柜</el-button>
-        <el-button type="success" icon="el-icon-plus" @click="openAddwindow()">新增储物柜</el-button>
+        <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo, pageSize)">电话查询</el-button>
+        <el-button type="primary" plain icon="el-icon-search" @click="selectNullLocker(pageNo, pageSize)">查询空储物柜
+        </el-button>
+        <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow()">新增储物柜</el-button>
         <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
       </el-form-item>
     </el-form>
@@ -23,19 +24,17 @@
       <el-table-column prop="endTime" label="到期时间"></el-table-column>
       <el-table-column label="操作" width="550" align="center">
         <template slot-scope="scope">
-          <el-button type="success" icon="el-icon-plus" :disabled="item2(scope.$index, scope.row)" size="small"
+          <el-button type="success" plain icon="el-icon-plus" :disabled="item2(scope.$index, scope.row)" size="small"
             @click="updeteOpen(scope.row)">启用</el-button>
-          <el-button icon="el-icon-close" :disabled="item(scope.$index, scope.row)" type="danger" size="small"
+          <el-button type="danger" plain icon="el-icon-minus" :disabled="item(scope.$index, scope.row)" size="small"
             @click="updeteClose(scope.row)">禁用</el-button>
-          <el-button icon="el-icon-close" type="danger" size="small" @click="del(scope.row)">删除储物柜</el-button>
-          <el-button type="success" icon="el-icon-plus" :disabled="item(scope.$index, scope.row)" size="small"
+          <el-button icon="el-icon-close" type="warning" plain size="small" @click="del(scope.row)">删除储物柜</el-button>
+          <el-button type="success" plain icon="el-icon-plus" :disabled="item(scope.$index, scope.row)" size="small"
             @click="openMemwindow(scope.row)">添加会员</el-button>
-          <el-button icon="el-icon-close" :disabled="item(scope.$index, scope.row)" type="danger" size="small"
+          <el-button type="danger" plain icon="el-icon-minus" :disabled="item(scope.$index, scope.row)" size="small"
             @click="deleteMember(scope.row)">移除会员</el-button>
         </template>
-
       </el-table-column>
-
     </el-table>
 
     <!-- 分页组件 -->
@@ -48,8 +47,8 @@
     <system-dialog :title="addLockerDialog.title" :visible="addLockerDialog.visible" :width="addLockerDialog.width"
       :height="addLockerDialog.height" @onClose="Closelocker()" @onConfirm="Confirmlocker()">
       <div slot="content">
-        <el-form :model="black" ref="addLockerForm" :rules="mbrules" label-width="100px" size="small">
-          <el-form-item label="储物柜编号">
+        <el-form :model="locker" ref="addLockerForm" :rules="rules" label-width="100px" size="small">
+          <el-form-item label="储物柜编号" prop="lockerId">
             <el-input v-model="locker.lockerId"></el-input>
           </el-form-item>
         </el-form>
@@ -59,11 +58,11 @@
     <system-dialog :title="memDialog.title" :visible="memDialog.visible" :width="memDialog.width"
       :height="memDialog.height" @onClose="CloseMemlocker()" @onConfirm="ConfirmlockerMember()">
       <div slot="content">
-        <el-form :model="memberLocker" ref="memberLockeForm" :rules="mbrules" label-width="80px" size="small">
-          <el-form-item label="会员姓名">
+        <el-form :model="memberLocker" ref="memberLockeForm" :rules="rules" label-width="80px" size="small">
+          <el-form-item label="会员姓名" prop="memberName">
             <el-input v-model="memberLocker.memberName"></el-input>
           </el-form-item>
-          <el-form-item label="电话">
+          <el-form-item label="电话" prop="memberPhone">
             <el-input v-model="memberLocker.memberPhone"></el-input>
           </el-form-item>
         </el-form>
@@ -74,11 +73,11 @@
   
   
 <script>
-import LockerApi from "@/api/locker";
+import LockerApi from "@/api/locker"
 //导入对话框组件
 import SystemDialog from "@/components/system/SystemDialog.vue";
 export default {
-  name: "blackmember",
+  name: "lockmember",
   //注册组件
   components: {
     SystemDialog,
@@ -89,9 +88,14 @@ export default {
       pageNo: 1, //当前页码
       total: 0, //数据总数量
       pageSize: 10, //每页显示数量
-
       //表格数据列表
       tableData: [],
+      //验证
+      rules: {
+        lockerId: [{ required: true, message: '请输入储物柜编号', trigger: 'blur' }, { pattern: new RegExp(/^[0-9]*$/), message: '储物柜编号为数字' }],
+        memberName: [{ required: true, message: '请输入会员姓名', trigger: 'blur' }],
+        memberPhone: [{ required: true, message: '请输入会员电话', trigger: 'blur' }, { pattern: new RegExp(/^((1[34578]\d{9}))$/), message: '请正确输入电话号码' }],
+      },
       //电话查询参数
       phone: {
         lockerState: null,//储物柜状态
@@ -105,11 +109,10 @@ export default {
         visible: false,//是否显示窗口
         width: 400,//窗口宽度
         height: 100,//窗口高度
-
       },
       //新增储物柜参数
       locker: {
-        lockerId: null
+        lockerId: "",
       },
       //新增储物柜会员属性
       memDialog: {
@@ -122,8 +125,8 @@ export default {
       //添加会员储物柜参数
       memberLocker: {
         memberPhone: "",
-        memberName:"",
-        lockerId:""
+        memberName: "",
+        lockerId2: ""
       },
 
     };
@@ -259,8 +262,6 @@ export default {
     },
     //打开添加窗口
     openAddwindow() {
-      //回显
-      //this.$restForm("memberForm", this.member);
       //设置属性
       this.addLockerDialog.visible = true
     },
@@ -269,76 +270,89 @@ export default {
       this.addLockerDialog.visible = false
     },
     //新增储物柜窗口确认事件
-    async Confirmlocker() {
-      //发送请求
-      let res = await LockerApi.addLocker(this.locker)
-      //判断是否发送成功
-      if (res.success) {
-        //提示成功
-        this.$message.success(res.message)
-        this.addLockerDialog.visible = false
-        //刷新数据
-        this.search(this.pageNo, this.pageSize)
-        this.locker.lockerId = ""
-      } else {
-        //提示失败
-        this.$message.error(res.message)
-      }
+    Confirmlocker() {
+      //进行表单验证
+      this.$refs.addLockerForm.validate(async (valid) => {
+        //如果验证通过
+        if (valid) {
+          //发送请求
+          let res = await LockerApi.addLocker(this.locker)
+          //判断是否发送成功
+          if (res.success) {
+            //提示成功
+            this.$message.success(res.message)
+            this.addLockerDialog.visible = false
+            //刷新数据
+            this.search(this.pageNo, this.pageSize)
+            this.locker.lockerId = ""
+          } else {
+            //提示失败
+            this.$message.error(res.message)
+          }
+        }
+      })
+
     },
 
 
     //打开储物柜会员添加窗口
     openMemwindow(row) {
-      this.memberLocker.memberName=""
-      this.memberLocker.memberPhone=""
-      this.memberLocker.lockerId=""
-      //重置验证
-      //this.$restForm("memberForm", this.member);
-      this.memberLocker.lockerId=row.lockerId
+      this.memberLocker.memberName = ""
+      this.memberLocker.memberPhone = ""
+      //this.memberLocker.lockerId = ""
+      this.memberLocker.lockerId = row.lockerId
       //设置属性
-      this.memDialog.visible = true 
+      this.memDialog.visible = true
     },
     //窗口取消事件
     CloseMemlocker() {
       this.memDialog.visible = false
     },
+
     //新增会员储物柜窗口确认事件
     async ConfirmlockerMember() {
-      //发送请求
-      let res = await LockerApi.addLockerByMemberId(this.memberLocker)
-      //判断是否发送成功
-      if (res.success) {
-        //提示成功
-        this.$message.success(res.message)
-        this.memDialog.visible = false
-        //刷新数据
-        this.search(this.pageNo, this.pageSize)
-      
-      } else {
-        //提示失败
-        this.$message.error(res.message)
+      //进行表单验证
+      this.$refs.memberLockeForm.validate(async (valid) => {
+        //如果验证通过
+        if (valid) {
+          //发送请求
+          let res = await LockerApi.addLockerByMemberId(this.memberLocker)
+          //判断是否发送成功
+          if (res.success) {
+            //提示成功
+            this.$message.success(res.message)
+            this.memDialog.visible = false
+            //刷新数据
+            this.search(this.pageNo, this.pageSize)
 
-      }
+          } else {
+            //提示失败
+            this.$message.error(res.message)
+
+          }
+        }
+      })
+
     },
-      //移出会员
-  async deleteMember(row){
-    let confirm = await this.$myconfirm("确定要移出该会员嘛?")//await代表同步
+    //移出会员
+    async deleteMember(row) {
+      let confirm = await this.$myconfirm("确定要移出该会员嘛?")//await代表同步
       if (confirm) {
-      //发送请求
-      let res=await LockerApi.deleteLockerByMemberId({memberId : row.memberId,lockerId : row.lockerId});
-       //判断是否发送成功
-       if (res.success) {
-        //提示成功
-        this.$message.success(res.message)
-        //刷新数据
-        this.search(this.pageNo, this.pageSize)
+        //发送请求
+        let res = await LockerApi.deleteLockerByMemberId({ memberId: row.memberId, lockerId: row.lockerId });
+        //判断是否发送成功
+        if (res.success) {
+          //提示成功
+          this.$message.success(res.message)
+          //刷新数据
+          this.search(this.pageNo, this.pageSize)
 
-      } else {
-        //提示失败
-        this.$message.error(res.message)
+        } else {
+          //提示失败
+          this.$message.error(res.message)
+        }
       }
     }
-  }
   },
 };
 </script>

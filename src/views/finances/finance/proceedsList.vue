@@ -30,7 +30,12 @@
             <el-table-column prop="ptpName" label="项目名称" />                       
             <el-table-column prop="comsunePrice" label="消费金额" />
             <el-table-column prop="comsuneDate" label="消费时间" />
-            
+            <el-table-column label="操作" align="center">
+                <template slot-scope="scope">
+                    <el-button icon="el-icon-close" type="danger" size="small"  plain @click="handleDelete(scope.row)">删除
+                    </el-button>
+                </template>
+            </el-table-column>
 
         </el-table>
 
@@ -208,6 +213,25 @@ export default {
             //调用查询方法
             this.search(page, this.pageSize);
         },
+        //删除按钮实现
+    async handleDelete(row) {
+        console.log(row)
+      let confirm = await this.$myconfirm("确定要删除该数据嘛?");
+      if (confirm) {
+        await comsuneApi.deleteComSune({comsuneId : row.comsuneId})
+          .then((res) => {
+            if (res.success) {
+              //提示成功
+              this.$message.success(res.message);
+              //刷新数据
+              this.search(this.pageNo, this.pageSize);
+            } else {
+              //提示失败
+              this.$message.error(res.message);
+            }
+          });
+      }
+    },
     }
 };
 </script>

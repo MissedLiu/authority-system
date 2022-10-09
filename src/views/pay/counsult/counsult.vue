@@ -6,8 +6,8 @@
                 <el-input placeholder="请输入电话" v-model="consult.consultPhone"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
-                <el-button type="success" icon="el-icon-plus" @click="openAddwindow">新增</el-button>
+                <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
+                <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow">新增</el-button>
                 <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
             </el-form-item>
         </el-form>

@@ -6,8 +6,8 @@
                 <el-input placeholder="请输入电话" v-model="phone.memberPhone"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
-                <el-button type="success" icon="el-icon-plus" @click="openAddwindow">新增</el-button>
+                <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
+                <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow">新增</el-button>
                 <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
             </el-form-item>
         </el-form>
@@ -15,23 +15,23 @@
         <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="id"
             default-expand-all :tree-props="{ children: 'children' }">
             <el-table-column prop="memberName" label="会员姓名"></el-table-column>
-            <el-table-column prop="memberSex" label="会员性别"></el-table-column>
+            <el-table-column prop="memberSex" label="会员性别" :formatter="playbackFormat"></el-table-column>
             <el-table-column prop="memberPhone" label="会员电话"></el-table-column>
             <el-table-column prop="memberDate" label="出生日期"></el-table-column>
             <el-table-column prop="memberAge" label="年龄"></el-table-column>
             <el-table-column prop="memberAddress" label="地址"></el-table-column>
-            <el-table-column prop="memberType" label="状态"></el-table-column>
+            <el-table-column prop="memberType" label="状态" :formatter="playbackFormat2"></el-table-column>
             <el-table-column prop="createTime" label="注册时间"></el-table-column>
             <el-table-column label="操作" width="350" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-close" type="danger" size="small" @click="upd(scope.row)">
-                        加入黑名单
-                    </el-button>
-                    <el-button icon="el-icon-edit-outline" type="primary" size="small"
+                    <el-button icon="el-icon-edit-outline" plain type="primary" size="small"
                         @click="selectCommonMeal(scope.row)">
                         修改
                     </el-button>
-                    <el-button icon="el-icon-close" type="danger" size="small" @click="del(scope.row)">
+                    <el-button icon="el-icon-plus" plain type="warning" size="small" @click="upd(scope.row)">
+                        加入黑名单
+                    </el-button>
+                    <el-button icon="el-icon-close" plain type="danger" size="small" @click="del(scope.row)">
                         删除
                     </el-button>
                 </template>
@@ -71,6 +71,12 @@
                     <el-form-item label="住址" prop="memberAddress">
                         <el-input v-model="member.memberAddress"></el-input>
                     </el-form-item>
+                    <el-form-item label="会员状态" prop="memberType">
+                        <el-select v-model="member.memberType" placeholder="请选择会员状态">
+                            <el-option :value="1" label="正式会员">正式会员</el-option>
+                            <el-option :value="0" label="体验会员">体验会员</el-option>
+                        </el-select>
+                    </el-form-item>
                 </el-form>
             </div>
         </system-dialog>
@@ -80,7 +86,7 @@
             :height="blackDialog.height" @onClose="Closeblack()" @onConfirm="Confirmblack()">
             <div slot="content">
                 <el-form :model="black" ref="blackForm" :rules="mbrules" label-width="80px" size="small">
-                    <el-form-item label="拉黑原因">
+                    <el-form-item label="拉黑原因" prop="why">
                         <el-input v-model="black.why"></el-input>
                     </el-form-item>
                 </el-form>
@@ -113,7 +119,7 @@ export default {
                 title: "",//窗口标题
                 visible: false,//是否显示窗口
                 width: 400,//窗口宽度
-                height: 300//窗口高度
+                height: 400//窗口高度
             },
             //添加窗口绑定数据
             member: {
@@ -124,6 +130,7 @@ export default {
                 memberPhone: "",//电话号码
                 memberAge: "",//年龄
                 memberAddress: "",//住址 
+                memberType: "",//会员状态
             },
             //查询传递数据
             phone: {
@@ -136,13 +143,11 @@ export default {
                 memberName: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
                 memberSex: [{ required: true, message: '请选择性别', trigger: 'change' }],
                 memberDate: [{ required: true, message: '请选择出生日期', trigger: 'change' }],
-                memberPhone: [{ required: true, message: '请输入电话', trigger: 'blur' },
-                { pattern: new RegExp(/^((1[34578]\d{9}))$/), message: '请正确输入电话号码' }],
-                memberAge: [{ required: true, message: '请输入年龄', trigger: 'blur' },
-                { pattern: new RegExp(/^(?:[1-9][0-9]?|1[01][0-9]|100)$/), message: '请正确输入年龄' }],
-                memberAddress: [{ required: true, message: '请输入地址', trigger: 'blur' }],
-                memberDate: [{ required: true, message: '请选择出生日期', trigger: 'change' }],
-                black: [{ required: true, message: '请输入原因', trigger: 'blur' }]
+                memberPhone: [{ required: true, message: '请输入电话', trigger: 'blur' },{ pattern: new RegExp(/^((1[34578]\d{9}))$/), message: '请正确输入电话号码' }],
+                memberAge: [{ required: true, message: '请输入年龄', trigger: 'blur' },{ pattern: new RegExp(/^(?:[1-9][0-9]?|1[01][0-9]|100)$/), message: '请正确输入年龄' }],
+                memberAddress: [{ required: true, message: '请输入地址', trigger: 'blur' },{ pattern: new RegExp(/^[\u4e00-\u9fa5]{0,20}$/), message: '请正确输入地址' }],
+                memberType: [{ required: true, message: '请选择会员状态', trigger: 'change' }],
+                why: [{ required: true, message: '请输入原因', trigger: 'blur' }],
             },
             //黑名单的属性
             blackDialog: {
@@ -175,12 +180,23 @@ export default {
             if (res.success) {
                 //获取数据
                 this.tableData = res.data.records;
-                for (let i = 0; i < this.tableData.length; i++) {
-                    this.tableData[i].memberSex = this.tableData[i].memberSex == 0 ? '女' : '男'
-                    this.tableData[i].memberType = this.tableData[i].memberType == 0 ? '体验会员' : '正式会员'
-                }
                 //当前数据数量
                 this.total = res.data.total;
+            }
+        },
+        playbackFormat(row, column) {
+            if (row.memberSex == 0) {
+                return '女'
+            } else if (row.memberSex == 1) {
+                return '男'
+            }
+
+        },
+        playbackFormat2(row, column) {
+            if (row.memberType == 0) {
+                return '体验会员'
+            } else if (row.memberType == 1) {
+                return '正式会员'
             }
         },
         /**
@@ -194,10 +210,11 @@ export default {
         },
         //打开添加窗口
         openAddwindow() {
+            //清空表单数据
             this.$restForm("memberForm", this.member);
             //设置属性
-            this.ptmbDialog.title = '新增会员',
-                this.ptmbDialog.visible = true
+            this.ptmbDialog.title = '新增会员'
+            this.ptmbDialog.visible = true
         },
         //窗口关闭事件
         onClose() {
@@ -216,8 +233,6 @@ export default {
                         res = await MemberApi.getAddMember(this.member)
                     } else {
                         //修改事件
-                        this.member.memberSex = this.member.memberSex == '男' ? 1 : 0
-                        this.member.memberType = this.member.memberType == '体验会员' ? 0 : 1
                         res = await MemberApi.updataMemberByMemberPhone(this.member)
                     }
 
@@ -238,25 +253,30 @@ export default {
         },
 
         //黑名单确认事件
-        async Confirmblack() {
-            //提示是否确认
-            let confirm = await this.$myconfirm("确定加入黑名单?")//await代表同步
-            if (confirm) {
-                //发送请求
-                console.log("黑名单参数:", this.black);
-                let res = await BlackApi.updMemberState(this.black)
-                //判断是否发送成功
-                if (res.success) {
-                    //提示成功
-                    this.$message.success(res.message)
-                    this.blackDialog.visible = false
-                    //刷新数据
-                    this.search(this.pageNo, this.pageSize)
-                } else {
-                    //提示失败
-                    this.$message.error(res.message)
+         Confirmblack() {
+            //进行表单验证
+            this.$refs.blackForm.validate(async (valids) => {
+                //提示是否确认
+                if (valids) {
+                    let confirm = await this.$myconfirm("确定加入黑名单?")//await代表同步
+                    if (confirm) {
+                        //发送请求
+                        console.log("黑名单参数:", this.black);
+                        let res = await BlackApi.updMemberState(this.black)
+                        //判断是否发送成功
+                        if (res.success) {
+                            //提示成功
+                            this.$message.success(res.message)
+                            this.blackDialog.visible = false
+                            //刷新数据
+                            this.search(this.pageNo, this.pageSize)
+                        } else {
+                            //提示失败
+                            this.$message.error(res.message)
+                        }
+                    }
                 }
-            }
+            })
         },
 
         //黑名单关闭
@@ -293,9 +313,11 @@ export default {
         },
         //打开修改窗口
         async selectCommonMeal(row) {
+            //数据回显
+            this.$objCopy(row, this.member);
             this.ptmbDialog.title = "修改"
             this.ptmbDialog.visible = true
-            this.member = row
+            //this.member = row
         },
         //修改窗口关闭事件 
         pageClose() {

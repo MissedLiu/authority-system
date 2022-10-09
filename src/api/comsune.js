@@ -13,5 +13,8 @@ export default {
   },
   async getSumPrice(params){
     return await http.get("api/Comsune/sumPrice",params)
+  },
+  async deleteComSune(params){
+    return await http.delete("/api/Comsune/delete",params)
   }
 };

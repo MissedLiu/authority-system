@@ -6,8 +6,8 @@
                 <el-input placeholder="请输入电话" v-model="phone.memberPhone"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
-                <el-button type="success" icon="el-icon-plus" @click="openAddwindow()">新增</el-button>
+                <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
+                <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow()">新增</el-button>
                 <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
             </el-form-item>
         </el-form>
@@ -15,21 +15,24 @@
         <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="id"
             default-expand-all :tree-props="{ children: 'children' }">
             <el-table-column prop="memberName" label="会员姓名"></el-table-column>
-            <el-table-column prop="memberSex" label="会员性别"></el-table-column>
-            <el-table-column prop="memberPhone" label="会员电话"></el-table-column>
+            <el-table-column prop="memberSex" label="会员性别" :formatter="playbackFormat"></el-table-column>
+            <el-table-column prop="memberPhone" label="会员电话" width="110"></el-table-column>
             <el-table-column prop="memberAddress" label="地址"></el-table-column>
-            <el-table-column prop="memberType" label="状态"></el-table-column>
+            <el-table-column prop="memberType" label="状态" :formatter="playbackFormat2"></el-table-column>
             <el-table-column prop="mealName" label="套餐名称"></el-table-column>
             <el-table-column prop="mealType" label="套餐类型"></el-table-column>
             <el-table-column prop="mmTime" label="办理时间"></el-table-column>
             <el-table-column prop="mmDate" label="到期时间"></el-table-column>
-            <el-table-column label="套餐操作" width="200" align="center">
+            <el-table-column label="套餐操作" width="280" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-edit-outline" type="primary" size="small"
+                    <el-button icon="el-icon-edit-outline" plain type="primary" size="small"
                         @click="selectCommonMeal(scope.row)">
                         详情
                     </el-button>
-                    <el-button icon="el-icon-close" type="danger" size="small" @click="del(scope.row)">
+                    <el-button type="success" plain icon="el-icon-plus" size="small" @click="renew(scope.row)">
+                        续费
+                    </el-button>
+                    <el-button icon="el-icon-close" plain type="danger" size="small" @click="del(scope.row)">
                         删除
                     </el-button>
                 </template>
@@ -63,8 +66,8 @@
         <system-dialog :title="parentDialog.title" :visible="parentDialog.visible" :width="parentDialog.width"
             :height="parentDialog.height" @onClose="onParentClose()" @onConfirm="onParentConfirm()">
             <div slot="content">
-                <el-table border style="margin-top: 50px;" :data="mealList">
-                    <el-table-column label="套餐编号" align="center" prop="cmId">
+                <el-table border :data="mealList">
+                    <el-table-column label="编号" type="index" align="center" width="100">
                     </el-table-column>
                     <el-table-column label="套餐名称" align="center" prop="cmName">
                     </el-table-column>
@@ -134,8 +137,8 @@ export default {
             ptmbDialog: {
                 title: "",//窗口标题
                 visible: false,//是否显示窗口
-                width: 560,//窗口宽度
-                height: 500//窗口高度
+                width: 350,//窗口宽度
+                height: 250//窗口高度
             },
             //新增窗口绑定数据（传给后端的数据），
             member: {
@@ -156,7 +159,7 @@ export default {
                 title: "选择套餐",//窗口标题
                 visible: false,//是否显示窗口
                 width: 600,//窗口宽度
-                height: 400//窗口高度
+                height: 500//窗口高度
             },
             //套餐数据
             mealList: [],
@@ -164,8 +167,8 @@ export default {
             mealDialog: {
                 title: "套餐详情",//窗口标题
                 visible: false,//是否显示窗口
-                width: 500,//窗口宽度
-                height: 400//窗口高度
+                width: 400,//窗口宽度
+                height: 300//窗口高度
             },
             //详情数据
             mealSJ: {
@@ -178,6 +181,21 @@ export default {
         this.search();
     },
     methods: {
+        playbackFormat(row, column) {
+            if (row.memberSex == 0) {
+                return '女'
+            } else if (row.memberSex == 1) {
+                return '男'
+            }
+
+        },
+        playbackFormat2(row, column) {
+            if (row.memberType == 0) {
+                return '体验会员'
+            } else if (row.memberType == 1) {
+                return '正式会员'
+            }
+        },
         //查询普通会员列表
         async search(pageNo, pageSize) {
             //修改当前页码
@@ -190,10 +208,6 @@ export default {
             if (res.success) {
                 //获取数据
                 this.tableData = res.data.records;
-                for (let i = 0; i < this.tableData.length; i++) {
-                    this.tableData[i].memberSex = this.tableData[i].memberSex == 0 ? '女' : '男'
-                    this.tableData[i].memberType = this.tableData[i].memberType == 0 ? '体验会员' : '正式会员'
-                }
                 //当前数据数量
                 this.total = res.data.total;
             }
@@ -299,6 +313,27 @@ export default {
     pageConfirm() {
         this.mealDialog.visible = false
     },
+    //续费
+    async renew(row){
+        let confirm = await this.$myconfirm("确定续费吗?")//await代表同步
+        if (confirm) {
+            //发送续费请求
+            let res = await CommonMember.renewCommonMember(row)
+            //判断是否发送成功
+            if (res.success) {
+                //提示成功
+                this.$message.success(res.message)
+                //刷新数据
+                this.search(this.pageNo, this.size)
+            } else {
+                //提示失败
+                this.$message.error(res.message)
+            }
+        }
+    },
+
+
+
     handleSizeChange(size) {
         //修改每页显示数量
         this.pageSize = size

@@ -6,7 +6,7 @@
                 <el-input placeholder="请输入电话" v-model="emp.memberPhone"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
+                <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
                 <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
             </el-form-item>
         </el-form>
@@ -20,7 +20,7 @@
             <el-table-column prop="createTime" label="注册时间"></el-table-column>
             <el-table-column label="操作" width="150" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-close" type="danger" size="small" @click="addCallBack(scope.row)">
+                    <el-button icon="el-icon-plus" type="success" plain size="small" @click="addCallBack(scope.row)">
                         回访
                     </el-button>
                 </template>
@@ -35,8 +35,9 @@
         <system-dialog :title="callBackDialog.title" :visible="callBackDialog.visible" :width="callBackDialog.width"
             :height="callBackDialog.height" @onClose="callBackClose()" @onConfirm="callBackConfirm()">
             <div slot="content">
-                <el-form ref="memberFormXQ" label-width="80px" size="small" :inline="true">
-                    <el-form-item label="回访内容">
+                <el-form :model="callBack" ref="memberFormXQ" label-width="80px" size="small" :inline="true"
+                    :rules="rules">
+                    <el-form-item label="回访内容" prop="callbackContent">
                         <el-input v-model="callBack.callbackContent" :rows="10" type="textarea"></el-input>
                     </el-form-item>
                 </el-form>
@@ -64,10 +65,14 @@ export default {
             pageSize: 10,//每页显示数量
             tableData: [],//表格数据列表
             emp: {
-                memberPhone:"",
+                memberPhone: "",
                 empId: this.$store.getters.userId,//账户id
                 pageNo: 1,//当前页码
                 pageSize: 10,//每页显示数量
+            },
+            //验证
+            rules: {
+                callbackContent: [{ required: true, message: '回访内容不能未空', trigger: 'blur' }]
             },
             //回访框参数
             callBackDialog: {
@@ -123,11 +128,15 @@ export default {
             this.callBackDialog.visible = false
         },
         //确认事件
-        async callBackConfirm() {
-             //发送查询请求
-             let res = await memberListApi.addCallbackMember(this.callBack);
-            //判断是否存在数据
-            if (res.success) {
+        callBackConfirm() {
+            //进行表单验证
+            this.$refs.memberFormXQ.validate(async (valid) => {
+                //如果验证通过
+                if (valid) {
+                    //发送查询请求
+                    let res = await memberListApi.addCallbackMember(this.callBack);
+                    //判断是否存在数据
+                    if (res.success) {
                         //提示成功
                         this.$message.success(res.message)
                         //关闭窗口事件
@@ -136,6 +145,8 @@ export default {
                         //提示失败
                         this.$message.error(res.message)
                     }
+                }
+            })
         },
         /**
         * 重置查询条件

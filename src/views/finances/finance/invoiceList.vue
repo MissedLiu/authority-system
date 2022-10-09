@@ -30,7 +30,12 @@
             <el-table-column prop="brand" label="品牌" />
             <el-table-column prop="empId" label="销售人员编号" />
             <el-table-column prop="createTime" label="创建时间" />
-
+            <el-table-column label="操作" align="center">
+                <template slot-scope="scope">
+                    <el-button icon="el-icon-close" type="danger" size="small" plain  @click="handleDelete(scope.row)">删除
+                    </el-button>
+                </template>
+            </el-table-column>
         </el-table>
 
         <!-- 分页工具栏 -->
@@ -138,9 +143,6 @@ export default {
             this.search();
         },
 
-        /**
-         * 查询采购计划列表
-         */
         async search(pageNo, pageSize) {
             //修改当前页码
             this.searchModel.pageNo = pageNo;
@@ -206,10 +208,28 @@ export default {
 
         async toSumPrice() {
             console.log(this.tjType)
-            await invoiceApi.toSumPrice({id:this.tjType}).then(res => {
-                this.sumPrice=res.data
+            await invoiceApi.toSumPrice({ id: this.tjType }).then(res => {
+                this.sumPrice = res.data
             })
-        }
+        },
+        //删除按钮实现
+    async handleDelete(row) {
+      let confirm = await this.$myconfirm("确定要删除该数据嘛?");
+      if (confirm) {
+        await invoiceApi.deleteInvoice({invoiceId : row.invoiceId})
+          .then((res) => {
+            if (res.success) {
+              //提示成功
+              this.$message.success(res.message);
+              //刷新数据
+              this.search(this.pageNo, this.pageSize);
+            } else {
+              //提示失败
+              this.$message.error(res.message);
+            }
+          });
+      }
+    },
     },
 };
 </script>

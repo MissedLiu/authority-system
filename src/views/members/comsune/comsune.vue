@@ -6,14 +6,13 @@
           <el-input placeholder="请输入电话" v-model="phone.memberPhone"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" icon="el-icon-search" @click="search(pageNo, pageSize)">查询</el-button>
+          <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo, pageSize)">查询</el-button>
           <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
         </el-form-item>
       </el-form>
       <!-- 数据表格 -->
       <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="id" default-expand-all
         :tree-props="{ children: 'children' }">
-        <el-table-column prop="comsuneId" label="消费记录编号"></el-table-column>
         <el-table-column prop="memberName" label="会员名称" :formatter="playbackFormat"></el-table-column>
         <el-table-column prop="memberPhone" label="会员电话"></el-table-column>
         <el-table-column prop="mealName" label="套餐名称"></el-table-column>
