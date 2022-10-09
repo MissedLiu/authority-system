@@ -10,14 +10,7 @@
                 <el-button icon="el-icon-refresh-right " @click="resetValue()">重置</el-button>
             </el-form-item>
         </el-form>
-        <!-- 
-            data属性:表格数据
-            border属性:表格边框
-            stripe属性:表格斑马线
-            row-key属性:行数据的key,用来优化table的渲染
-            default-expand-all属性:默认展开树形表格数据
-            tree-props属性:树形表格配置属性选型
-         -->
+
         <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="eeId"
             default-expand-all>
             <el-table-column prop="empName" label="销售人员名称" />

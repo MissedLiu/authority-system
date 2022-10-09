@@ -138,15 +138,7 @@ export default {
           this.tableData = res.data.records;
           this.total = res.data.total;
           console.log(this.changeDisburseTime);
-          for (let i = 0; i < this.tableData.length; i++) {
-            if (this.tableData[i].methods == 0) {
-              this.tableData[i].methods = "自修";
-            } else if (this.tableData[i].methods == 1) {
-              this.tableData[i].methods = "换件";
-            } else if (this.tableData[i].methods == 2) {
-              this.tableData[i].methods = "外修";
-            }
-          }
+
         }
       });
     },
@@ -160,16 +152,6 @@ export default {
         if (res.success) {
           this.tableData = res.data.records;
           this.total = res.data.total;
-          console.log(this.changeDisburseTime);
-          for (let i = 0; i < this.tableData.length; i++) {
-            if (this.tableData[i].methods == 0) {
-              this.tableData[i].methods = "自修";
-            } else if (this.tableData[i].methods == 1) {
-              this.tableData[i].methods = "换件";
-            } else if (this.tableData[i].methods == 2) {
-              this.tableData[i].methods = "外修";
-            }
-          }
         }
       });
     },
