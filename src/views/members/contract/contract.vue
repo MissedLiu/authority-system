@@ -6,8 +6,8 @@
                 <el-input placeholder="请输入电话" v-model="phone.memberPhone"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" icon="el-icon-search" @click="search(pageNo, pageSize)">查询</el-button>
-                <el-button type="primary" icon="el-icon-search" @click="opencompactWindow()">签订合同</el-button>
+                <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo, pageSize)">查询</el-button>
+                <el-button type="success" plain icon="el-icon-plus" @click="opencompactWindow()">签订合同</el-button>
                 <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
             </el-form-item>
         </el-form>
@@ -20,10 +20,13 @@
             <el-table-column prop="endDate" label="结束日期"></el-table-column>
             <el-table-column prop="compactType" label="合同类型"></el-table-column>
             <el-table-column prop="salesman" label="业务员"></el-table-column>
-            <el-table-column label="操作" width="200" align="center">
+            <el-table-column label="操作" width="250" align="center">
                 <template slot-scope="scope">
-                    <el-button type="primary" icon="el-icon-search" size="small" @click="detialwindow(scope.row)">
+                    <el-button icon="el-icon-edit-outline" plain type="primary" size="small" @click="detialwindow(scope.row)">
                         合同详情
+                    </el-button>
+                    <el-button type="danger" plain size="small" @click="delDetial(scope.row)">
+                        删除合同
                     </el-button>
                 </template>
             </el-table-column>
@@ -44,7 +47,7 @@
                         <el-input placeholder="请输入电话" v-model="compactPhone.memberPhone"></el-input>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" icon="el-icon-search" @click="findAllMember()">查询</el-button>
+                        <el-button type="primary" plain icon="el-icon-search" @click="findAllMember()">查询</el-button>
                         <el-button icon="el-icon-refresh-right" @click="resetValue2">返回</el-button>
                     </el-form-item>
                 </el-form>
@@ -67,31 +70,31 @@
         <system-dialog :title="signingDialog.title" :visible="signingDialog.visible" :width="signingDialog.width"
             :height="signingDialog.height" @onClose="signingClose" @onConfirm="signingConfirm">
             <div slot="content">
-                <el-form :model="signing" ref="signingForm" :rules="mbrules" label-width="100px" size="small">
-                    <el-form-item label="会员姓名">
+                <el-form :model="signing" ref="signingForm" :rules="rules" label-width="110px" size="small">
+                    <el-form-item label="会员姓名" prop="memberName">
                         <el-input v-model="signing.memberName"></el-input>
                     </el-form-item>
-                    <el-form-item label="会员电话">
+                    <el-form-item label="会员电话" prop="memberPhone">
                         <el-input v-model="signing.memberPhone"></el-input>
                     </el-form-item>
-                    <el-form-item label="套餐办理编号">
+                    <el-form-item label="套餐办理编号" prop="meal">
                         <el-input v-model="signing.meal" @click.native="openMealWindow()"></el-input>
                     </el-form-item>
                     <el-form-item label="类型">
-                        <el-input v-model="signing.compactType"></el-input>
+                        <el-input v-model="signing.compactType" readonly></el-input>
                     </el-form-item>
-                    <el-form-item label="合同签订时间">
+                    <el-form-item label="合同签订时间" prop="createDate">
                         <el-date-picker v-model="signing.createDate" type="datetime" style="width:180px"
                             placeholder="选择合同签订时间" format="yyyy-MM-dd" value-format="yyyy-MM-dd">
                         </el-date-picker>
                     </el-form-item>
                     <el-form-item label="合同结束时间">
-                        <el-input v-model="signing.endDate"></el-input>
+                        <el-input v-model="signing.endDate" readonly></el-input>
                     </el-form-item>
-                    <el-form-item label="业务员" prop="memberAddress">
+                    <el-form-item label="业务员" prop="salesman">
                         <el-input v-model="signing.salesman"></el-input>
                     </el-form-item>
-                    <el-form-item label="图片">
+                    <el-form-item label="图片" prop="photoAddress">
                         <el-upload :show-file-list="false" :on-success="handleAvatarSuccess"
                             :before-upload="beforeAvatarUpload" class="avatar-uploader" :data="uploadHeader"
                             action="http://localhost:8888/api/oss/file/upload?module=photoAddress">
@@ -131,7 +134,7 @@
         <system-dialog :title="detialDialog.title" :visible="detialDialog.visible" :width="detialDialog.width"
             :height="detialDialog.height" @onClose="closedetial" @onConfirm="closedetial">
             <div slot="content">
-                <img :src=this.src style="width:650px;height:400px" >
+                <img :src=this.src style="width:650px;height:400px">
             </div>
         </system-dialog>
     </el-main>
@@ -164,6 +167,16 @@ export default {
                 pageNo: 1, //当前页码
                 pageSize: 10, //每页显示数量
             },
+            //验证
+            rules: {
+                memberName: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
+                memberSex: [{ required: true, message: '请选择性别', trigger: 'change' }],
+                meal: [{ required: true, message: '请选择套餐办理编号', trigger: 'change' }],
+                createDate: [{ required: true, message: '请选择签订时间', trigger: 'change' }],
+                salesman: [{ required: true, message: '请输入业务员', trigger: 'blur' }],
+                photoAddress: [{ required: true, message: '合同图片不能为空', trigger: 'blur' }],
+            },
+
             //合同签订窗口的电话查询参数
             compactPhone: {
                 memberPhone: ""
@@ -184,7 +197,7 @@ export default {
                 title: "会员签约",//窗口标题
                 visible: false,//是否显示窗口
                 width: 500,//窗口宽度
-                height: 400//窗口高度
+                height: 600//窗口高度
             },
             //签约框绑定数据
             signing: {
@@ -216,7 +229,7 @@ export default {
                 width: 700,//窗口宽度
                 height: 500//窗口高度
             },
-            src:"",
+            src: "",
         };
     },
     created() {
@@ -243,15 +256,15 @@ export default {
         //打开查看合同详情窗口
         async detialwindow(row) {
             //发送请求
-            this.detialDialog.title="合同原件"
-            this.detialDialog.visible=true
-            this.src=row.photoAddress
+            this.detialDialog.title = "合同原件"
+            this.detialDialog.visible = true
+            this.src = row.photoAddress
             console.log("xxxx", row);
         },
-         //关闭查看合同详情窗口
-         closedetial(){
-            this.detialDialog.visible=false
-         },
+        //关闭查看合同详情窗口
+        closedetial() {
+            this.detialDialog.visible = false
+        },
 
 
 
@@ -284,8 +297,6 @@ export default {
             this.compactDialog.visible = false
         },
 
-
-
         //打开签约框
         signingwindow(row) {
             this.$restForm("signingForm", this.signing);
@@ -300,31 +311,41 @@ export default {
         },
         //签约框确定事件
         async signingConfirm() {
-            let perom = {
-                memberId: this.signing.memberId,
-                createDate: this.signing.createDate,
-                endDate: this.signing.endDate,
-                photoAddress: this.signing.photoAddress,
-                compactType: this.signing.compactType,
-                salesman: this.signing.salesman,
-                mmId: this.signing.meal
-            }
-            //发送请求
-            console.log(perom)
-            let res = await contractApi.addCompact(perom)
-            if (res.success) {
-                //提示成功
-                this.$message.success(res.message)
-                //关闭窗口事件
-                this.signingDialog.visible = false
-                //刷新数据
-                this.search(this.pageNo, this.pageSize);
-            } else {
-                //提示失败
-                this.$message.error(res.message)
-            }
-        },
 
+            //进行表单验证
+            this.$refs.signingForm.validate(async (valid) => {
+                //如果验证通过
+                if (valid) {
+                    let perom = {
+                        memberId: this.signing.memberId,
+                        createDate: this.signing.createDate,
+                        endDate: this.signing.endDate,
+                        photoAddress: this.signing.photoAddress,
+                        compactType: this.signing.compactType,
+                        salesman: this.signing.salesman,
+                        mmId: this.signing.meal
+                    }
+                    //发送请求
+                    console.log(perom)
+                    let res = await contractApi.addCompact(perom)
+                    if (res.success) {
+                        //提示成功
+                        this.$message.success(res.message)
+                        //关闭窗口事件
+                        this.signingDialog.visible = false
+                        this.compactDialog.visible = false
+                        //刷新数据
+                        this.search(this.pageNo, this.pageSize);
+                        this.resetValue2()
+                    } else {
+                        //提示失败
+                        this.$message.error(res.message)
+                    }
+                }
+
+            })
+
+        },
 
 
         //打开未签订合同的套餐框
@@ -333,6 +354,7 @@ export default {
             this.parentDialog.visible = true
             let res = await contractApi.findMemberMeal({ memberId: this.signing.memberId })
             if (res.success) {
+                console.log("-=-=-=-=-=-=-=--=-=-=-=", res);
                 this.mealList = res.data
             }
         },
@@ -353,9 +375,6 @@ export default {
         },
 
 
-
-
-
         //上传成功回调
         handleAvatarSuccess(res, file) {
             this.signing.photoAddress = res.data
@@ -374,8 +393,24 @@ export default {
             }
             return isJPG && isLt2M
         },
-
-
+        //删除合同
+        async delDetial(row) {
+            let confirm = await this.$myconfirm("确定删除该记录吗?")//await代表同步
+            if (confirm) {
+                let res = await contractApi.delDetial({ compactId: row.compactId })
+                if (res.success) {
+                    //提示成功
+                    this.$message.success(res.message)
+                    //关闭窗口事件
+                    this.signingDialog.visible = false
+                    //刷新数据
+                    this.search(this.pageNo, this.pageSize);
+                } else {
+                    //提示失败
+                    this.$message.error(res.message)
+                }
+            }
+        },
 
 
 

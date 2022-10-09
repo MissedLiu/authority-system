@@ -6,15 +6,15 @@
                 <el-input placeholder="请输入名字" v-model="lose.itemName"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
-                <el-button type="success" icon="el-icon-plus" @click="openAddwindow">新增</el-button>
+                <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
+                <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow">新增</el-button>
                 <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
             </el-form-item>
         </el-form>
         <!-- 数据表格 -->
         <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="id"
             default-expand-all :tree-props="{ children: 'children' }">
-            <el-table-column prop="id" label="编号"></el-table-column>
+            <el-table-column label="编号" type="index" align="center" width="100"></el-table-column>
             <el-table-column prop="itemName" label="物品名称"></el-table-column>
             <el-table-column prop="createTtime" label="添加时间"></el-table-column>
             <el-table-column prop="state" label="领取状态"></el-table-column>
@@ -23,7 +23,7 @@
             <el-table-column prop="addTime" label="领取时间"></el-table-column>
             <el-table-column label="操作" width="200" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="openReceive(scope.row)">
+                    <el-button type="success" plain icon="el-icon-plus" size="small" @click="openReceive(scope.row)">
                         领取
                     </el-button>
                 </template>
@@ -39,8 +39,8 @@
         <system-dialog :title="addloseDialog.title" :visible="addloseDialog.visible" :width="addloseDialog.width"
             :height="addloseDialog.height" @onClose="onClose" @onConfirm="onConfirm">
             <div slot="content">
-                <el-form :model="addlose" ref="memberForm" :rules="mbrules" label-width="80px" size="small">
-                    <el-form-item label="物品名称" prop="memberName">
+                <el-form :model="addlose" ref="addloseForm" :rules="loserules" label-width="80px" size="small">
+                    <el-form-item label="物品名称" prop="itemName">
                         <el-input v-model="addlose.itemName"></el-input>
                     </el-form-item>
                 </el-form>
@@ -51,11 +51,11 @@
         <system-dialog :title="receiveDialog.title" :visible="receiveDialog.visible" :width="receiveDialog.width"
             :height="receiveDialog.height" @onClose="receiveClose" @onConfirm="receiveConfirm">
             <div slot="content">
-                <el-form :model="receive" ref="memberForm" :rules="mbrules" label-width="100px" size="small">
-                    <el-form-item label="领取人姓名" >
+                <el-form :model="receive" ref="userForm" :rules="loserules" label-width="100px" size="small">
+                    <el-form-item label="领取人姓名" prop="uname">
                         <el-input v-model="receive.uname"></el-input>
                     </el-form-item>
-                    <el-form-item label="领取人电话" >
+                    <el-form-item label="领取人电话" prop="phone">
                         <el-input v-model="receive.phone"></el-input>
                     </el-form-item>
                 </el-form>
@@ -89,6 +89,12 @@ export default {
                 itemName: "",//模糊名称
                 pageNo: 1,//当前页码
                 pageSize: 10,//每页显示数量
+            },
+            //校验
+            loserules: {
+                itemName: [{ required: true, message: '请输入失物名称', trigger: 'blur' }],
+                uname: [{ required: true, message: '请输入会员姓名', trigger: 'blur' }],
+                phone: [{ required: true, message: '请输入会员电话', trigger: 'blur' },{pattern: new RegExp(/^((1[34578]\d{9}))$/), message: '请正确输入电话号码' }],
             },
             //添加窗口属性
             addloseDialog: {
@@ -144,21 +150,26 @@ export default {
         },
         //添加窗口确定事件
         async onConfirm() {
-            console.log("----------------",this.addlose);
-            //发送添加请求
-            let res = await LoseApi.addLose(this.addlose);
-            //判断是否成功
-            if (res.success) {
-                //提示成功
-                this.$message.success(res.message)
-                //关闭窗口事件
-                this.addloseDialog.visible = false
-                //刷新数据
-                this.search(this.pageNo, this.size)
-            } else {
-                //提示失败
-                this.$message.error(res.message)
-            }
+            //进行表单验证
+            this.$refs.addloseForm.validate(async (valid) => {
+                //如果验证通过
+                if (valid) { 
+                    //发送添加请求
+                    let res = await LoseApi.addLose(this.addlose);
+                    //判断是否成功
+                    if (res.success) {
+                        //提示成功
+                        this.$message.success(res.message)
+                        //关闭窗口事件
+                        this.addloseDialog.visible = false
+                        //刷新数据
+                        this.search(this.pageNo, this.size)
+                    } else {
+                        //提示失败
+                        this.$message.error(res.message)
+                    }
+                }
+            })
 
         },
         //添加窗口取消事件
@@ -172,26 +183,34 @@ export default {
             this.receive.id = row.id
             this.receive.itemName = row.itemName
             this.receive.createTtime = row.createTtime
-            
+
         },
         //领取窗口确定事件
-        async receiveConfirm() {
+        receiveConfirm() {
+            //进行表单验证
+            this.$refs.userForm.validate(async (valid) => {
+                //如果验证通过
+                if (valid) {
+                    //发送添加请求
+                    console.log("---------------", this.receive);
+                    let res = await LoseApi.updateLoseState(this.receive);
+                    //判断是否成功
+                    if (res.success) {
+                        //提示成功
+                        this.$message.success(res.message)
+                        //清空表单数据
+                        this.$restForm("userForm", this.receive);
+                        //刷新数据
+                        this.search(this.pageNo, this.size)
+                        //关闭窗口事件
+                        this.receiveDialog.visible = false
+                    } else {
+                        //提示失败
+                        this.$message.error(res.message)
+                    }
+                }
+            })
 
-            //发送添加请求
-            console.log("---------------",this.receive);
-            let res = await LoseApi.updateLoseState(this.receive);
-            //判断是否成功
-            if (res.success) {
-                //提示成功
-                this.$message.success(res.message)
-                //关闭窗口事件
-                this.receiveDialog.visible = false
-                //刷新数据
-                this.search(this.pageNo, this.size)
-            } else {
-                //提示失败
-                this.$message.error(res.message)
-            }
         },
         //领取窗口取消事件
         receiveClose() {

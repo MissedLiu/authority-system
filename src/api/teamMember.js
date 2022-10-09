@@ -26,6 +26,13 @@ export default {
   async getdelTeamMealById(params) {
     return await request.delete("/api/teamMember/delTeamMealById", params);
   },
+     /**
+   * 续费
+   * @returns
+   */
+      async renewTeamMember(params) {
+        return await request.put("/api/teamMember/renew", params);
+      },
 
   /*********************************/
   /**

@@ -6,7 +6,7 @@
                 <el-input placeholder="请输入电话" v-model="member.memberPhone"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
+                <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
                 <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
             </el-form-item>
         </el-form>
@@ -19,7 +19,7 @@
             <el-table-column prop="memberPhone" label="电话"></el-table-column>
             <el-table-column prop="createTime" label="注册时间"></el-table-column>
             <el-table-column prop="columnTime" label="回访时间"></el-table-column>
-            <el-table-column prop="callbackContent" label="回访内容" ></el-table-column>
+            <el-table-column prop="callbackContent" label="回访内容" width="500" ></el-table-column>
 
         </el-table>
         <!-- 分页组件 -->

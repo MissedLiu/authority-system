@@ -3,33 +3,16 @@
     <!-- 查询条件 -->
     <el-form ref="searchForm" label-width="80px" :inline="true" size="small">
       <el-form-item>
-        <el-input
-          placeholder="请输入电话"
-          v-model="phone.memberPhone"
-        ></el-input>
+        <el-input placeholder="请输入电话" v-model="phone.memberPhone"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button
-          type="primary"
-          icon="el-icon-search"
-          @click="search(pageNo, pageSize)"
-          >查询</el-button
-        >
-        <el-button icon="el-icon-refresh-right" @click="resetValue()"
-          >返回</el-button
-        >
+        <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo, pageSize)">查询</el-button>
+        <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
       </el-form-item>
     </el-form>
     <!-- 数据表格 -->
-    <el-table
-      :data="tableData"
-      border
-      stripe
-      style="width: 100%; margin-bottom: 20px"
-      row-key="id"
-      default-expand-all
-      :tree-props="{ children: 'children' }"
-    >
+    <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="id" default-expand-all
+      :tree-props="{ children: 'children' }">
       <el-table-column prop="memberName" label="会员姓名"></el-table-column>
       <el-table-column prop="memberSex" label="会员性别"></el-table-column>
       <el-table-column prop="memberPhone" label="会员电话"></el-table-column>
@@ -38,30 +21,21 @@
       <el-table-column prop="memberAddress" label="地址"></el-table-column>
       <el-table-column prop="memberType" label="状态"></el-table-column>
       <el-table-column prop="createTime" label="拉黑时间"></el-table-column>
-      <el-table-column
-        prop="why"
-        label="拉黑原因"
-        width="200"
-      ></el-table-column>
+      <el-table-column prop="why" label="拉黑原因" width="200"></el-table-column>
       <el-table-column label="操作" width="150" align="center">
         <template slot-scope="scope">
-          <el-button
-            icon="el-icon-close"
-            type="danger"
-            size="small"
-            @click="del(scope.row)"
-          >
+          <el-button icon="el-icon-minus" plain type="warning" size="small" @click="del(scope.row)">
             移出黑名单
           </el-button>
         </template>
       </el-table-column>
     </el-table>
 
-            <!-- 分页组件 -->
-            <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange"
-            :current-page="pageNo" :page-sizes="[10, 20, 30, 40, 50]" :page-size="10"
-            layout="total, sizes, prev, pager, next, jumper" :total="total">
-        </el-pagination>
+    <!-- 分页组件 -->
+    <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange"
+      :current-page="pageNo" :page-sizes="[10, 20, 30, 40, 50]" :page-size="10"
+      layout="total, sizes, prev, pager, next, jumper" :total="total">
+    </el-pagination>
   </el-main>
 </template>
 
@@ -159,17 +133,19 @@ export default {
       //调用查询方法
       this.search(page, this.pageSize);
     },
-            /**
-        * 重置查询条件
-        */
-        resetValue() {
-            //清空数据
-            this.phone.memberPhone = "";
-            //调用查询方法
-            this.search()
-        },
+    /**
+* 重置查询条件
+*/
+    resetValue() {
+      //清空数据
+      this.phone.memberPhone = "";
+      //调用查询方法
+      this.search()
+    },
   },
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+
+</style>

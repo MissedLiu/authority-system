@@ -6,7 +6,7 @@
                 <el-input placeholder="请输入电话" v-model="emp.empPhone"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
+                <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
                 <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
             </el-form-item>
         </el-form>
@@ -23,11 +23,11 @@
             <el-table-column prop="weix" label="微信"></el-table-column>
             <el-table-column label="操作" width="450" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-edit-outline" type="primary" @click="openupdwindow(scope.row)">修改
+                    <el-button icon="el-icon-edit-outline"  plain  type="primary" @click="openupdwindow(scope.row)">修改
                     </el-button>
-                    <el-button icon="el-icon-edit-outline" type="primary" @click="openPtMealWindow(scope.row)">分配私教套餐
+                    <el-button icon="el-icon-edit-outline"  plain  type="primary"  @click="openPtMealWindow(scope.row)">分配私教套餐
                     </el-button>
-                    <el-button icon="el-icon-edit-outline" type="primary" @click="openTeamMealWindow(scope.row)">分配团操套餐
+                    <el-button icon="el-icon-edit-outline" plain  type="primary" @click="openTeamMealWindow(scope.row)">分配团操套餐
                     </el-button>
                 </template>
             </el-table-column>
@@ -42,35 +42,35 @@
         <system-dialog :title="coachDialog.title" :visible="coachDialog.visible" :width="coachDialog.width"
             :height="coachDialog.height" @onClose="onClose" @onConfirm="onConfirm">
             <div slot="content">
-                <el-form :model="updEmp" ref="coachForm" :rules="mbrules" label-width="80px" size="small">
-                    <el-form-item label="姓名">
+                <el-form :model="updEmp" ref="coachForm" :rules="rules" label-width="80px" size="small">
+                    <el-form-item label="姓名" prop="empName">
                         <el-input v-model="updEmp.empName"></el-input>
                     </el-form-item>
-                    <el-form-item label="性别">
+                    <el-form-item label="性别" prop="empSex">
                         <el-select v-model="updEmp.empSex" placeholder="请选择性别">
                             <el-option :value="'男'" label="男">男</el-option>
                             <el-option :value="'女'" label="女">女</el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item label="电话">
+                    <el-form-item label="电话" prop="empPhone">
                         <el-input v-model="updEmp.empPhone"></el-input>
                     </el-form-item>
-                    <el-form-item label="年龄">
+                    <el-form-item label="年龄" prop="empAge">
                         <el-input v-model="updEmp.empAge"></el-input>
                     </el-form-item>
-                    <el-form-item label="住址">
+                    <el-form-item label="住址" prop="empAddress">
                         <el-input v-model="updEmp.empAddress"></el-input>
                     </el-form-item>
                     <el-form-item label="邮箱">
-                        <el-input v-model="updEmp.emil"></el-input>
+                        <el-input v-model="updEmp.emil" disabled></el-input>
                     </el-form-item>
                     <el-form-item label="qq">
-                        <el-input v-model="updEmp.qq"></el-input>
+                        <el-input v-model="updEmp.qq" disabled></el-input>
                     </el-form-item>
                     <el-form-item label="微信">
-                        <el-input v-model="updEmp.weix"></el-input>
+                        <el-input v-model="updEmp.weix" disabled></el-input>
                     </el-form-item>
-                    <el-form-item label="简介">
+                    <el-form-item label="简介" prop="synopsis">
                         <el-input v-model="updEmp.synopsis" :rows="10" type="textarea"></el-input>
                     </el-form-item>
                 </el-form>
@@ -144,17 +144,14 @@ export default {
                 pageNo: 1,//当前页码
                 pageSize: 10,//每页显示数量
             },
-            //  //验证
-            //  mbrules: {
-            //     consultName: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
-            //     consultSex: [{ required: true, message: '请选择性别', trigger: 'change' }],
-            //     consultPhone: [{ required: true, message: '请输入电话', trigger: 'blur' },
-            //     { pattern: new RegExp(/^((1[34578]\d{9}))$/), message: '请正确输入电话号码' }],
-            //     consultAge: [{ required: true, message: '请输入年龄', trigger: 'blur' },
-            //     { pattern: new RegExp(/^(?:[1-9][0-9]?|1[01][0-9]|100)$/), message: '请正确输入年龄' }],
-            //     consultContent: [{ required: true, message: '请输入咨询内容', trigger: 'blur' }],
-
-            //  },
+            rules: {
+                synopsis: [{ required: true, trigger: 'blur', message: '简介不能为空' }],
+                empName: [{ required: true, trigger: 'blur', message: '请填写教练姓名' }],
+                empAge: [{ required: true, trigger: 'blur', message: '请输入年龄' }, { pattern: new RegExp(/^(?:[1-9][0-9]?|1[01][0-9]|100)$/), message: '请正确输入年龄' }],
+                empPhone: [{ required: true, trigger: 'blur', message: '请输入电话' }, { pattern: new RegExp(/^((1[34578]\d{9}))$/), message: '请正确输入电话号码' }],
+                empSex: [{ required: true, trigger: 'change', message: '请选择性别' }],
+                empAddress: [{ required: true, trigger: 'blur', message: '请输入住址' }, { pattern: new RegExp(/^[\u4e00-\u9fa5]{0,20}$/), message: '请正确输入地址' }]
+            },
             coachDialog: {
                 title: "",//窗口标题
                 visible: false,//是否显示窗口
@@ -198,7 +195,7 @@ export default {
             empId: "",
 
             //团操套餐窗口
-             teamMealDialog: {
+            teamMealDialog: {
                 title: "",//窗口标题
                 visible: false,//是否显示窗口
                 width: 700,//窗口宽度
@@ -246,11 +243,11 @@ export default {
             console.log(this.ptAndEmp.ptMealId);
             console.log(this.ptAndEmp.empId);
         },
-                /**
-            * 复选框选中事件
-            * @param  rows 
-            */
-            handleSelectionChange2(rows) {
+        /**
+    * 复选框选中事件
+    * @param  rows 
+    */
+        handleSelectionChange2(rows) {
             //拿到选中的ID 值
             this.teamAndEmp.teamMealId = rows.map(item => item.teamId);
         },
@@ -270,20 +267,27 @@ export default {
         },
         // //窗口确认事件
         async onConfirm() {
-            //添加事件
-            let res = await CoachApi.updateEmp(this.updEmp)
-            //判断是否成功
-            if (res.success) {
-                //提示成功
-                this.$message.success(res.message)
-                //关闭窗口事件
-                this.coachDialog.visible = false
-                //刷新数据
-                this.search(this.pageNo, this.pageSize)
-            } else {
-                //提示失败
-                this.$message.error(res.message)
-            }
+            //进行表单验证
+            this.$refs.coachForm.validate(async (valid) => {
+                //如果验证通过
+                if (valid) {
+                    //添加事件
+                    let res = await CoachApi.updateEmp(this.updEmp)
+                    //判断是否成功
+                    if (res.success) {
+                        //提示成功
+                        this.$message.success(res.message)
+                        //关闭窗口事件
+                        this.coachDialog.visible = false
+                        //刷新数据
+                        this.search(this.pageNo, this.pageSize)
+                    } else {
+                        //提示失败
+                        this.$message.error(res.message)
+                    }
+                }
+            })
+
         },
 
         //打开分配私教套餐窗口

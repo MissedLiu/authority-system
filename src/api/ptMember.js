@@ -27,6 +27,13 @@ export default {
       return await request.delete("/api/ptMember/delPtMealById", params);
     },
 
+       /**
+   * 续费
+   * @returns
+   */
+        async renewPtMember(params) {
+          return await request.put("/api/ptMember/renew", params);
+        },
 
   /*********************************/
     /**
