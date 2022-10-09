@@ -24,16 +24,16 @@
             <el-table-column prop="commTime" label="最后统计时间" />
             <el-table-column label="操作" width="470" align="center">
                 <template slot-scope="scope">
-                    <el-button type="success" icon="el-icon-plus" size="small" @click="handlePtStatistics(scope.row)">
+                    <el-button type="primary" plain  size="small" @click="handlePtStatistics(scope.row)">
                         普通提成
                     </el-button>
-                    <el-button type="success" icon="el-icon-plus" size="small" @click="handleSjStatistics(scope.row)">
+                    <el-button type="success" plain  size="small" @click="handleSjStatistics(scope.row)">
                         私教提成
                     </el-button>
-                    <el-button type="success" icon="el-icon-plus" size="small" @click="handleTcStatistics(scope.row)">
+                    <el-button type="primary" plain  size="small" @click="handleTcStatistics(scope.row)">
                         团操提成
                     </el-button>
-                    <el-button type="success" icon="el-icon-plus" size="small" @click="handleSpStatistics(scope.row)">
+                    <el-button type="success" plain  size="small" @click="handleSpStatistics(scope.row)">
                         商品提成
                     </el-button>
                 </template>

@@ -32,7 +32,7 @@
             <el-table-column prop="createTime" label="创建时间" />
             <el-table-column label="操作" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete(scope.row)">删除
+                    <el-button icon="el-icon-close" type="danger" size="small" plain  @click="handleDelete(scope.row)">删除
                     </el-button>
                 </template>
             </el-table-column>
