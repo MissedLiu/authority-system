@@ -3,14 +3,12 @@
   <div>
     <div class="dashboard-container">
       <el-row :gutter="20">
-        <el-col :span="16">
-          <!-- <div><RaddarChart></RaddarChart></div> -->
+        <el-col :span="14">
           <bin-zhuang v-if="flag" :emp="this.empNUm"></bin-zhuang>
-
         </el-col>
         <el-col :span="8">
           <div>
-            <PieChart></PieChart>
+            <PieChart v-if="flag" :mealNum="this.TeamlNum"></PieChart>
           </div>
         </el-col>
       </el-row>
@@ -50,6 +48,7 @@ import RaddarChart from './admin/components/RaddarChart.vue'
 import TransactionTable from './admin/components/TransactionTable.vue'
 import BinZhuang from './admin/components/BinZhuang.vue'
 import empApi from '@/api/empApi'
+import memberApi from '@/api/member'
 
 export default {
   components: { BarChart, LineChart, PanelGroup, BoxCard, PieChart, RaddarChart, TransactionTable, BinZhuang },
@@ -57,26 +56,25 @@ export default {
   data() {
     return {
       empNUm: {},
-      flag:false,
+      TeamlNum: {},
+      flag: false,
     }
   },
   mounted() {
-    
+
   },
   created() {
-    this.find();
+    this.findres();
   },
 
   methods: {
-    async find() {
+    async findres() {
       let res = await empApi.CountEmpNum();
-     
-      if (res.success) {
-        console.log(res.data)
-        this.empNUm = res.data;     
-      }
-      this.flag=true;
-    }
+      this.empNUm = res.data;
+      let mealNum = await memberApi.findNum();
+      this.TeamlNum = mealNum.data;
+      this.flag = true;
+    },
 
   }
 }

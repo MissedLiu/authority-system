@@ -7,7 +7,8 @@
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
-                <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow">新增</el-button>
+                <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow"
+                    v-if="hasPermission('members:refinance:add')">新增</el-button>
                 <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
             </el-form-item>
         </el-form>
@@ -24,14 +25,16 @@
             <el-table-column prop="createTime" label="注册时间"></el-table-column>
             <el-table-column label="操作" width="350" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-edit-outline" plain type="primary" size="small"
-                        @click="selectCommonMeal(scope.row)">
+                    <el-button icon="el-icon-edit-outline" plain type="primary" size="small" @click="selectCommonMeal(scope.row)" 
+                        v-if="hasPermission('members:refinance:edit')">
                         修改
                     </el-button>
-                    <el-button icon="el-icon-plus" plain type="warning" size="small" @click="upd(scope.row)">
+                    <el-button icon="el-icon-plus" plain type="warning" size="small" @click="upd(scope.row)"
+                        v-if="hasPermission('members:refinance:addblack')">
                         加入黑名单
                     </el-button>
-                    <el-button icon="el-icon-close" plain type="danger" size="small" @click="del(scope.row)">
+                    <el-button icon="el-icon-close" plain type="danger" size="small" @click="del(scope.row)"
+                        v-if="hasPermission('members:refinance:delete')">
                         删除
                     </el-button>
                 </template>
@@ -143,9 +146,9 @@ export default {
                 memberName: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
                 memberSex: [{ required: true, message: '请选择性别', trigger: 'change' }],
                 memberDate: [{ required: true, message: '请选择出生日期', trigger: 'change' }],
-                memberPhone: [{ required: true, message: '请输入电话', trigger: 'blur' },{ pattern: new RegExp(/^((1[34578]\d{9}))$/), message: '请正确输入电话号码' }],
-                memberAge: [{ required: true, message: '请输入年龄', trigger: 'blur' },{ pattern: new RegExp(/^(?:[1-9][0-9]?|1[01][0-9]|100)$/), message: '请正确输入年龄' }],
-                memberAddress: [{ required: true, message: '请输入地址', trigger: 'blur' },{ pattern: new RegExp(/^[\u4e00-\u9fa5]{0,20}$/), message: '请正确输入地址' }],
+                memberPhone: [{ required: true, message: '请输入电话', trigger: 'blur' }, { pattern: new RegExp(/^((1[34578]\d{9}))$/), message: '请正确输入电话号码' }],
+                memberAge: [{ required: true, message: '请输入年龄', trigger: 'blur' }, { pattern: new RegExp(/^(?:[1-9][0-9]?|1[01][0-9]|100)$/), message: '请正确输入年龄' }],
+                memberAddress: [{ required: true, message: '请输入地址', trigger: 'blur' }, { pattern: new RegExp(/^[\u4e00-\u9fa5]{0,20}$/), message: '请正确输入地址' }],
                 memberType: [{ required: true, message: '请选择会员状态', trigger: 'change' }],
                 why: [{ required: true, message: '请输入原因', trigger: 'blur' }],
             },
@@ -253,7 +256,7 @@ export default {
         },
 
         //黑名单确认事件
-         Confirmblack() {
+        Confirmblack() {
             //进行表单验证
             this.$refs.blackForm.validate(async (valids) => {
                 //提示是否确认

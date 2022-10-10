@@ -20,7 +20,8 @@
             <el-table-column prop="createTime" label="注册时间"></el-table-column>
             <el-table-column label="操作" width="150" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-plus" type="success" plain size="small" @click="addCallBack(scope.row)">
+                    <el-button icon="el-icon-plus" type="success" plain size="small" @click="addCallBack(scope.row)"
+                    v-if="hasPermission('pay:member:paymember')">
                         回访
                     </el-button>
                 </template>

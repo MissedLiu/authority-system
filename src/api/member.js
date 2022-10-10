@@ -44,5 +44,11 @@ export default {
   async updataMemberByMemberPhone(params) {
     return await request.put("/api/member/updataMemberByMemberPhone", params);
   },
+  /**
+   * 统计每个套餐办理的次数
+   */
+  async findNum(){
+    return await request.get("/api/Comsune/findNum")
+  }
 
 };

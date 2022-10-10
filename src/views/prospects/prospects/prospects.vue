@@ -7,7 +7,7 @@
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
-                <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow">新增</el-button>
+                <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow" v-if="hasPermission('pay:counsult:add')">新增</el-button>
                 <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
             </el-form-item>
         </el-form>
@@ -23,10 +23,11 @@
             <el-table-column label="操作" width="200" align="center">
                 <template slot-scope="scope">
                     <el-button icon="el-icon-edit-outline" type="primary" plain size="small"
-                        @click="selectCommonMeal(scope.row)">
+                        @click="selectCommonMeal(scope.row)" v-if="hasPermission('pay:counsult:add')">
                         修改
                     </el-button>
-                    <el-button icon="el-icon-close" type="danger" plain size="small" @click="del(scope.row)">
+                    <el-button icon="el-icon-close" type="danger" plain size="small" @click="del(scope.row)"
+                    v-if="hasPermission('pay:counsult:add')">
                         删除
                     </el-button>
                 </template>

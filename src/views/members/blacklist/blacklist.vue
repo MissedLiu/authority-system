@@ -24,7 +24,8 @@
       <el-table-column prop="why" label="拉黑原因" width="200"></el-table-column>
       <el-table-column label="操作" width="150" align="center">
         <template slot-scope="scope">
-          <el-button icon="el-icon-minus" plain type="warning" size="small" @click="del(scope.row)">
+          <el-button icon="el-icon-minus" plain type="warning" size="small" @click="del(scope.row)"
+          v-if="hasPermission('members:blacklist:delete')">
             移出黑名单
           </el-button>
         </template>

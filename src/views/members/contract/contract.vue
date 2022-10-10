@@ -7,7 +7,7 @@
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo, pageSize)">查询</el-button>
-                <el-button type="success" plain icon="el-icon-plus" @click="opencompactWindow()">签订合同</el-button>
+                <el-button type="success" plain icon="el-icon-plus" @click="opencompactWindow()" v-if="hasPermission('members:contract:add')">签订合同</el-button>
                 <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
             </el-form-item>
         </el-form>
@@ -22,10 +22,10 @@
             <el-table-column prop="salesman" label="业务员"></el-table-column>
             <el-table-column label="操作" width="250" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-edit-outline" plain type="primary" size="small" @click="detialwindow(scope.row)">
+                    <el-button icon="el-icon-edit-outline" plain type="primary" size="small" @click="detialwindow(scope.row)" >
                         合同详情
                     </el-button>
-                    <el-button type="danger" plain size="small" @click="delDetial(scope.row)">
+                    <el-button type="danger" plain size="small" @click="delDetial(scope.row)" v-if="hasPermission('members:contract:delete')">
                         删除合同
                     </el-button>
                 </template>
