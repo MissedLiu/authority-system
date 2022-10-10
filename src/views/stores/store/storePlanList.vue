@@ -8,7 +8,7 @@
             <el-form-item>
                 <el-button type="primary" icon="el-icon-search" @click="search(pageNo,pageSize)">查询</el-button>
                 <el-button icon="el-icon-refresh-right" @click="resetValue()">重置</el-button>
-                <el-button type="success" icon="el-icon-plus" @click="openAddwindow()">新增</el-button>
+                <el-button type="success" icon="el-icon-plus" @click="openAddwindow()" v-if="hasPermission('stores:plan:add')">新增</el-button>
                 <el-button type="success" plain @click="handleDownload">导出</el-button>
             </el-form-item>
         </el-form>
@@ -34,15 +34,15 @@
             <el-table-column prop="scheduleState" label="状态" />
             <el-table-column label="操作" width="450" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="PlanToPo(scope.row)">
+                    <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="PlanToPo(scope.row)" v-if="hasPermission('stores:plan:toPo')">
                         已购 </el-button>
-                    <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handleEdit(scope.row)">编辑
+                    <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handleEdit(scope.row)" v-if="hasPermission('stores:plan:edit')">编辑
                     </el-button>
-                    <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete(scope.row)">删除
+                    <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete(scope.row)" v-if="hasPermission('stores:plan:delete')">删除
                     </el-button>
-                    <el-button type="success" icon="el-icon-plus" size="small" @click="shenhe(scope.row)">审核
+                    <el-button type="success" icon="el-icon-plus" size="small" @click="shenhe(scope.row)" v-if="hasPermission('stores:plan:shenhe')">审核
                     </el-button>
-                    <el-button type="success" icon="el-icon-plus" size="small" @click="romve(scope.row)">撤销
+                    <el-button type="success" icon="el-icon-plus" size="small" @click="romve(scope.row)" v-if="hasPermission('stores:plan:cxshenhe')">撤销
                     </el-button>
                 </template>
             </el-table-column>
