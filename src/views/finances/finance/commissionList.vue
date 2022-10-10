@@ -8,6 +8,7 @@
             <el-form-item>
                 <el-button type="primary" icon="el-icon-search" @click="search(pageNo, pageSize)">查询</el-button>
                 <el-button icon="el-icon-refresh-right " @click="resetValue()">重置</el-button>
+                <el-button type="success" plain @click="handleDownload">导出</el-button>
             </el-form-item>
         </el-form>
 
@@ -209,6 +210,11 @@ export default {
     },
     data() {
         return {
+            downloadLoading: false,
+            filename: "提成统计表",
+            autoWidth: true,
+            bookType: "xlsx",
+
             searchModel: {
                 empName: "",
                 pageNo: 1,
@@ -540,6 +546,38 @@ export default {
                     this.total = res.data.total;
                 }
             });
+        },
+        
+        async handleDownload() {
+        let confirm = await this.$myconfirm("确定要导出吗?")
+            if(confirm){
+            this.downloadLoading = true
+            import('@/vendor/Export2Excel').then(excel => {
+                const tHeader = ['销售人员名称', '销售人员电话', '销售人员部门', '私教课程提成', '普通课程提成','团操课程提成','商品提成','总提成','最后统计时间'] 
+                const filterVal = ['empName', 'empPhone', 'departmentName', 'commissionSj', 'commissionPt','commissionTc','commissionSp','commissionPrice','commTime'] 
+                const list = this.tableData 
+                const data = this.formatJson(filterVal, list)
+                excel.export_json_to_excel({
+                    header: tHeader,
+                    data,
+                    filename: this.filename, 
+                    autoWidth: this.autoWidth,
+                    bookType: this.bookType
+                })
+                this.downloadLoading = false
+            })
+            this.$message.success("导出成功")
+        }
+    },
+        formatJson(filterVal, jsonData) {
+            return jsonData.map(v => filterVal.map(j => {
+                if (j === 'timestamp') {
+                    return parseTime(v[j])
+                } else {
+                    return v[j]
+                }
+            }))
+
         },
     },
 };

@@ -12,27 +12,24 @@
                 </el-select>
                 <el-button type="primary" icon="el-icon-search" @click="toSumPrice()">统计</el-button>
             </el-form-item>
+            <el-form-item>
+                <el-button type="success" plain @click="handleDownload">导出</el-button>
+            </el-form-item>
         </el-form>
-        <!-- 
-            data属性:表格数据
-            border属性:表格边框
-            stripe属性:表格斑马线
-            row-key属性:行数据的key,用来优化table的渲染
-            default-expand-all属性:默认展开树形表格数据
-            tree-props属性:树形表格配置属性选型
-         -->
+        
+
         <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="poId"
             default-expand-all>
             <el-table-column prop="memberName" label="会员名称" />
-            <el-table-column prop="memberPhone" label="会员电话" /> 
+            <el-table-column prop="memberPhone" label="会员电话" />
             <el-table-column prop="mealName" label="套餐名称" />
             <el-table-column prop="mealType" label="套餐类型" />
-            <el-table-column prop="ptpName" label="项目名称" />                       
+            <el-table-column prop="ptpName" label="项目名称" />
             <el-table-column prop="comsunePrice" label="消费金额" />
             <el-table-column prop="comsuneDate" label="消费时间" />
             <el-table-column label="操作" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-close" type="danger" size="small"  plain @click="handleDelete(scope.row)">删除
+                    <el-button icon="el-icon-close" type="danger" size="small" plain @click="handleDelete(scope.row)">删除
                     </el-button>
                 </template>
             </el-table-column>
@@ -42,7 +39,8 @@
         <system-dialog :title="DialogConfig.title" :visible="DialogConfig.visible" :width="DialogConfig.width"
             :height="DialogConfig.height" @onClose="onClose" @onConfirm="onClose">
             <div slot="content">
-                <span>{{searchModel.typee}}</span><span v-if="searchModel.type!=''">{{searchModel.type}}套餐</span>的收入总额为{{sumPrice}}
+                <span>{{searchModel.typee}}</span><span
+                    v-if="searchModel.type!=''">{{searchModel.type}}套餐</span>的收入总额为{{sumPrice}}
             </div>
         </system-dialog>
 
@@ -68,6 +66,12 @@ export default {
     },
     data() {
         return {
+
+            downloadLoading: false,
+            filename: "套餐收入报表",
+            autoWidth: true,
+            bookType: "xlsx",
+
             searchModel: {
                 type: "",
                 typee: "",
@@ -102,7 +106,7 @@ export default {
                 comsuneDate: "", //消费时间
             },
 
-            
+
 
             options: [
                 {
@@ -127,7 +131,7 @@ export default {
                 },
             ],
             tOptions: [
-            {
+                {
                     value: '',
                     label: '全部套餐',
                 },
@@ -184,14 +188,14 @@ export default {
             this.DialogConfig.visible = false;
         },
 
-       async toSumPrice(){
-            await comsuneApi.getSumPrice(this.searchModel).then(res=>{
-                if(res.success){
-                    this.sumPrice=res.data
-                    this.DialogConfig.title="🐂"
+        async toSumPrice() {
+            await comsuneApi.getSumPrice(this.searchModel).then(res => {
+                if (res.success) {
+                    this.sumPrice = res.data
+                    this.DialogConfig.title = "🐂"
                     this.DialogConfig.visible = true;
-                    if(this.sumPrice==null){
-                        this.sumPrice='0'
+                    if (this.sumPrice == null) {
+                        this.sumPrice = '0'
                     }
                 }
             })
@@ -214,24 +218,57 @@ export default {
             this.search(page, this.pageSize);
         },
         //删除按钮实现
-    async handleDelete(row) {
-        console.log(row)
-      let confirm = await this.$myconfirm("确定要删除该数据嘛?");
-      if (confirm) {
-        await comsuneApi.deleteComSune({comsuneId : row.comsuneId})
-          .then((res) => {
-            if (res.success) {
-              //提示成功
-              this.$message.success(res.message);
-              //刷新数据
-              this.search(this.pageNo, this.pageSize);
-            } else {
-              //提示失败
-              this.$message.error(res.message);
+        async handleDelete(row) {
+            console.log(row)
+            let confirm = await this.$myconfirm("确定要删除该数据嘛?");
+            if (confirm) {
+                await comsuneApi.deleteComSune({ comsuneId: row.comsuneId })
+                    .then((res) => {
+                        if (res.success) {
+                            //提示成功
+                            this.$message.success(res.message);
+                            //刷新数据
+                            this.search(this.pageNo, this.pageSize);
+                        } else {
+                            //提示失败
+                            this.$message.error(res.message);
+                        }
+                    });
             }
-          });
-      }
+        },
+        
+        async handleDownload() {
+        let confirm = await this.$myconfirm("确定要导出吗?")
+            if(confirm){
+            this.downloadLoading = true
+            import('@/vendor/Export2Excel').then(excel => {
+                const tHeader = ['会员名称', '会员电话', '套餐名称', '套餐类型', '项目名称','消费金额','消费时间'] 
+                const filterVal = ['memberName','memberPhone', 'mealName', 'mealType', 'ptpName', 'comsunePrice','comsuneDate'] 
+                const list = this.tableData 
+                const data = this.formatJson(filterVal, list)
+                excel.export_json_to_excel({
+                    header: tHeader,
+                    data,
+                    filename: this.filename, 
+                    autoWidth: this.autoWidth,
+                    bookType: this.bookType
+                })
+                this.downloadLoading = false
+            })
+            this.$message.success("导出成功")
+        }
     },
+        formatJson(filterVal, jsonData) {
+            return jsonData.map(v => filterVal.map(j => {
+                if (j === 'timestamp') {
+                    return parseTime(v[j])
+                } else {
+                    return v[j]
+                }
+            }))
+
+        },
+
     }
 };
 </script>

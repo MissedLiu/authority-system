@@ -4,61 +4,34 @@
     <el-form ref="searchForm" label-width="80px" :inline="true" size="small">
       <el-form-item>
         <div class="block">
-          <el-date-picker
-            v-model="searchModel.changeTime"
-            type="month"
-            placeholder="Pick a month"
-            value-format="yyyy-MM"
-            @change="changeTimeb(pageNo,pageSize)"
-          />
+          <el-date-picker v-model="searchModel.changeTime" type="month" placeholder="请选择月份" value-format="yyyy-MM"
+            @change="changeTimeb(pageNo,pageSize)" />
         </div>
       </el-form-item>
+      <el-form-item>
+        <el-button type="success" plain @click="handleDownload">导出</el-button>
+      </el-form-item>
     </el-form>
-    <!-- 
-            data属性:表格数据
-            border属性:表格边框
-            stripe属性:表格斑马线
-            row-key属性:行数据的key,用来优化table的渲染
-            default-expand-all属性:默认展开树形表格数据
-            tree-props属性:树形表格配置属性选型
-         -->
-    <el-table
-      :data="tableData"
-      border
-      stripe
-      style="width: 100%; margin-bottom: 20px"
-      row-key="eeId"
-      default-expand-all
-    >
+
+
+    <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="eeId"
+      default-expand-all>
       <el-table-column prop="disburseType" label="支出类型" />
       <el-table-column prop="disburseTime" label="支出时间" />
       <el-table-column prop="disbursePrice" label="支出金额" />
       <el-table-column prop="beizhu" label="备注" />
       <el-table-column label="操作" width="300" align="center">
         <template slot-scope="scope">
-          <el-button
-            icon="el-icon-close"
-            type="danger"
-            size="small"
-            plain
-            @click="handleDelete(scope.row)"
-            >删除
+          <el-button icon="el-icon-close" type="danger" size="small" plain @click="handleDelete(scope.row)">删除
           </el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <!-- 分页工具栏 -->
-    <el-pagination
-      background
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-      :current-page="pageNo"
-      :page-sizes="[10, 20, 30, 40, 50]"
-      :page-size="10"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="total"
-    >
+    <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange"
+      :current-page="pageNo" :page-sizes="[10, 20, 30, 40, 50]" :page-size="10"
+      layout="total, sizes, prev, pager, next, jumper" :total="total">
     </el-pagination>
   </el-main>
 </template>
@@ -76,6 +49,12 @@ export default {
   },
   data() {
     return {
+
+      downloadLoading: false,
+      filename: "支出报表",
+      autoWidth: true,
+      bookType: "xlsx",
+
       searchModel: {
         changeTime: "",
         pageNo: 1,
@@ -99,7 +78,7 @@ export default {
         disburseTime: "", //支出时间
         disbursePrice: "", //支出金额
         beizhu: "", //备注
-        changeDisburseTime:""//时间查询
+        changeDisburseTime: ""//时间查询
       },
     };
   },
@@ -144,8 +123,8 @@ export default {
       });
     },
 
-    changeTimeb(pageNo,pageSize) {
-    this.searchModel.pageNo = pageNo;
+    changeTimeb(pageNo, pageSize) {
+      this.searchModel.pageNo = pageNo;
       //修改每页显示条数
       this.searchModel.pageSize = pageSize;
       //发送查询请求
@@ -176,6 +155,39 @@ export default {
           });
       }
     },
+
+    async handleDownload() {
+      let confirm = await this.$myconfirm("确定要导出吗?")
+      if (confirm) {
+        this.downloadLoading = true
+        import('@/vendor/Export2Excel').then(excel => {
+          const tHeader = ['支出类型', '支出时间', '支出金额', '备注']
+          const filterVal = ['disburseType', 'disburseTime', 'disbursePrice', 'beizhu']
+          const list = this.tableData
+          const data = this.formatJson(filterVal, list)
+          excel.export_json_to_excel({
+            header: tHeader,
+            data,
+            filename: this.filename,
+            autoWidth: this.autoWidth,
+            bookType: this.bookType
+          })
+          this.downloadLoading = false
+        })
+        this.$message.success("导出成功")
+      }
+    },
+    formatJson(filterVal, jsonData) {
+      return jsonData.map(v => filterVal.map(j => {
+        if (j === 'timestamp') {
+          return parseTime(v[j])
+        } else {
+          return v[j]
+        }
+      }))
+
+    },
+
   },
 };
 </script>
@@ -195,11 +207,11 @@ export default {
     height: 40px;
   }
 
-  .el-tree > .el-tree-node:before {
+  .el-tree>.el-tree-node:before {
     border-left: none;
   }
 
-  .el-tree > .el-tree-node:after {
+  .el-tree>.el-tree-node:after {
     border-top: none;
   }
 
@@ -235,7 +247,7 @@ export default {
     width: 8px;
   }
 
-  .el-tree-node__content > .el-tree-node__expand-icon {
+  .el-tree-node__content>.el-tree-node__expand-icon {
     display: none;
   }
 
@@ -246,7 +258,7 @@ export default {
   }
 }
 
-::v-deep .el-tree > div {
+::v-deep .el-tree>div {
   &::before {
     display: none;
   }
