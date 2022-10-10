@@ -1,52 +1,43 @@
 <template>
-  <div :class="className" :style="{height:height,width:width}" />
+
+  <div>
+    <div ref="main" style="width: 600px;height:400px;" class="dashboard-container"></div>
+  </div>
 </template>
 
 <script>
 import echarts from 'echarts'
 require('echarts/theme/macarons') // echarts theme
-import resize from './mixins/resize'
-
 const animationDuration = 6000
-
 export default {
-  mixins: [resize],
-  props: {
-    className: {
-      type: String,
-      default: 'chart'
-    },
-    width: {
-      type: String,
-      default: '100%'
-    },
-    height: {
-      type: String,
-      default: '300px'
-    }
-  },
+  props: ["JiaoXue"],
   data() {
     return {
-      chart: null
+      JiaoXue2: [],
+
     }
   },
+  created() {
+    this.JiaoXue2 = this.JiaoXue
+    console.log("emp=", this.JiaoXue)
+    this.showMain();
+  },
+
   mounted() {
     this.$nextTick(() => {
-      this.initChart()
+      this.showMain()
     })
   },
-  beforeDestroy() {
-    if (!this.chart) {
-      return
-    }
-    this.chart.dispose()
-    this.chart = null
-  },
-  methods: {
-    initChart() {
-      this.chart = echarts.init(this.$el, 'macarons')
 
-      this.chart.setOption({
+  methods: {
+
+    showMain() {
+
+      // 基于准备好的dom，初始化echarts实例
+      var myChart = echarts.init(this.$refs.main);
+      // 绘制图表
+      myChart.setOption({
+
         tooltip: {
           trigger: 'axis',
           axisPointer: { // 坐标轴指示器，坐标轴触发有效
@@ -62,7 +53,7 @@ export default {
         },
         xAxis: [{
           type: 'category',
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          data: this.JiaoXue2.map(d=>d.name),
           axisTick: {
             alignWithLabel: true
           }
@@ -74,29 +65,43 @@ export default {
           }
         }],
         series: [{
-          name: 'pageA',
+          name: '总人数',
           type: 'bar',
           stack: 'vistors',
           barWidth: '60%',
-          data: [79, 52, 200, 334, 390, 330, 220],
+          data:this.JiaoXue2.map(d=>d.value),
           animationDuration
         }, {
-          name: 'pageB',
+          name: '私教套餐人数',
           type: 'bar',
           stack: 'vistors',
           barWidth: '60%',
           data: [80, 52, 200, 334, 390, 330, 220],
           animationDuration
         }, {
-          name: 'pageC',
+          name: '团操套餐人数',
           type: 'bar',
           stack: 'vistors',
           barWidth: '60%',
           data: [30, 52, 200, 334, 390, 330, 220],
           animationDuration
         }]
-      })
-    }
+      });
+
+    },
+
   }
 }
 </script>
+<style lang="scss" scoped>
+.dashboard {
+  &-container {
+    margin: 30px;
+  }
+
+  &-text {
+    font-size: 30px;
+    line-height: 46px;
+  }
+}
+</style>

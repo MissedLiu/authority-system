@@ -15,12 +15,13 @@
       <el-row :gutter="20">
         <el-col :span="24">
           <div>
-            <BarChart></BarChart>
+            <BarChart v-if="flag" :JiaoXue="this.JiaoXue"></BarChart>
           </div>
         </el-col>
       </el-row>
       <el-row :gutter="20">
         <el-col :span="4">
+        
         </el-col>
         <el-col :span="16">
           <div class="grid-content ep-bg-purple" />
@@ -49,14 +50,16 @@ import TransactionTable from './admin/components/TransactionTable.vue'
 import BinZhuang from './admin/components/BinZhuang.vue'
 import empApi from '@/api/empApi'
 import memberApi from '@/api/member'
+import xueyuanApi from '@/api/xueyuanApi'
 
 export default {
-  components: { BarChart, LineChart, PanelGroup, BoxCard, PieChart, RaddarChart, TransactionTable, BinZhuang },
+  components: { BarChart,LineChart, PanelGroup, BoxCard, PieChart, RaddarChart, TransactionTable, BinZhuang },
 
   data() {
     return {
       empNUm: {},
       TeamlNum: {},
+      JiaoXue:{},
       flag: false,
     }
   },
@@ -69,10 +72,15 @@ export default {
 
   methods: {
     async findres() {
+      //统计部门人数
       let res = await empApi.CountEmpNum();
       this.empNUm = res.data;
+      //统计套餐办理数
       let mealNum = await memberApi.findNum();
       this.TeamlNum = mealNum.data;
+      //统计教练下学员数   
+      let jaioxueNum = await xueyuanApi.findNumJiaoLian();
+      this.JiaoXue = jaioxueNum.data;
       this.flag = true;
     },
 

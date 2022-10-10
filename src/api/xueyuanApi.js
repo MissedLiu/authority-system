@@ -11,6 +11,11 @@ export default{
          //检查是否添加体检记录单
          async checkMemberId(params){
             return await http.getRestApi("/api/XueYuan/checkMemberId",params);
-        }
-    
+        },
+        /**
+         * 统计教练下的人数
+         */
+         async findNumJiaoLian(){
+            return await http.getRestApi("/api/XueYuan/findNumJiaoLian");
+        },
 }

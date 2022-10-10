@@ -36,6 +36,9 @@ console.log(this.mealNum)
 
       this.chart.setOption({
         tooltip: {
+          title: {//标题
+            text: '部门人数'
+          },
           trigger: 'item',
           formatter: '{a} <br/>{b} : {c} ({d}%)'
         },
