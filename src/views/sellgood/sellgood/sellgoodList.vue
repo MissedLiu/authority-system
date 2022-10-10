@@ -11,7 +11,7 @@
             <el-form-item>
                 <el-button type="primary" icon="el-icon-search" @click="search(pageNo, pageSize)">查询</el-button>
                 <el-button icon="el-icon-refresh-right " @click="resetValue()">重置</el-button>
-                <el-button type="success" icon="el-icon-plus" @click="openAddwindow()">新增</el-button>
+                <el-button type="success" icon="el-icon-plus" @click="openAddwindow()" v-if="hasPermission('sellgood:sellgood:add')">新增</el-button>
             </el-form-item>
         </el-form>
 
@@ -25,9 +25,9 @@
             <el-table-column prop="salesPrice" label="金额" />
             <el-table-column label="操作" width="300" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handleDelete2(scope.row)">撤销购买
+                    <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handleDelete2(scope.row)" v-if="hasPermission('sellgood:sellgood:delete2')">撤销购买
                     </el-button>
-                    <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete(scope.row)">删除
+                    <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete(scope.row)" v-if="hasPermission('sellgood:sellgood:delete')">删除
                     </el-button>
                 </template>
             </el-table-column>

@@ -11,7 +11,7 @@
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="search(pageNo, pageSize)">查询</el-button>
         <el-button icon="el-icon-refresh-right " @click="resetValue()">重置</el-button>
-        <el-button type="success" icon="el-icon-plus" @click="openAddwindow">新增</el-button>
+        <el-button type="success" icon="el-icon-plus" @click="openAddwindow" v-if="hasPermission('sellgood:activity:add')">新增</el-button>
       </el-form-item>
     </el-form>
     <!-- 
@@ -33,9 +33,9 @@
       <el-table-column prop="createTime" label="活动时间" />
       <el-table-column label="操作" width="200" align="center">
         <template slot-scope="scope">
-          <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handleEdit(scope.row)">编辑
+          <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handleEdit(scope.row)" v-if="hasPermission('sellgood:activity:edit')">编辑
           </el-button>
-          <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete(scope.row)">删除
+          <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete(scope.row)" v-if="hasPermission('sellgood:activity:delete')">删除
           </el-button>
         </template>
       </el-table-column>
@@ -66,7 +66,7 @@
             <el-input v-model="flyer.flyerStaff"></el-input>
           </el-form-item>
 
-          <el-form-item label=" 客户数量" prop="num">
+          <el-form-item label="客户数量" prop="num">
             <el-input v-model="flyer.num"></el-input>
           </el-form-item>
         </el-form>

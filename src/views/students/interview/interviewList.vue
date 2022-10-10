@@ -20,7 +20,7 @@
             <el-table-column prop="interview" label="访谈内容"></el-table-column>
             <el-table-column label="操作" align="center" width="290">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-delete" type="danger" size="small" @click="handleDelete(scope.row)">删除
+                    <el-button icon="el-icon-delete" type="danger" size="small" @click="handleDelete(scope.row)" v-if="hasPermission('coachs:interview:delete')">删除
                     </el-button>
 
                 </template>

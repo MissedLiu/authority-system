@@ -8,27 +8,12 @@
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="search(pageNo,pageSize)">查询</el-button>
         <el-button icon="el-icon-refresh-right " @click="resetValue()">重置</el-button>
-        <el-button type="success" icon="el-icon-plus" @click="openAddwindow"
-          >新增</el-button
-        >
+        <el-button type="success" icon="el-icon-plus" @click="openAddwindow" v-if="hasPermission('projectname:teamPro:add')">新增</el-button>
       </el-form-item>
     </el-form>
-    <!-- 
-            data属性:表格数据
-            border属性:表格边框
-            stripe属性:表格斑马线
-            row-key属性:行数据的key,用来优化table的渲染
-            default-expand-all属性:默认展开树形表格数据
-            tree-props属性:树形表格配置属性选型
-         -->
-    <el-table
-      :data="tableData"
-      border
-      stripe
-      style="width: 100%; margin-bottom: 20px"
-      row-key="tpId"
-      default-expand-all
-    >
+   
+    <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="tpId"
+      default-expand-all>
       <el-table-column prop="tpId" label="编号" />
       <el-table-column prop="tpName" label="项目名称名称" />
       <el-table-column prop="createTime" label="创建时间" />
@@ -36,46 +21,23 @@
       <el-table-column prop="tpIs" label="状态" />
       <el-table-column label="操作" width="200" align="center">
         <template slot-scope="scope">
-          <el-button
-            icon="el-icon-edit-outline"
-            type="primary"
-            size="small"
-            @click="handleEdit(scope.row)"
-            >编辑
+          <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handleEdit(scope.row)" v-if="hasPermission('projectname:teamPro:edit')">编辑
           </el-button>
-          <el-button
-            icon="el-icon-close"
-            type="danger"
-            size="small"
-            @click="handleDelete(scope.row)"
-            >删除
+          <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete(scope.row)" v-if="hasPermission('projectname:teamPro:delete')">删除
           </el-button>
         </template>
       </el-table-column>
     </el-table>
- <!-- 分页工具栏 -->
- <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange"
-            :current-page="pageNo" :page-sizes="[10, 20, 30, 40, 50]" :page-size="10"
-            layout="total, sizes, prev, pager, next, jumper" :total="total">
-        </el-pagination>
+    <!-- 分页工具栏 -->
+    <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange"
+      :current-page="pageNo" :page-sizes="[10, 20, 30, 40, 50]" :page-size="10"
+      layout="total, sizes, prev, pager, next, jumper" :total="total">
+    </el-pagination>
     <!-- 添加和修改窗口-->
-    <system-dialog
-      :title="tpDialog.title"
-      :visible="tpDialog.visible"
-      :width="tpDialog.width"
-      :height="tpDialog.height"
-      @onClose="onClose"
-      @onConfirm="onConfirm"
-    >
+    <system-dialog :title="tpDialog.title" :visible="tpDialog.visible" :width="tpDialog.width" :height="tpDialog.height"
+      @onClose="onClose" @onConfirm="onConfirm">
       <div slot="content">
-        <el-form
-          :model="tpPro"
-          ref="tpForm"
-          :rules="rules"
-          label-width="80px"
-          :inline="true"
-          size="small"
-        >
+        <el-form :model="tpPro" ref="tpForm" :rules="rules" label-width="80px" :inline="true" size="small">
           <el-form-item label="项目名称" prop="tpName">
             <el-input v-model="tpPro.tpName"></el-input>
           </el-form-item>
@@ -84,10 +46,10 @@
           </el-form-item> -->
           <el-form-item label="状态" prop="tpIs">
             <el-radio-group v-model="tpPro.tpIs">
-             
-                <el-radio-button label="启用" />
-                <el-radio-button label="禁用" />
-          
+
+              <el-radio-button label="启用" />
+              <el-radio-button label="禁用" />
+
             </el-radio-group>
           </el-form-item>
         </el-form>
@@ -111,12 +73,12 @@ export default {
     return {
       searchModel: {
         tpName: "", //项目名字
-        pageNo:1,
-        pageSize:10,
+        pageNo: 1,
+        pageSize: 10,
       },
-        pageNo:1,
-        pageSize:10,
-        total:0,
+      pageNo: 1,
+      pageSize: 10,
+      total: 0,
       sta: [],
       tableData: [], //表格数据
       tpDialog: {
@@ -133,8 +95,8 @@ export default {
         tpIs: "", //是否禁用(0-禁用,1-使用)
       },
       rules: {
-        tpName: [{ required: true,message: '请输入项目名称',trigger: 'blur',}],
-        tpIs: [{ required: true,message: '请选择该项目状态',trigger: 'change',}],
+        tpName: [{ required: true, message: '请输入项目名称', trigger: 'blur', }],
+        tpIs: [{ required: true, message: '请选择该项目状态', trigger: 'change', }],
       },
     };
   },
@@ -155,42 +117,42 @@ export default {
     /**
      * 查询部门列表
      */
-    async search(pageNo,pageSize) {
-      this.searchModel.pageNo=pageNo;
-      this.searchModel.pageSize=pageSize;
+    async search(pageNo, pageSize) {
+      this.searchModel.pageNo = pageNo;
+      this.searchModel.pageSize = pageSize;
       //发送查询请求
       let res = await tpApi.gettpProlist(this.searchModel);
       //判断是否成功
       if (res.success) {
         console.log(res);
         console.log(res.data);
-       
+
         this.tableData = res.data.records;
-        this.total=res.data.total;
+        this.total = res.data.total;
         console.log(this.total)
         for (let i = 0; i < res.data.records.length; i++) {
           res.data.records[i].tpIs = res.data.records[i].tpIs == 0 ? "启用" : "禁用";
         }
       }
     },
- /**
-        * 当每页数量发生变化时触发该事件
-        */
-        handleSizeChange(size) {
-            //修改每页显示数量
-            this.pageSize=size
-            //调用查询方法
-            this.search(this.pageNo,size)
-        },
-        /**
-        * 当页码发生变化时触发该事件
-        */
-        handleCurrentChange(page) {
-            //修改当前页码
-            this.pageNo=page
-            //调用查询方法
-            this.search(page,this.pageSize)
-        },
+    /**
+           * 当每页数量发生变化时触发该事件
+           */
+    handleSizeChange(size) {
+      //修改每页显示数量
+      this.pageSize = size
+      //调用查询方法
+      this.search(this.pageNo, size)
+    },
+    /**
+    * 当页码发生变化时触发该事件
+    */
+    handleCurrentChange(page) {
+      //修改当前页码
+      this.pageNo = page
+      //调用查询方法
+      this.search(page, this.pageSize)
+    },
     //打开添加窗口
     openAddwindow() {
       //
@@ -209,14 +171,14 @@ export default {
         //如果验证通过
         if (valid) {
           let res = null;
-          this.tpPro.tpIs =   this.tpPro.tpIs =="启用" ? 0 : 1;
+          this.tpPro.tpIs = this.tpPro.tpIs == "启用" ? 0 : 1;
           //判断是添加还是修改操作(依据id是否为空,为空则为添加操作)
           if (this.tpPro.tpId === "") {
             //发送添加请求
             res = await tpApi.addtpPro(this.tpPro);
           } else {
             //发送修改请求
-         console.log("=========================="+this.tpPro.tpName);
+            console.log("==========================" + this.tpPro.tpName);
             res = await tpApi.updatetpPro(this.tpPro);
           }
 
@@ -255,7 +217,7 @@ export default {
           //提示成功
           this.$message.success(res.message);
           //刷新数据
-          this.search(this.pageNo,this.pageSize);
+          this.search(this.pageNo, this.pageSize);
         } else {
           //提示失败
           this.$message.error(res.message);
@@ -272,18 +234,23 @@ export default {
     position: relative;
     padding-left: 10px;
   }
+
   .el-tree-node__children {
     padding-left: 20px;
   }
+
   .el-tree-node :last-child:before {
     height: 40px;
   }
-  .el-tree > .el-tree-node:before {
+
+  .el-tree>.el-tree-node:before {
     border-left: none;
   }
-  .el-tree > .el-tree-node:after {
+
+  .el-tree>.el-tree-node:after {
     border-top: none;
   }
+
   .el-tree-node:before,
   .el-tree-node:after {
     content: "";
@@ -292,9 +259,11 @@ export default {
     right: auto;
     border-width: 1px;
   }
+
   .tree :first-child .el-tree-node:before {
     border-left: none;
   }
+
   .el-tree-node:before {
     border-left: 1px dotted #d9d9d9;
     bottom: 0px;
@@ -302,28 +271,34 @@ export default {
     top: -25px;
     width: 1px;
   }
+
   .el-tree-node:after {
     border-top: 1px dotted #d9d9d9;
     height: 20px;
     top: 14px;
     width: 24px;
   }
+
   .el-tree-node__expand-icon.is-leaf {
     width: 8px;
   }
-  .el-tree-node__content > .el-tree-node__expand-icon {
+
+  .el-tree-node__content>.el-tree-node__expand-icon {
     display: none;
   }
+
   .el-tree-node__content {
     line-height: 30px;
     height: 30px;
     padding-left: 10px !important;
   }
 }
-::v-deep .el-tree > div {
+
+::v-deep .el-tree>div {
   &::before {
     display: none;
   }
+
   &::after {
     display: none;
   }

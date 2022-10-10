@@ -8,7 +8,7 @@
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="search(pageNo,pageSize)">查询</el-button>
         <el-button icon="el-icon-refresh-right " @click="resetValue()">重置</el-button>
-        <el-button type="success" icon="el-icon-plus" @click="openAddwindow">新增</el-button>
+        <el-button type="success" icon="el-icon-plus" @click="openAddwindow" v-if="hasPermission('sellgood:ptMeal:add')" >新增</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="ptId"
@@ -21,11 +21,11 @@
       <el-table-column prop="ptIs" label="状态" />
       <el-table-column label="操作" width="300" align="center">
         <template slot-scope="scope">
-          <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handleEdit(scope.row)">编辑
+          <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handleEdit(scope.row)" v-if="hasPermission('sellgood:ptMeal:edit')">编辑
           </el-button>
-          <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete(scope.row)">删除
+          <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete(scope.row)" v-if="hasPermission('sellgood:ptMeal:delete')">删除
           </el-button>
-          <el-button icon="el-icon-plus" type="success" size="small" @click="assignPt(scope.row)">选择项目
+          <el-button icon="el-icon-plus" type="success" size="small" @click="assignPt(scope.row)" v-if="hasPermission('sellgood:ptMeal:xuanze')">选择项目
           </el-button>
         </template>
       </el-table-column>
