@@ -1,5 +1,5 @@
 <template>
-  <div :class="className" :style="{height:height,width:width}" />
+  <div ref="main" style="height:400px;" class="dashboard2-container" />
 </template>
 
 <script>
@@ -9,24 +9,14 @@ import resize from './mixins/resize'
 
 export default {
   mixins: [resize],
-  props: {
-    className: {
-      type: String,
-      default: 'chart'
-    },
-    width: {
-      type: String,
-      default: '100%'
-    },
-    height: {
-      type: String,
-      default: '300px'
-    }
-  },
+  props:["mealNum"],
   data() {
     return {
       chart: null
     }
+  },
+  created(){
+console.log(this.mealNum)
   },
   mounted() {
     this.$nextTick(() => {
@@ -52,7 +42,7 @@ export default {
         legend: {
           left: 'center',
           bottom: '10',
-          data: ['Industries', 'Technology', 'Forex', 'Gold', 'Forecasts']
+          data:this.mealNum.map(d=>d.name)
         },
         series: [
           {
@@ -61,13 +51,7 @@ export default {
             roseType: 'radius',
             radius: [15, 95],
             center: ['50%', '38%'],
-            data: [
-              { value: 320, name: 'Industries' },
-              { value: 240, name: 'Technology' },
-              { value: 149, name: 'Forex' },
-              { value: 100, name: 'Gold' },
-              { value: 59, name: 'Forecasts' }
-            ],
+            data:this.mealNum,
             animationEasing: 'cubicInOut',
             animationDuration: 2600
           }
@@ -77,3 +61,15 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+.dashboard2 {
+  &-container {
+    margin: 30px;
+  }
+
+  &-text {
+    font-size: 30px;
+    line-height: 46px;
+  }
+}
+</style>

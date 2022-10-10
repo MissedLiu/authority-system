@@ -31,11 +31,11 @@
                 <el-table-column prop="caigouShenhe.state" label="状态" />
                 <el-table-column label="操作" width="300" align="center">
                     <template slot-scope="scope">
-                        <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handle1(scope.row)">
+                        <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handle1(scope.row)" v-if="hasPermission('shenhes:caigou:cl')">
                             同意
                         </el-button>
 
-                        <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete1(scope.row)">拒绝
+                        <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete1(scope.row)" v-if="hasPermission('shenhes:caigou:cl')">拒绝
                         </el-button>
                     </template>
                 </el-table-column>
@@ -62,7 +62,7 @@
                 <el-table-column label="操作2" width="200" align="center">
                     <template slot-scope="scope">
                         <el-button icon="el-icon-close" type="danger" size="small"
-                            @click="handle2(scope.row)">删除
+                            @click="handle2(scope.row)" v-if="hasPermission('shenhes:caigou:delete')">删除
                         </el-button>
                     </template>
                 </el-table-column>

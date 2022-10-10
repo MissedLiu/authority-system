@@ -29,9 +29,9 @@
             <el-table-column prop="state" label="状态" />
             <el-table-column label="操作" width="350" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handleToEm2(scope.row)">
+                    <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handleToEm2(scope.row)" v-if="hasPermission('equipments:sunhuai:xiuli')">
                         修理失败 </el-button>
-                    <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handleToEm(scope.row)">
+                    <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handleToEm(scope.row)" v-if="hasPermission('equipments:sunhuai:xiuli')">
                         修理成功 </el-button>
                     <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete(scope.row)">删除
                     </el-button>

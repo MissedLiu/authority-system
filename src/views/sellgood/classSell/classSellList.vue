@@ -15,9 +15,9 @@
                 <el-button type="primary" icon="el-icon-search" @click="search(salesPage.pageNo,salesPage.pageSize)">查询
                 </el-button>
                 <el-button icon="el-icon-refresh-right " @click="resetValue()">重置</el-button>
-                <el-button type="primary" plain icon="el-icon-plus" @click="openPt(typeAll.Pt)">购买私教</el-button>
-                <el-button type="success" plain icon="el-icon-plus" @click="openTeamPt(typeAll.TeamPt)">购买团操</el-button>
-                <el-button type="warning" plain icon="el-icon-plus" @click="openCommon(typeAll.Common)">购买普通会员
+                <el-button type="primary" plain icon="el-icon-plus" @click="openPt(typeAll.Pt)" v-if="hasPermission('sellgood:classSell:getMeal')">购买私教</el-button>
+                <el-button type="success" plain icon="el-icon-plus" @click="openTeamPt(typeAll.TeamPt)" v-if="hasPermission('sellgood:classSell:getMeal')">购买团操</el-button>
+                <el-button type="warning" plain icon="el-icon-plus" @click="openCommon(typeAll.Common)" v-if="hasPermission('sellgood:classSell:getMeal')">购买普通会员
                 </el-button>
             </el-form-item>
         </el-form>
@@ -34,7 +34,7 @@
             <el-table-column prop="salesTime" label="购买时间" />
             <el-table-column label="操作" width="200" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete(scope.row)">删除
+                    <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete(scope.row)" v-if="hasPermission('sellgood:classSell:delete')">删除
                     </el-button>
                 </template>
             </el-table-column>
