@@ -18,7 +18,6 @@
     },
     created(){
       this.emp2=this.emp
-        console.log("emp=",this.emp)
         this.showMain();
     },
     mounted() {
@@ -42,7 +41,7 @@
           },
           legend: {//图例组件,点击后会显示或隐藏柱状
             data: [{
-              name: '销量',
+              name: '人数',
               // 强制设置图形为圆。circle
               icon: 'circle',
               // 设置文本为红色
@@ -61,7 +60,7 @@
           series: [//序列
             {
 
-              name: '销量',//用于提示框中显示的内容
+              name: '人数',//用于提示框中显示的内容
               type: 'bar',//用于使用哪个图表
               data:this.emp2.map(d=>d.value)
             }

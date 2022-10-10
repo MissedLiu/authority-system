@@ -40,7 +40,7 @@ console.log(this.mealNum)
             text: '部门人数'
           },
           trigger: 'item',
-          formatter: '{a} <br/>{b} : {c} ({d}%)'
+          formatter: '{a} <br/>{b} : {c} (次)'
         },
         legend: {
           left: 'center',
@@ -49,7 +49,7 @@ console.log(this.mealNum)
         },
         series: [
           {
-            name: 'WEEKLY WRITE ARTICLES',
+            name: '销量',
             type: 'pie',
             roseType: 'radius',
             radius: [15, 95],
