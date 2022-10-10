@@ -11,6 +11,9 @@
                 <el-button type="primary" icon="el-icon-search" @click="getNotExecuted(pageNo, pageSize)">查看未入库的物品
                 </el-button>
             </el-form-item>
+            <el-form-item>
+                <el-button type="success" plain @click="handleDownload">导出</el-button>
+            </el-form-item>
         </el-form>
         <!-- 
             data属性:表格数据
@@ -25,7 +28,7 @@
             <el-table-column prop="poName" label="物品名称" />
             <el-table-column prop="poNum" label="已购数量" />
             <el-table-column prop="poPrice" label="单价" />
-            <el-table-column prop="brand" label="单位" />
+            <el-table-column prop="brand" label="品牌" />
             <el-table-column prop="scheduleAddress" label="供货地址" />
             <el-table-column prop="scheduleSupplier" label="供货商名称" />
             <el-table-column prop="poTime" label="创建时间" />
@@ -34,9 +37,9 @@
             <el-table-column label="操作" width="300" align="center">
                 <template slot-scope="scope">
                     <el-button icon="el-icon-edit-outline" type="primary" size="small"
-                        @click="handleToStock(scope.row)">入库
+                        @click="handleToStock(scope.row)" v-if="hasPermission('stores:po:toStore')" >入库
                     </el-button>
-                    <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete(scope.row)">删除
+                    <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete(scope.row)" v-if="hasPermission('stores:po:delete')">删除
                     </el-button>
                 </template>
             </el-table-column>
@@ -91,6 +94,12 @@ export default {
             pageNo: 1, //当前页码
             total: 0, //数据总数量
             pageSize: 10, //每页显示数量
+
+
+            downloadLoading: false,
+            filename: "已购物品表",
+            autoWidth: true,
+            bookType: "xlsx",
 
             //新增或编辑的表单属性
             poDialog: {
@@ -235,7 +244,41 @@ export default {
             }
             this.search(this.pageNo, this.pageSize);
         },
+
+        async handleDownload() {
+            let confirm = await this.$myconfirm("确定要导出吗?")
+            if(confirm){
+                this.downloadLoading = true
+                import('@/vendor/Export2Excel').then(excel => {
+                const tHeader = ['物品名称', '已购数量', '单价', '品牌', '供货地址','供货商名称','创建时间','物品类型','状态'] 
+                const filterVal = ['poName', 'poNum', 'poPrice', 'brand','scheduleAddress','scheduleSupplier','poTime','poType','poState']
+                const list = this.tableData 
+                const data = this.formatJson(filterVal, list)
+                excel.export_json_to_excel({
+                    header: tHeader,
+                    data,
+                    filename: this.filename, 
+                    autoWidth: this.autoWidth,
+                    bookType: this.bookType
+                })
+                this.downloadLoading = false
+            })
+            this.$message.success("导出成功")
+            }
+            
+        },
+        formatJson(filterVal, jsonData) {
+            return jsonData.map(v => filterVal.map(j => {
+                if (j === 'timestamp') {
+                    return parseTime(v[j])
+                } else {
+                    return v[j]
+                }
+            }))
+
+        },
     },
+    
 };
 </script>
     
