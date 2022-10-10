@@ -10,27 +10,45 @@
           <el-calendar v-model="value" />
         </el-col>
         <el-col :span="6" :xs="24">
-          <el-tabs v-model="activeName" type="card" class="demo-tabs" @tab-click="handleClick">
+          <el-tabs  v-model="activeName" type="card" class="demo-tabs" @tab-click="handleClick">
             <el-tab-pane label="查看详细" name="first">
               <el-col :span="6">
                 <el-card class="box-card">
                   <template #header>
                     <div class="card-header">
                       <span>详细信息</span>
-
                     </div>
                   </template>
-                  <span>姓名:</span><span>{{this.emp.empName}}</span><br>
-                  <span>用户名:</span><span>{{this.username}}</span><br>
-                  <span>姓名:</span><span>{{this.emp.empName}}</span><br>
-                  <span>姓名:</span><span>{{this.emp.empName}}</span><br>
-                  <span>姓名:</span><span>{{this.emp.empName}}</span><br>
-                  <span>姓名:</span><span>{{this.emp.empName}}</span><br>
-                  <span>姓名:</span><span>{{this.emp.empName}}</span><br>
-                  <span>姓名:</span><span>{{this.emp.empName}}</span><br>
-                  <span>姓名:</span><span>{{this.emp.empName}}</span><br>
-                  <span>姓名:</span><span>{{this.emp.empName}}</span><br>
-                  <span>姓名:</span><span>{{this.emp.empName}}</span><br>
+                  <div style="border: 1px; height:40px;" >
+                      <span >姓名:</span>&nbsp;<span>{{this.emp.empName}}</span>
+                  </div>
+                  <div style="border: 1px; height:40px;" >
+                    <span>用户名:</span>&nbsp;<span>{{this.username}}</span>
+                  </div>
+                  <div style="border: 1px; height:40px;" >
+                    <span>年龄:</span>&nbsp;<span>{{this.emp.empAge}}</span>
+                  </div>
+                  <div style="border: 1px; height:40px;" >
+                    <span>QQ:</span>&nbsp;<span>{{this.emp.qq}}</span>
+                  </div>
+                  <div style="border: 1px; height:40px;" >
+                    <span>微信:</span>&nbsp;<span>{{this.emp.weix}}</span>
+                  </div>
+                  <div style="border: 1px; height:40px;" >
+                    <span>电话:</span>&nbsp;<span>{{this.emp.empPhone}}</span>
+                  </div>
+                  <div style="border: 1px; height:40px;" >
+                    <span>邮箱:</span>&nbsp;<span>{{this.emp.emil}}</span>
+                  </div>
+                  <div style="border: 1px; height:40px;" >
+                    <span>住址:</span>&nbsp;<span>{{this.emp.empAddress}}</span>
+                  </div>
+                  <div style="border: 1px; height:40px;" >
+                    <span>性别:</span>&nbsp;<span>{{this.emp.empSex}}</span>
+                  </div>
+                  <div style="border: 1px; height:40px;" >
+                    <span>简介:</span>&nbsp;<span>{{this.emp.synopsis}}</span>
+                  </div>
                 </el-card>
               </el-col>
             </el-tab-pane>
@@ -107,7 +125,7 @@ export default {
     return {
       user: {},
       //表中员工信息
-      username:"",
+      username: "",
       emp: {
         id: this.$store.getters.userId,//账号编号
         empName: "",//员工姓名
@@ -159,7 +177,7 @@ export default {
       let res = await userApi.empByUserId({ id: this.emp.id })
       if (res.success) {
         this.emp = res.data.emp;
-        this.username=res.data.username
+        this.username = res.data.username
         console.log(this.emp)
       }
     },
