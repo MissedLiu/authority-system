@@ -7,7 +7,7 @@
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
-                <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow">新增</el-button>
+                <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow" v-if="hasPermission('members:sjmember:add')">新增</el-button>
                 <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
             </el-form-item>
         </el-form>
@@ -26,13 +26,16 @@
             <el-table-column prop="mmDate" label="到期时间"></el-table-column>
             <el-table-column label="套餐操作" width="280" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-edit-outline" plain type="primary" size="small" @click="selectPtMeal(scope.row)">
+                    <el-button icon="el-icon-edit-outline" plain type="primary" size="small" @click="selectPtMeal(scope.row)"
+                    v-if="hasPermission('members:sjmember:xiangqing')">
                         详情
                     </el-button>
-                    <el-button type="success" plain icon="el-icon-plus" size="small" @click="renew(scope.row)">
+                    <el-button type="success" plain icon="el-icon-plus" size="small" @click="renew(scope.row)"
+                    v-if="hasPermission('members:sjmember:xufei')">
                         续费
                     </el-button>
-                    <el-button icon="el-icon-close" plain type="danger" size="small" @click="del(scope.row)">
+                    <el-button icon="el-icon-close" plain type="danger" size="small" @click="del(scope.row)"
+                    v-if="hasPermission('members:sjmember:delete')">
                         删除
                     </el-button>
                 </template>

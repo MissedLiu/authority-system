@@ -20,7 +20,8 @@
             <el-table-column prop="type" label="状态"></el-table-column>
             <el-table-column label="操作" width="150" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-plus" type="success" plain size="small" @click="addCallBack(scope.row)">
+                    <el-button icon="el-icon-plus" type="success" plain size="small" @click="addCallBack(scope.row)"
+                    v-if="hasPermission('pay:prospect:payprospect')">
                         回访
                     </el-button>
                 </template>

@@ -7,14 +7,14 @@
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
-                <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow">新增</el-button>
+                <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow" v-if="hasPermission('pay:counsult:add')">新增</el-button>
                 <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
             </el-form-item>
         </el-form>
         <!-- 数据表格 -->
         <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="id"
             default-expand-all :tree-props="{ children: 'children' }">
-            <el-table-column prop="consultName" label="潜在用户姓名"></el-table-column>
+            <el-table-column prop="consultName" label="用户姓名"></el-table-column>
             <el-table-column prop="consultAge" label="年龄"></el-table-column>
             <el-table-column prop="consultSex" label="性别" :formatter="playbackFormat"></el-table-column>
             <el-table-column prop="consultPhone" label="电话"></el-table-column>

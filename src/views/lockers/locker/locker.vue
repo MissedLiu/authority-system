@@ -9,7 +9,9 @@
         <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo, pageSize)">电话查询</el-button>
         <el-button type="primary" plain icon="el-icon-search" @click="selectNullLocker(pageNo, pageSize)">查询空储物柜
         </el-button>
-        <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow()">新增储物柜</el-button>
+        <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow()" 
+        v-if="hasPermission('members:locker:add')" >
+        新增储物柜</el-button>
         <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
       </el-form-item>
     </el-form>
@@ -28,11 +30,12 @@
             @click="updeteOpen(scope.row)">启用</el-button>
           <el-button type="danger" plain icon="el-icon-minus" :disabled="item(scope.$index, scope.row)" size="small"
             @click="updeteClose(scope.row)">禁用</el-button>
-          <el-button icon="el-icon-close" type="warning" plain size="small" @click="del(scope.row)">删除储物柜</el-button>
+          <el-button icon="el-icon-close" type="warning" plain size="small" @click="del(scope.row)"
+          v-if="hasPermission('members:locker:delete')">删除储物柜</el-button>
           <el-button type="success" plain icon="el-icon-plus" :disabled="item(scope.$index, scope.row)" size="small"
-            @click="openMemwindow(scope.row)">添加会员</el-button>
+            @click="openMemwindow(scope.row)" v-if="hasPermission('members:locker:addmember')">添加会员</el-button>
           <el-button type="danger" plain icon="el-icon-minus" :disabled="item(scope.$index, scope.row)" size="small"
-            @click="deleteMember(scope.row)">移除会员</el-button>
+            @click="deleteMember(scope.row)" v-if="hasPermission('members:locker:deletemember')">移除会员</el-button>
         </template>
       </el-table-column>
     </el-table>

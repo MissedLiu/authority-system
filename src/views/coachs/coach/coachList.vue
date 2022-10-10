@@ -23,11 +23,14 @@
             <el-table-column prop="weix" label="微信"></el-table-column>
             <el-table-column label="操作" width="450" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-edit-outline"  plain  type="primary" @click="openupdwindow(scope.row)">修改
+                    <el-button icon="el-icon-edit-outline"  plain  type="primary" @click="openupdwindow(scope.row)"
+                    v-if="hasPermission('coachs:coach:edit')">修改
                     </el-button>
-                    <el-button icon="el-icon-edit-outline"  plain  type="primary"  @click="openPtMealWindow(scope.row)">分配私教套餐
+                    <el-button icon="el-icon-edit-outline"  plain  type="primary"  @click="openPtMealWindow(scope.row)"
+                    v-if="hasPermission('coachs:coach:sjmeal')">分配私教套餐
                     </el-button>
-                    <el-button icon="el-icon-edit-outline" plain  type="primary" @click="openTeamMealWindow(scope.row)">分配团操套餐
+                    <el-button icon="el-icon-edit-outline" plain  type="primary" @click="openTeamMealWindow(scope.row)"
+                    v-if="hasPermission('coachs:coach:tcmeal')">分配团操套餐
                     </el-button>
                 </template>
             </el-table-column>
