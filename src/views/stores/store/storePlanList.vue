@@ -9,7 +9,7 @@
                 <el-button type="primary" icon="el-icon-search" @click="search(pageNo,pageSize)">查询</el-button>
                 <el-button icon="el-icon-refresh-right" @click="resetValue()">重置</el-button>
                 <el-button type="success" icon="el-icon-plus" @click="openAddwindow()">新增</el-button>
-              
+                <el-button type="success" plain @click="handleDownload">导出</el-button>
             </el-form-item>
         </el-form>
         <!-- 
@@ -35,7 +35,7 @@
             <el-table-column label="操作" width="450" align="center">
                 <template slot-scope="scope">
                     <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="PlanToPo(scope.row)">
-                        入库 </el-button>
+                        已购 </el-button>
                     <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handleEdit(scope.row)">编辑
                     </el-button>
                     <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete(scope.row)">删除
@@ -126,6 +126,12 @@ export default {
                 pageNo: 1,//当前页码
                 pageSize: 10,//每页显示条数
             },
+
+            downloadLoading: false,
+            filename: "采购计划表",
+            autoWidth: true,
+            bookType: "xlsx",
+
             tableData: [],//表格数据
 
             //分页组件所需的属性
@@ -357,7 +363,7 @@ export default {
                 this.plan.scheduleState = 4
             };
             console.log(this.plan);
-            let confirm = await this.$myconfirm("确定要入库该数据嘛?")
+            let confirm = await this.$myconfirm("该采购计划是否已完成？")
             if (confirm) {
             let res = await planApi.toPo(this.plan)
             console.log(res)
@@ -444,11 +450,46 @@ export default {
                 this.$message.error(res.message)
             }
             }
-        }
+        },
+
+       async handleDownload() {
+            let confirm = await this.$myconfirm("确定要导出吗?")
+            if(confirm){
+                this.downloadLoading = true
+                import('@/vendor/Export2Excel').then(excel => {
+                const tHeader = ['物品名称', '物品类型', '供货名称', '单位', '供货地址','数量','单价','品牌','创建时间','状态'] 
+                const filterVal = ['scheduleName', 'scheduleType', 'scheduleSupplier', 'unit',
+                                 'scheduleAddress','scheduleNum','schedulePrice','brand','scheduleTime','scheduleState']
+                const list = this.tableData 
+                const data = this.formatJson(filterVal, list)
+                excel.export_json_to_excel({
+                    header: tHeader,
+                    data,
+                    filename: this.filename, 
+                    autoWidth: this.autoWidth,
+                    bookType: this.bookType
+                })
+                this.downloadLoading = false
+            })
+            this.$message.success("导出成功")
+            }
+            
+        },
+        formatJson(filterVal, jsonData) {
+            return jsonData.map(v => filterVal.map(j => {
+                if (j === 'timestamp') {
+                    return parseTime(v[j])
+                } else {
+                    return v[j]
+                }
+            }))
+
+        },
+    },
 
     }
 
-}
+
 
 
 </script>

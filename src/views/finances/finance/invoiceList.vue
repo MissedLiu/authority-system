@@ -13,15 +13,12 @@
                     <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
                 </el-select>
             </el-form-item>
+            <el-form-item>
+                <el-button type="success" plain @click="handleDownload">导出</el-button>
+            </el-form-item>
         </el-form>
-        <!-- 
-            data属性:表格数据
-            border属性:表格边框
-            stripe属性:表格斑马线
-            row-key属性:行数据的key,用来优化table的渲染
-            default-expand-all属性:默认展开树形表格数据
-            tree-props属性:树形表格配置属性选型
-         -->
+       
+
         <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="poId"
             default-expand-all>
             <el-table-column prop="stockinName" label="物品名称" />
@@ -32,7 +29,7 @@
             <el-table-column prop="createTime" label="创建时间" />
             <el-table-column label="操作" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-close" type="danger" size="small" plain  @click="handleDelete(scope.row)">删除
+                    <el-button icon="el-icon-close" type="danger" size="small" plain @click="handleDelete(scope.row)">删除
                     </el-button>
                 </template>
             </el-table-column>
@@ -55,7 +52,7 @@
 </template>
 
 <script>
-//导入department.js脚本文件
+
 import invoiceApi from "@/api/invoiceApi";
 //先导入systemDialog组件
 import SystemDialog from "@/components/system/SystemDialog.vue";
@@ -67,6 +64,12 @@ export default {
     },
     data() {
         return {
+
+            downloadLoading: false,
+            filename: "商品收入报表",
+            autoWidth: true,
+            bookType: "xlsx",
+
             searchModel: {
                 stockinName: "", //库存物品名
                 pageNo: 1, //当前页码
@@ -213,23 +216,55 @@ export default {
             })
         },
         //删除按钮实现
-    async handleDelete(row) {
-      let confirm = await this.$myconfirm("确定要删除该数据嘛?");
-      if (confirm) {
-        await invoiceApi.deleteInvoice({invoiceId : row.invoiceId})
-          .then((res) => {
-            if (res.success) {
-              //提示成功
-              this.$message.success(res.message);
-              //刷新数据
-              this.search(this.pageNo, this.pageSize);
-            } else {
-              //提示失败
-              this.$message.error(res.message);
+        async handleDelete(row) {
+            let confirm = await this.$myconfirm("确定要删除该数据嘛?");
+            if (confirm) {
+                await invoiceApi.deleteInvoice({ invoiceId: row.invoiceId })
+                    .then((res) => {
+                        if (res.success) {
+                            //提示成功
+                            this.$message.success(res.message);
+                            //刷新数据
+                            this.search(this.pageNo, this.pageSize);
+                        } else {
+                            //提示失败
+                            this.$message.error(res.message);
+                        }
+                    });
             }
-          });
-      }
+        },
+        
+        async handleDownload() {
+        let confirm = await this.$myconfirm("确定要导出吗?")
+            if(confirm){
+            this.downloadLoading = true
+            import('@/vendor/Export2Excel').then(excel => {
+                const tHeader = ['物品名称', '数量', '总价', '品牌', '销售人员编号','创建时间'] 
+                const filterVal = ['stockinName', 'stockinNum', 'price', 'brand', 'empId','createTime'] 
+                const list = this.tableData 
+                const data = this.formatJson(filterVal, list)
+                excel.export_json_to_excel({
+                    header: tHeader,
+                    data,
+                    filename: this.filename, 
+                    autoWidth: this.autoWidth,
+                    bookType: this.bookType
+                })
+                this.downloadLoading = false
+            })
+            this.$message.success("导出成功")
+        }
     },
+        formatJson(filterVal, jsonData) {
+            return jsonData.map(v => filterVal.map(j => {
+                if (j === 'timestamp') {
+                    return parseTime(v[j])
+                } else {
+                    return v[j]
+                }
+            }))
+
+        },
     },
 };
 </script>
