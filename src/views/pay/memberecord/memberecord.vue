@@ -20,7 +20,14 @@
             <el-table-column prop="createTime" label="注册时间"></el-table-column>
             <el-table-column prop="columnTime" label="回访时间"></el-table-column>
             <el-table-column prop="callbackContent" label="回访内容" width="500" ></el-table-column>
-
+            <el-table-column label="操作" width="100" align="center">
+                <template slot-scope="scope">
+                    <el-button icon="el-icon-close" type="danger" plain size="small" @click="del(scope.row)"
+                        v-if="hasPermission('pay:memberecord:delete')">
+                        删除
+                    </el-button>
+                </template>
+            </el-table-column>
         </el-table>
         <!-- 分页组件 -->
         <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange"
@@ -85,6 +92,27 @@ export default {
                 this.tableData = res.data.records;
                 //当前数据数量
                 this.total = res.data.total;
+            }
+        },
+
+         //删除
+         async del(row) {
+            //提示是否确认删除
+            let confirm = await this.$myconfirm("确定要删除该记录吗?")//await代表同步
+            if (confirm) {
+                //发送删除请求
+                console.log("ssssssssssssss",row);
+                let res = await memberecotdApi.deleteMemberCord({callbackId : row.callbackId})
+                //判断是否发送成功
+                if (res.success) {
+                    //提示成功
+                    this.$message.success(res.message)
+                    //刷新数据
+                    this.search(this.pageNo, this.pageSize)
+                } else {
+                    //提示失败
+                    this.$message.error(res.message)
+                }
             }
         },
 

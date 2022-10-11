@@ -57,7 +57,7 @@
                     <el-table-column prop="memberPhone" label="会员电话"></el-table-column>
                     <el-table-column label="操作" width="200" align="center">
                         <template slot-scope="scope">
-                            <el-button icon="el-icon-close" type="danger" size="small"
+                            <el-button type="success" plain icon="el-icon-plus" size="small"
                                 @click="signingwindow(scope.row)">
                                 签订合同
                             </el-button>

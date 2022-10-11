@@ -20,13 +20,11 @@
 
         <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="poId"
             default-expand-all>
-            <el-table-column prop="memberName" label="会员名称" />
-            <el-table-column prop="memberPhone" label="会员电话" />
             <el-table-column prop="mealName" label="套餐名称" />
             <el-table-column prop="mealType" label="套餐类型" />
-            <el-table-column prop="ptpName" label="项目名称" />
-            <el-table-column prop="comsunePrice" label="消费金额" />
-            <el-table-column prop="comsuneDate" label="消费时间" />
+            <el-table-column prop="pname" label="项目名称" />
+            <el-table-column prop="proceedsPrice" label="消费金额" />
+            <el-table-column prop="proceedsTime" label="消费时间" />
             <el-table-column label="操作" align="center">
                 <template slot-scope="scope">
                     <el-button icon="el-icon-close" type="danger" size="small" plain @click="handleDelete(scope.row)">删除
@@ -55,7 +53,7 @@
 
 <script>
 //导入department.js脚本文件
-import comsuneApi from "@/api/comsune";
+import proceedsApi from "@/api/proceedsApi";
 //先导入systemDialog组件
 import SystemDialog from "@/components/system/SystemDialog.vue";
 export default {
@@ -93,17 +91,12 @@ export default {
                 height: 30, //窗口高度
             },
             proceeds: {
-                comsuneId: "", //编号
-                memberId: "", //会员编号
-                memberPhone: "", //会员电话
-                memberName: "", //会员名称
-                mealId: "", //套餐编号
+                proceedsId: "", //编号
                 mealName: "", //套餐名称
                 mealType: "", //套餐类型
-                ptpId: "", //项目编号
-                ptpName: "", //项目名称
-                comsunePrice: "", //消费金额
-                comsuneDate: "", //消费时间
+                pName: "", //项目名称
+                proceedsPrice: "", //消费金额
+                proceedsTime: "", //消费时间
             },
 
 
@@ -175,10 +168,12 @@ export default {
             //修改每页显示条数
             this.searchModel.pageSize = pageSize;
             //发送查询请求
-            let res = await comsuneApi.selectComsuneList(this.searchModel);
+            let res = await proceedsApi.selectList(this.searchModel);
+            console.log("w=",res.data.records)
             //判断是否成功
             if (res.success) {
                 this.tableData = res.data.records;
+                console.log(this.tableData)
                 this.total = res.data.total;
             }
         },
@@ -189,7 +184,7 @@ export default {
         },
 
         async toSumPrice() {
-            await comsuneApi.getSumPrice(this.searchModel).then(res => {
+            await proceedsApi.getSumPrice(this.searchModel).then(res => {
                 if (res.success) {
                     this.sumPrice = res.data
                     this.DialogConfig.title = "🐂"
@@ -222,7 +217,7 @@ export default {
             console.log(row)
             let confirm = await this.$myconfirm("确定要删除该数据嘛?");
             if (confirm) {
-                await comsuneApi.deleteComSune({ comsuneId: row.comsuneId })
+                await proceedsApi.delete({ comsuneId: row.comsuneId })
                     .then((res) => {
                         if (res.success) {
                             //提示成功

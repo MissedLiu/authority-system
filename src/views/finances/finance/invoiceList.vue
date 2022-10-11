@@ -25,7 +25,6 @@
             <el-table-column prop="stockinNum" label="数量" />
             <el-table-column prop="price" label="总价" />
             <el-table-column prop="brand" label="品牌" />
-            <el-table-column prop="empId" label="销售人员编号" />
             <el-table-column prop="createTime" label="创建时间" />
             <el-table-column label="操作" align="center">
                 <template slot-scope="scope">
