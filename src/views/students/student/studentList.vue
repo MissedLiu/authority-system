@@ -154,6 +154,7 @@
 
 <script>
 import xueyuanApi from '@/api/xueyuanApi';
+import userApi from '@/api/userApi';
 import interviewApi from '@/api/interview';
 //导入对话框组件
 import SystemDialog from '@/components/system/SystemDialog.vue';
@@ -267,14 +268,21 @@ export default {
     }
   },
   created() {
+
     this.search();
   },
   methods: {
+    //查询当前登录的人的员工姓名
+ 
     //查询
     async search(pageNo, pageSize) {
+      let userId= this.$store.getters.userId;
+    let res2=await userApi.empByUserId({id:userId});
+    this.searchModel.empId=res2.data.empId
       this.searchModel.pageNo = pageNo;
       this.searchModel.pageSize = pageSize;
-      this.searchModel.empId = this.$store.getters.userId;
+     
+      console.log("cc=", this.searchModel.empId)//账号id
       this.searchModel.mealType = "私教";
       console.log(this.searchModel)
       let res = await xueyuanApi.findAll(this.searchModel);
@@ -304,9 +312,12 @@ export default {
     async tm(pageNo2, pageSize2) {
       this.falg1 = false;
       this.falg2 = true;
+      let userId= this.$store.getters.userId;
+    let res2=await userApi.empByUserId({id:userId});
+    this.searchModel2.empId=res2.data.empId
       this.searchModel2.pageNo = pageNo2;
       this.searchModel2.pageSize = pageSize2;
-      this.searchModel2.empId = this.$store.getters.userId;
+
       this.searchModel2.mealType = "团操";
       console.log(this.searchModel2)
       let res = await xueyuanApi.findAll(this.searchModel2);
