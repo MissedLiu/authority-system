@@ -15,7 +15,7 @@
       <el-row :gutter="20">
         <el-col :span="24">
           <div>
-            <BarChart v-if="flag" :JiaoXue="this.JiaoXue"></BarChart>
+            <BarChart v-if="flag" :JiaoXue="this.JiaoXue" :tuanNum="this.countTeamNum" :sijiao="this.countPtNum"></BarChart>
           </div>
         </el-col>
       </el-row>
@@ -51,7 +51,8 @@ import BinZhuang from './admin/components/BinZhuang.vue'
 import empApi from '@/api/empApi'
 import memberApi from '@/api/member'
 import xueyuanApi from '@/api/xueyuanApi'
-
+import teamApi from '@/api/team'
+import ptApi from '@/api/pt'
 export default {
   components: { BarChart,LineChart, PanelGroup, BoxCard, PieChart, RaddarChart, TransactionTable, BinZhuang },
 
@@ -60,6 +61,8 @@ export default {
       empNUm: {},
       TeamlNum: {},
       JiaoXue:{},
+      countTeamNum:{},
+      countPtNum:{},
       flag: false,
     }
   },
@@ -81,6 +84,12 @@ export default {
       //统计教练下学员数   
       let jaioxueNum = await xueyuanApi.findNumJiaoLian();
       this.JiaoXue = jaioxueNum.data;
+      //统计团操人数
+      let countteamnum=await teamApi.countTeamNum();
+      this.countTeamNum=countteamnum.data;
+       //统计私教人数
+       let countptnum=await ptApi.countPtNum();
+      this.countPtNum=countptnum.data;
       this.flag = true;
     },
 

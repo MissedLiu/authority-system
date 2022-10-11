@@ -10,7 +10,7 @@ import echarts from 'echarts'
 require('echarts/theme/macarons') // echarts theme
 const animationDuration = 6000
 export default {
-  props: ["JiaoXue"],
+  props: ["JiaoXue","tuanNum","sijiao"],
   data() {
     return {
       JiaoXue2: [],
@@ -20,6 +20,7 @@ export default {
   created() {
     this.JiaoXue2 = this.JiaoXue
     console.log("emp=", this.JiaoXue)
+    console.log("tuanNum2=", this.tuanNum)
     this.showMain();
   },
 
@@ -76,14 +77,14 @@ export default {
           type: 'bar',
           stack: 'vistors',
           barWidth: '60%',
-          data: [80, 52, 200, 334, 390, 330, 220],
+          data:  this.sijiao.map(d=>d.value),
           animationDuration
         }, {
           name: '团操套餐人数',
           type: 'bar',
           stack: 'vistors',
           barWidth: '60%',
-          data: [30, 52, 200, 334, 390, 330, 220],
+          data: this.tuanNum.map(d=>d.value),
           animationDuration
         }]
       });

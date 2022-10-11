@@ -51,5 +51,10 @@ async getAssignPtList(params){
 async assignPtProjectSave(params){
     return await http.post("/api/ptMeal/savePtMealPtProject",params)
     },
-    
+    /**
+     * 统计私教人数
+     */
+     async countPtNum(){
+        return await http.get("/api/ptMeal/countPtNum")
+        },
 }

@@ -49,5 +49,10 @@ async getAssigntpList(params){
 async assigntpProjectSave(params){
     return await http.post("/api/teamMeal/saveTeamProject",params)
     },
-
+/**
+ * 统计套餐
+ */
+ async countTeamNum(){
+    return await http.get("/api/teamMeal/countTeamNum")
+    },
 }
