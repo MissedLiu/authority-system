@@ -22,7 +22,7 @@
             default-expand-all>
             <el-table-column prop="mealName" label="套餐名称" />
             <el-table-column prop="mealType" label="套餐类型" />
-            <el-table-column prop="pName" label="项目名称" />
+            <el-table-column prop="pname" label="项目名称" />
             <el-table-column prop="proceedsPrice" label="消费金额" />
             <el-table-column prop="proceedsTime" label="消费时间" />
             <el-table-column label="操作" align="center">
@@ -169,9 +169,11 @@ export default {
             this.searchModel.pageSize = pageSize;
             //发送查询请求
             let res = await proceedsApi.selectList(this.searchModel);
+            console.log("w=",res.data.records)
             //判断是否成功
             if (res.success) {
                 this.tableData = res.data.records;
+                console.log(this.tableData)
                 this.total = res.data.total;
             }
         },
