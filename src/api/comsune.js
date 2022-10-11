@@ -11,10 +11,5 @@ export default {
   async selectComsuneList(params) {
     return await request.get("/api/Comsune/selectComsuneList", params);
   },
-  async getSumPrice(params){
-    return await http.get("api/Comsune/sumPrice",params)
-  },
-  async deleteComSune(params){
-    return await http.delete("/api/Comsune/delete",params)
-  }
+  
 };
