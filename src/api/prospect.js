@@ -17,5 +17,9 @@ export default {
     async updProspect(params) {
         return await request.put("api/prospect/updProspect", params);
       },
+      //通过id修改潜在用户状态
+    async updProspectById(params) {
+      return await request.put("api/prospect/updProspectById", params);
+    },
 
 };

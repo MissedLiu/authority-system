@@ -7,7 +7,8 @@
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
-                <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow" v-if="hasPermission('pay:counsult:add')">新增</el-button>
+                <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow"
+                    v-if="hasPermission('pay:counsult:add')">新增</el-button>
                 <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
             </el-form-item>
         </el-form>
@@ -19,7 +20,15 @@
             <el-table-column prop="consultSex" label="性别" :formatter="playbackFormat"></el-table-column>
             <el-table-column prop="consultPhone" label="电话"></el-table-column>
             <el-table-column prop="consultTime" label="咨询时间"></el-table-column>
-            <el-table-column prop="consultContent" label="咨询内容"></el-table-column>
+            <el-table-column prop="consultContent" label="咨询内容" width="500"></el-table-column>
+            <el-table-column label="操作" width="100" align="center">
+                <template slot-scope="scope">
+                    <el-button icon="el-icon-close" type="danger" plain size="small" @click="del(scope.row)"
+                        v-if="hasPermission('pay:counsult:delete')">
+                        删除
+                    </el-button>
+                </template>
+            </el-table-column>
         </el-table>
         <!-- 分页组件 -->
         <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange"
@@ -48,7 +57,7 @@
                         <el-input v-model="consults.consultAge"></el-input>
                     </el-form-item>
                     <el-form-item label="咨询内容" prop="consultContent">
-                       <el-input v-model="consults.consultContent" :rows="10" type="textarea"></el-input>
+                        <el-input v-model="consults.consultContent" :rows="10" type="textarea"></el-input>
                     </el-form-item>
                 </el-form>
             </div>
@@ -79,8 +88,8 @@ export default {
                 pageNo: 1,//当前页码
                 pageSize: 10,//每页显示数量
             },
-             //验证
-             mbrules: {
+            //验证
+            mbrules: {
                 consultName: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
                 consultSex: [{ required: true, message: '请选择性别', trigger: 'change' }],
                 consultPhone: [{ required: true, message: '请输入电话', trigger: 'blur' },
@@ -88,7 +97,7 @@ export default {
                 consultAge: [{ required: true, message: '请输入年龄', trigger: 'blur' },
                 { pattern: new RegExp(/^(?:[1-9][0-9]?|1[01][0-9]|100)$/), message: '请正确输入年龄' }],
                 consultContent: [{ required: true, message: '请输入咨询内容', trigger: 'blur' }],
-    
+
             },
             consultDialog: {
                 title: "",//窗口标题
@@ -96,14 +105,14 @@ export default {
                 width: 400,//窗口宽度
                 height: 300//窗口高度
             },
-                       // 添加窗口绑定数据
+            // 添加窗口绑定数据
             consults: {
-                consultId:"",
-                consultName:"",
-                consultSex:"",
-                consultPhone:"",
-                consultAge:"",
-                consultContent:"",
+                consultId: "",
+                consultName: "",
+                consultSex: "",
+                consultPhone: "",
+                consultAge: "",
+                consultContent: "",
             },
 
         }
@@ -137,13 +146,13 @@ export default {
         },
 
 
-         //打开添加窗口
-         openAddwindow() {
+        //打开添加窗口
+        openAddwindow() {
             //清空表单数据
             this.$restForm("consultForm", this.consult);
             //设置属性
             this.consultDialog.title = '新咨询记录',
-            this.consultDialog.visible = true
+                this.consultDialog.visible = true
         },
         //窗口关闭事件
         onClose() {
@@ -156,7 +165,7 @@ export default {
                 //如果验证通过
                 if (valid) {
                     //添加事件
-                     let res = await counsultApi.addMmeberConsult(this.consults)
+                    let res = await counsultApi.addMmeberConsult(this.consults)
                     //判断是否成功
                     if (res.success) {
                         //提示成功
@@ -171,6 +180,26 @@ export default {
                     }
                 }
             })
+        },
+        //删除
+        async del(row) {
+            //提示是否确认删除
+            let confirm = await this.$myconfirm("确定要删除该记录吗?")//await代表同步
+            if (confirm) {
+                //发送删除请求
+                console.log("ssssssssssssss",row);
+                let res = await counsultApi.deletecounsult({consultId : row.consultId})
+                //判断是否发送成功
+                if (res.success) {
+                    //提示成功
+                    this.$message.success(res.message)
+                    //刷新数据
+                    this.search(this.pageNo, this.pageSize)
+                } else {
+                    //提示失败
+                    this.$message.error(res.message)
+                }
+            }
         },
 
         /**

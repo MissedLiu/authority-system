@@ -18,11 +18,16 @@
             <el-table-column prop="prospectSex" label="性别"></el-table-column>
             <el-table-column prop="prospectPhone" label="电话"></el-table-column>
             <el-table-column prop="type" label="状态"></el-table-column>
-            <el-table-column label="操作" width="150" align="center">
+            <el-table-column label="操作" width="250" align="center">
                 <template slot-scope="scope">
                     <el-button icon="el-icon-plus" type="success" plain size="small" @click="addCallBack(scope.row)"
-                    v-if="hasPermission('pay:prospect:payprospect')">
+                        v-if="hasPermission('pay:prospect:payprospect')">
                         回访
+                    </el-button>
+                    <el-button icon="el-icon-edit-outline" type="primary" plain size="small"
+                        @click="openProspectType(scope.row)"
+                        v-if="hasPermission('prospects:prospects:editById')">
+                        修改状态
                     </el-button>
                 </template>
             </el-table-column>
@@ -32,13 +37,31 @@
             :current-page="pageNo" :page-sizes="[10, 20, 30, 40, 50]" :page-size="10"
             layout="total, sizes, prev, pager, next, jumper" :total="total">
         </el-pagination>
-        <!-- 会员回访窗口 -->
+        <!-- 回访窗口 -->
         <system-dialog :title="callBackDialog.title" :visible="callBackDialog.visible" :width="callBackDialog.width"
             :height="callBackDialog.height" @onClose="callBackClose()" @onConfirm="callBackConfirm()">
             <div slot="content">
-                <el-form :model="callBack" ref="prospectFormXQ" label-width="80px" size="small" :inline="true" :rules="rules">
-                    <el-form-item label="回访内容"  prop="callbackContent">
+                <el-form :model="callBack" ref="prospectFormXQ" label-width="80px" size="small" :inline="true"
+                    :rules="rules">
+                    <el-form-item label="回访内容" prop="callbackContent">
                         <el-input v-model="callBack.callbackContent" :rows="10" type="textarea"></el-input>
+                    </el-form-item>
+                </el-form>
+            </div>
+        </system-dialog>
+        <!-- 修改状态窗口 -->
+        <system-dialog :title="callBackTypeDialog.title" :visible="callBackTypeDialog.visible"
+            :width="callBackTypeDialog.width" :height="callBackTypeDialog.height" @onClose="callBackTypeClose()"
+            @onConfirm="callBackTypeConfirm()">
+            <div slot="content">
+                <el-form :model="prospect" ref="prospectType" label-width="80px" size="small" :inline="true"
+                    :rules="rules">
+                    <el-form-item label="状态" prop="type">
+                        <el-select v-model="prospect.type" placeholder="请选择状态">
+                            <el-option :value="'普通意向'" label="普通意向客户"></el-option>
+                            <el-option :value="'重点意向'" label="重点意向客户"></el-option>
+                            <el-option :value="'无意向'" label="无意向客户"></el-option>
+                        </el-select>
                     </el-form-item>
                 </el-form>
             </div>
@@ -49,6 +72,7 @@
 
 <script>
 import prospectListApi from '@/api/prospectlist';
+import prospectApi from '@/api/prospect';
 //导入对话框组件
 import SystemDialog from '@/components/system/SystemDialog.vue';
 export default {
@@ -85,6 +109,18 @@ export default {
             callBack: {
                 prospectId: "",
                 callbackContent: ""
+            },
+            //修改框参数
+            callBackTypeDialog: {
+                title: "状态修改",//窗口标题
+                visible: false,//是否显示窗口
+                width: 200,//窗口宽度
+                height: 100//窗口高度
+            },
+            //修改状态
+            prospect: {
+                type: "",
+                prospectId: "",
             }
         }
     },
@@ -101,6 +137,7 @@ export default {
             this.emp.pageSize = pageSize
             //发送查询请求
             let res = await prospectListApi.findProspectByEmpId(this.emp);
+            console.log("res:", res);
             //判断是否存在数据
             if (res.success) {
                 //获取数据
@@ -140,6 +177,33 @@ export default {
                     }
                 }
             })
+        },
+        //打开修改状态窗口
+        openProspectType(row) {
+            this.callBackTypeDialog.visible = true
+            this.prospect.type = row.type
+            this.prospect.prospectId = row.prospectId
+        },
+        //修改框关闭事件
+        callBackTypeClose() {
+            this.callBackTypeDialog.visible = false
+        },
+        //修改框确定事件
+        async callBackTypeConfirm() {
+            let res = await prospectApi.updProspectById(this.prospect);
+            //判断是否存在数据
+            if (res.success) {
+                //提示成功
+                this.$message.success(res.message)
+                //刷新数据
+                this.search(this.pageNo, this.pageSize)
+                //关闭窗口事件
+                this.callBackTypeDialog.visible = false
+            } else {
+                //提示失败
+                this.$message.error(res.message)
+            }
+
         },
         /**
         * 重置查询条件

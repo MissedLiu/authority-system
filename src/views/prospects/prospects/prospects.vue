@@ -66,6 +66,7 @@
                         <el-select v-model="prospect.type" placeholder="请选择状态">
                             <el-option :value="'普通意向'" label="普通意向客户"></el-option>
                             <el-option :value="'重点意向'" label="重点意向客户"></el-option>
+                            <el-option :value="'无意向'" label="无意向客户"></el-option>
                         </el-select>
                     </el-form-item>
                 </el-form>

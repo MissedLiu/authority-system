@@ -9,5 +9,9 @@ export default {
     async addMmeberConsult(params) {
       return await request.post("/api/memberConsult/addMmeberConsult", params);
     },
+    //删除咨询记录
+    async deletecounsult(params){
+      return await request.delete("/api/memberConsult/deleteCounsult", params)
+    }
 
 }

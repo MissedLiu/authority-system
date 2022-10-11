@@ -5,5 +5,9 @@ export default {
   async findProspectByEmpId(params) {
     return await request.get("/api/callBackProspect/selectCallBackList", params);
   },
+    //删除回访记录
+    async deleteProspectCord(params){
+      return await request.delete("/api/callBackProspect/deleteProspectCord", params)
+    }
 
 };

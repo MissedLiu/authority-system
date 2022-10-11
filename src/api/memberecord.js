@@ -5,5 +5,9 @@ export default {
   async findMemberByEmpId(params) {
     return await request.get("/api/callBackMember/selectCallBackList", params);
   },
+  //删除回访记录
+  async deleteMemberCord(params){
+    return await request.delete("/api/callBackMember/deleteMemberCord", params)
+  }
 
 };

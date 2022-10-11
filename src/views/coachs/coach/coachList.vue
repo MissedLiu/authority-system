@@ -21,7 +21,7 @@
             <el-table-column prop="emil" label="邮箱"></el-table-column>
             <el-table-column prop="qq" label="qq"></el-table-column>
             <el-table-column prop="weix" label="微信"></el-table-column>
-            <el-table-column label="操作" width="450" align="center">
+            <el-table-column label="操作" width="420" align="center">
                 <template slot-scope="scope">
                     <el-button icon="el-icon-edit-outline"  plain  type="primary" @click="openupdwindow(scope.row)"
                     v-if="hasPermission('coachs:coach:edit')">修改
