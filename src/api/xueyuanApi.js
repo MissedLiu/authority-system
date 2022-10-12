@@ -18,4 +18,10 @@ export default{
          async findNumJiaoLian(){
             return await http.getRestApi("/api/XueYuan/findNumJiaoLian");
         },
+         /**
+         * 统计各个教练个个套餐的人数
+         */
+          async CountTongJi(){
+            return await http.getRestApi("/api/XueYuan/CountTongJi");
+        },
 }

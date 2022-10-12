@@ -65,14 +65,7 @@ export default {
             show: false
           }
         }],
-        series: [{
-          name: '总人数',
-          type: 'bar',
-          stack: 'vistors',
-          barWidth: '60%',
-          data:this.JiaoXue2.map(d=>d.value),
-          animationDuration
-        }, {
+        series: [ {
           name: '私教套餐人数',
           type: 'bar',
           stack: 'vistors',

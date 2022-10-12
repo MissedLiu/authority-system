@@ -15,7 +15,8 @@
       <el-row :gutter="20">
         <el-col :span="24">
           <div>
-            <BarChart v-if="flag" :JiaoXue="this.JiaoXue" :tuanNum="this.countTeamNum" :sijiao="this.countPtNum"></BarChart>
+            <BarChart v-if="flag" :JiaoXue="this.JiaoXue" ></BarChart>
+            <!-- <BarChart v-if="flag" :JiaoXue="this.JiaoXue" :tuanNum="this.countTeamNum" :sijiao="this.countPtNum"></BarChart> -->
           </div>
         </el-col>
       </el-row>
@@ -82,14 +83,18 @@ export default {
       let mealNum = await memberApi.findNum();
       this.TeamlNum = mealNum.data;
       //统计教练下学员数   
-      let jaioxueNum = await xueyuanApi.findNumJiaoLian();
+      // let jaioxueNum = await xueyuanApi.findNumJiaoLian();
+      // this.JiaoXue = jaioxueNum.data;
+      // //统计团操人数
+      // let countteamnum=await teamApi.countTeamNum();
+      // this.countTeamNum=countteamnum.data;
+      // console.log("团操",this.countTeamNum)
+      //  //统计私教人数
+      //  let countptnum=await ptApi.countPtNum();
+      // this.countPtNum=countptnum.data;
+      let jaioxueNum = await xueyuanApi.CountTongJi();
       this.JiaoXue = jaioxueNum.data;
-      //统计团操人数
-      let countteamnum=await teamApi.countTeamNum();
-      this.countTeamNum=countteamnum.data;
-       //统计私教人数
-       let countptnum=await ptApi.countPtNum();
-      this.countPtNum=countptnum.data;
+      console.log("私教",this.JiaoXue)
       this.flag = true;
     },
 
