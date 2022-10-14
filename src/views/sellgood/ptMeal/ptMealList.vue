@@ -285,7 +285,7 @@ export default {
             //提示成功
             this.$message.success(res.message);
             //刷新数据
-            this.search();
+            this.search(this.pageNo, this.pageSize);
             //关闭窗口事件
             this.ptDialog.visible = false;
           } else {

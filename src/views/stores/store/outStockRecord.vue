@@ -26,7 +26,7 @@
             default-expand-all>
             <el-table-column prop="empName" label="领取人"/>
             <el-table-column prop="stockinName" label="物品名称" />
-            <el-table-column prop="storeNum" label="出库数量" />
+            <el-table-column prop="outNum" label="出库数量" />
             <el-table-column prop="stockinType" label="物品类型" />
             <el-table-column prop="brand" label="品牌" />
             <el-table-column prop="stockoutTime" label="出库时间" />
