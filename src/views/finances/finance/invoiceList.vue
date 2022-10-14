@@ -8,16 +8,20 @@
             <el-form-item>
                 <el-button type="primary" icon="el-icon-search" @click="search(pageNo, pageSize)">查询</el-button>
                 <el-button icon="el-icon-refresh-right" @click="resetValue()">重置</el-button>
-
-                <el-select v-model="tjType" class="m-2" placeholder="统计销售总值" size="small" @change="selectChange">
-                    <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
-                </el-select>
             </el-form-item>
             <el-form-item>
-                <el-button type="success" plain @click="handleDownload">导出</el-button>
+                <div class="block" style="position:relative; left:444px">
+                    <el-select v-model="tjType" class="m-2" placeholder="统计销售总值" size="small" @change="selectChange">
+                        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
+                    </el-select>
+                    <el-date-picker v-model="searchModel.changeTime" type="month" placeholder="请选择要查询的月份"
+                        @change="changeTimeb(pageNo,pageSize)" value-format="yyyy-MM" />
+                    <el-button type="success" plain @click="toFile" style="margin-left:10px">归档</el-button>
+                    <el-button type="success" plain @click="handleDownload">导出当页数据到Excel表格</el-button>
+                </div>
             </el-form-item>
         </el-form>
-       
+
 
         <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="poId"
             default-expand-all>
@@ -53,6 +57,7 @@
 <script>
 
 import invoiceApi from "@/api/invoiceApi";
+import onFileApi from "@/api/onFileApi"
 //先导入systemDialog组件
 import SystemDialog from "@/components/system/SystemDialog.vue";
 export default {
@@ -70,6 +75,8 @@ export default {
             bookType: "xlsx",
 
             searchModel: {
+                onFileType: "",
+                changeTime: "",
                 stockinName: "", //库存物品名
                 pageNo: 1, //当前页码
                 pageSize: 10, //每页显示条数
@@ -214,6 +221,20 @@ export default {
                 this.sumPrice = res.data
             })
         },
+
+        changeTimeb(pageNo, pageSize) {
+            this.searchModel.pageNo = pageNo;
+            //修改每页显示条数
+            this.searchModel.pageSize = pageSize;
+            //发送查询请求
+            invoiceApi.getInvoicelist(this.searchModel).then((res) => {
+                if (res.success) {
+                    this.tableData = res.data.records;
+                    this.total = res.data.total;
+                }
+            });
+        },
+
         //删除按钮实现
         async handleDelete(row) {
             let confirm = await this.$myconfirm("确定要删除该数据嘛?");
@@ -232,28 +253,43 @@ export default {
                     });
             }
         },
-        
+
         async handleDownload() {
-        let confirm = await this.$myconfirm("确定要导出吗?")
-            if(confirm){
-            this.downloadLoading = true
-            import('@/vendor/Export2Excel').then(excel => {
-                const tHeader = ['物品名称', '数量', '总价', '品牌', '销售人员编号','创建时间'] 
-                const filterVal = ['stockinName', 'stockinNum', 'price', 'brand', 'empId','createTime'] 
-                const list = this.tableData 
-                const data = this.formatJson(filterVal, list)
-                excel.export_json_to_excel({
-                    header: tHeader,
-                    data,
-                    filename: this.filename, 
-                    autoWidth: this.autoWidth,
-                    bookType: this.bookType
+            let confirm = await this.$myconfirm("确定要导出吗?")
+            if (confirm) {
+                this.downloadLoading = true
+                import('@/vendor/Export2Excel').then(excel => {
+                    const tHeader = ['物品名称', '数量', '总价', '品牌', '销售人员编号', '创建时间']
+                    const filterVal = ['stockinName', 'stockinNum', 'price', 'brand', 'empId', 'createTime']
+                    const list = this.tableData
+                    const data = this.formatJson(filterVal, list)
+                    excel.export_json_to_excel({
+                        header: tHeader,
+                        data,
+                        filename: this.filename,
+                        autoWidth: this.autoWidth,
+                        bookType: this.bookType
+                    })
+                    this.downloadLoading = false
                 })
-                this.downloadLoading = false
-            })
-            this.$message.success("导出成功")
-        }
-    },
+                this.$message.success("导出成功")
+            }
+        },
+
+        async toFile() {
+            let confirm = await this.$myconfirm("确定要将该月商品收入归档吗");
+            if (confirm) {
+                this.searchModel.onFileType = '商品收入';
+                await onFileApi.toFile(this.searchModel).then(res => {
+                    if (res.success) {
+                        this.$message.success(res.message);
+                    } else {
+                        this.$message.error(res.message);
+                    }
+                })
+            }
+
+        },
         formatJson(filterVal, jsonData) {
             return jsonData.map(v => filterVal.map(j => {
                 if (j === 'timestamp') {
@@ -334,6 +370,7 @@ export default {
         padding-left: 10px !important;
     }
 }
+
 
 ::v-deep .el-tree>div {
     &::before {

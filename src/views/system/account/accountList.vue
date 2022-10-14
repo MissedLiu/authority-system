@@ -3,7 +3,7 @@
         <!-- 查询条件 -->
         <el-form :model="searchModel" ref="searchForm" label-width="80px" :inline="true" size="small">
             <el-form-item>
-                <el-input v-model="searchModel.username" placeholder="请输入角色名称" />
+                <el-input v-model="searchModel.username" placeholder="请输入账号名" />
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" icon="el-icon-search" @click="search(pageNo,pageSize)">查询</el-button>
