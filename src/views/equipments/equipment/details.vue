@@ -30,7 +30,8 @@
             <el-table-column prop="edState" label="状态" />
             <el-table-column label="操作" width="300" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handleEdit(scope.row)" v-if="hasPermission('equipments:details:edit')">编辑
+                    <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handleEdit(scope.row)" v-if="hasPermission('equipments:details:edit') && scope.row.edState!='无法使用'" 
+                    >编辑
                     </el-button>
                     <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete(scope.row)" v-if="hasPermission('equipments:details:delete')">删除
                     </el-button>
@@ -145,6 +146,12 @@ export default {
             },
         };
     },
+
+    computed:{
+        butten(){
+            return 
+        }
+    },
     //初始化时调用
     created() {
         this.search();
@@ -213,6 +220,8 @@ export default {
                             this.tableData[i].edState = "使用中";
                         } else if (this.tableData[i].edState == 0) {
                             this.tableData[i].edState = "未使用";
+                        }else if(this.tableData[i].edState == 2){
+                            this.tableData[i].edState = "无法使用";
                         }
                     }
                 }

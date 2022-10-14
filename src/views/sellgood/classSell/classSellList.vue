@@ -21,7 +21,7 @@
                 </el-button>
             </el-form-item>
         </el-form>
-        <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 40px" row-key="salesId"
+        <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 40px" row-key="salesId" 
             default-expand-all>
             <el-table-column prop="mealName" label="套餐名称" />
             <el-table-column prop="memberName" label="会员姓名" />

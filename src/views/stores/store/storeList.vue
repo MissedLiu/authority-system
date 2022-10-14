@@ -45,6 +45,9 @@
                     <el-form-item label="出库数量" prop="outStockNum">
                         <el-input v-model="store.outStockNum"></el-input>
                     </el-form-item>
+                    <el-form-item label="领取人" prop="empName">
+                        <el-input v-model="store.empName"></el-input>
+                    </el-form-item>
                 </el-form>
             </div>
         </system-dialog>
@@ -103,6 +106,7 @@ export default {
                 brand: "", //品牌
                 stockinTime: "", //最后一次操作时间
                 outStockNum: "", //出库数量
+                empName:"",//领取人
             },
 
             //选择所属部门的属性

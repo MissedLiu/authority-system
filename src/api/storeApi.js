@@ -13,5 +13,11 @@ export default {
   },
   async toOutStock(params){
     return await http.post("/api/store/toOutStock",params)
+  },
+  async getOutStockRecord(params){
+    return await http.get("/api/outRecord/list",params)
+  },
+  async deleteRecord(params){
+    return await http.delete("/api/outRecord/delete",params)
   }
 }

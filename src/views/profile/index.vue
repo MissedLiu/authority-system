@@ -184,7 +184,7 @@ export default {
     //提交事件
     async update2() {
       //发送修改请求
-      let res = await empApi.update(this.emp);
+      let res = await empApi.update2(this.emp);
       //判断是否成功
       if (res.success) {
         //提示
