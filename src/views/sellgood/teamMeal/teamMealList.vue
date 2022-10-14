@@ -13,7 +13,7 @@
     </el-form>
     <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="teamId"
       default-expand-all>
-      <el-table-column prop="teamId" label="编号" />
+      <!-- <el-table-column prop="teamId" label="编号" /> -->
       <el-table-column prop="teamName" label="套餐名称" />
       <el-table-column prop="teamPrice" label="价格" />
       <el-table-column prop="teamTime" label="套餐时长" />

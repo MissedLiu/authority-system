@@ -39,14 +39,14 @@ export default {
         tooltip: {//提示内容
 
         },
-        toolbox: {
-          feature: {
-            magicType: {
-              type: ['line', 'bar'] //图表类型切换
+         toolbox: {
+                feature: {
+                    magicType: {
+                        type: ['line', 'bar'] //图表类型切换
+                    },
+                    icon:"circle"
+                },
             },
-            icon: "circle"
-          },
-        },
         legend: {//图例组件,点击后会显示或隐藏柱状
           data: [{
             name: '人数',
@@ -80,7 +80,7 @@ export default {
                 //这里是颜色
                 color: function (params) {
                   //注意，如果颜色太少的话，后面颜色不会自动循环，最好多定义几个颜色
-                  var colorList = ['#00A3E0', '#FFA100', '#CCCCCC', '#BBFFAA', '#749f83', '#ffc0cb', '#ca8622', '#00A3E0', '#FFA100', '#CCCCCC', '#BBFFAA', '#749f83', '#ffc0cb', '#ca8622'];
+                  var colorList = ['#00A3E0', '#FFA100', '#CCCCCC', '#BBFFAA', '#749f83', '#ffc0cb','#ca8622','#00A3E0', '#FFA100', '#CCCCCC', '#BBFFAA', '#749f83', '#ffc0cb','#ca8622'];
                   return colorList[params.dataIndex]
                 }
               }

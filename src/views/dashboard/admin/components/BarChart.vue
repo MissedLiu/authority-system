@@ -1,7 +1,7 @@
 <template>
 
   <div>
-    <div ref="main" style="width: 600px;height:500px;" class="dashboard-container"></div>
+    <div ref="main" style="width: 600px;height:300px;" class="dashboard-container"></div>
   </div>
 </template>
 
@@ -37,7 +37,9 @@ export default {
       var myChart = echarts.init(this.$refs.main);
       // 绘制图表
       myChart.setOption({
-
+        title: {//标题
+          text: '销售业绩'
+        },
         tooltip: {
           trigger: 'axis',
           axisPointer: { // 坐标轴指示器，坐标轴触发有效
@@ -53,7 +55,7 @@ export default {
           },
         },
         grid: {
-          top: 10,
+          top: 30,
           left: '1%',
           right: '1%',
           bottom: '1%',

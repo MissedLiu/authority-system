@@ -14,7 +14,7 @@
    
     <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="tpId"
       default-expand-all>
-      <el-table-column prop="tpId" label="编号" />
+      <!-- <el-table-column prop="tpId" label="编号" /> -->
       <el-table-column prop="tpName" label="项目名称名称" />
       <el-table-column prop="createTime" label="创建时间" />
       <el-table-column prop="updateTime" label="修改时间" />

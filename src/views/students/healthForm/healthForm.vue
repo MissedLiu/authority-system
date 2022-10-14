@@ -18,12 +18,12 @@
         <!-- 数据表格 -->
 
         <el-table :data="userList" :height="tableHeight"  stripe style="width: 100%;  margin-bottom: 10px">
-          <el-table-column prop="healthformId" label="体检编号" width="100" align="center"></el-table-column>
+          <el-table-column prop="healthformId" label="体检编号"  align="center"></el-table-column>
           <el-table-column prop="memberName" label="会员姓名"></el-table-column>
-          <el-table-column prop="weight" label="体重"></el-table-column>
-          <el-table-column prop="height" label="身高" width="100" align="center"></el-table-column>
-          <el-table-column prop="obpm" label="血压测量"></el-table-column>
-       
+          <el-table-column prop="weight" label="体重" width="50" align="center"></el-table-column>
+          <el-table-column prop="height" label="身高" width="50" align="center"></el-table-column>
+          <el-table-column prop="obpm" label="血压测量" align="center"></el-table-column>
+          <el-table-column prop="time" label="体检时间" width="100"></el-table-column>
           <el-table-column label="操作" align="center" width="200">
             <template slot-scope="scope">
               <el-button icon="el-icon-delete" type="danger" plain size="small" @click="handleEdit(scope.row)"
