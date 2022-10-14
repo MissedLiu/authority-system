@@ -63,7 +63,7 @@ export default {
    * 通过团操套餐id查详情
    * @returns
    */
-  async getSelectTeamMealByMealId(params) {
-    return await request.getRestApi("api/teamMember/selectTeamMealByMealId",params);
+  async findTeamByMemberId(params) {
+    return await request.getRestApi("api/teamMember/findTeamByMemberId",params);
   },
 };

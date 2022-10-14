@@ -40,11 +40,19 @@ export default {
    async getCommenMealList(params) {
     return await request.get("api/commonMember/findCommonMealListByCmis", params);
   },
-  /**
-   * 通过普通套餐id查详情
+  // /**
+  //  * 通过普通套餐id查详情
+  //  * @returns
+  //  */
+  // async getFindCommenMeal(params) {
+  //   return await request.getRestApi("api/commonMember/findCommenMealByCmId",params);
+  // }, 
+
+    /**
+   * 通过会员id查询普通套餐
    * @returns
    */
-  async getFindCommenMeal(params) {
-    return await request.getRestApi("api/commonMember/findCommenMealByCmId",params);
-  },   
+     async findCommonByMemberId(params) {
+      return await request.get("api/commonMember/findCommonByMemberId", params);
+    },
 }
