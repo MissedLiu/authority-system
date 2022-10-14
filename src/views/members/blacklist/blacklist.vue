@@ -14,18 +14,21 @@
     <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="id" default-expand-all
       :tree-props="{ children: 'children' }">
       <el-table-column prop="memberName" label="会员姓名"></el-table-column>
-      <el-table-column prop="memberSex" label="会员性别"></el-table-column>
+      <el-table-column prop="memberSex" label="会员性别" :formatter="playbackFormat"></el-table-column>
       <el-table-column prop="memberPhone" label="会员电话"></el-table-column>
       <el-table-column prop="memberDate" label="出生日期"></el-table-column>
       <el-table-column prop="memberAge" label="年龄"></el-table-column>
       <el-table-column prop="memberAddress" label="地址"></el-table-column>
-      <el-table-column prop="memberType" label="状态"></el-table-column>
+      <el-table-column prop="memberType" label="状态" :formatter="playbackFormat2"></el-table-column>
       <el-table-column prop="createTime" label="拉黑时间"></el-table-column>
       <el-table-column prop="why" label="拉黑原因" width="200"></el-table-column>
-      <el-table-column label="操作" width="150" align="center">
+      <el-table-column label="操作" width="250" align="center">
         <template slot-scope="scope">
+          <el-button icon="el-icon-close" plain type="danger" size="small" @click="openTF(scope.row)">
+            退费
+          </el-button>
           <el-button icon="el-icon-minus" plain type="warning" size="small" @click="del(scope.row)"
-          v-if="hasPermission('members:blacklist:delete')">
+            v-if="hasPermission('members:blacklist:delete')">
             移出黑名单
           </el-button>
         </template>
@@ -37,6 +40,38 @@
       :current-page="pageNo" :page-sizes="[10, 20, 30, 40, 50]" :page-size="10"
       layout="total, sizes, prev, pager, next, jumper" :total="total">
     </el-pagination>
+
+    <!-- 退费套餐框 -->
+    <system-dialog :title="TFDialog.title" :visible="TFDialog.visible" :width="TFDialog.width" :height="TFDialog.height"
+      @onClose="TFClose()" @onConfirm="TFConfirm()">
+      <div slot="content">
+        <el-form ref="TFForm" label-width="80px" :inline="true" size="small">
+          <el-form-item>
+            <el-input placeholder="请人工协商退费金额" v-model="returnPremium.disbursePrice"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-input placeholder="备注" v-model="returnPremium.beizhu"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button plain type="warning" @click="tuiFei">退费</el-button>
+          </el-form-item>
+        </el-form>
+        <el-table border :data="mealSJ">
+          <el-table-column label="套餐名称" align="center" prop="mealName">
+          </el-table-column>
+          <el-table-column label="套餐类型" align="center" prop="mealType">
+          </el-table-column>
+          <el-table-column label="套餐价格" align="center" prop="mealPrice">
+          </el-table-column>
+          <el-table-column label="办理时间" align="center" prop="mmTime">
+          </el-table-column>
+          <el-table-column label="到期时间" align="center" prop="mmDate">
+          </el-table-column>
+          <el-table-column label="到期状态" align="center" :formatter="time" >
+          </el-table-column>
+        </el-table>
+      </div>
+    </system-dialog>
   </el-main>
 </template>
 
@@ -67,12 +102,60 @@ export default {
         pageNo: 1, //当前页码
         pageSize: 10, //每页显示数量
       },
+      //显示套餐框参数
+      TFDialog: {
+        title: "",//窗口标题
+        visible: false,//是否显示窗口
+        width: 900,//窗口宽度
+        height: 500//窗口高度
+      },
+      mealSJ:[],
+      //退费传入参数
+      returnPremium:{
+          memberId:"",
+          disbursePrice:"",
+          beizhu:"",
+      },
     };
   },
   created() {
     this.search();
   },
   methods: {
+
+    playbackFormat(row, column) {
+            if (row.memberSex == 0) {
+                return '女'
+            } else if (row.memberSex == 1) {
+                return '男'
+            }
+
+        },
+        playbackFormat2(row, column) {
+            if (row.memberType == 0) {
+                return '体验会员'
+            } else if (row.memberType == 1) {
+                return '正式会员'
+            }
+        },
+         //判断到期状态
+         time(row, column) {
+            let date = new Date();  // Mon Oct 11 2021 08:39:50 GMT+0800 (中国标准时间)
+            let afterDate = this.formateDate(date);  // 2021-10-11 
+            if (row.mmDate >= afterDate) {
+                return '未过期'
+            } else if (row.mmDate <= afterDate) {
+                return '已过期'
+            }
+        },
+        // 格式化日期
+        formateDate(date) {
+            let year = date.getFullYear();
+            let month = (date.getMonth() + 1).toString().padStart(2, '0');  // 月要+1
+            let day = date.getDate().toString().padStart(2, '0');  // 获取天是getDate，而不是 getDay
+            let createTime = year + '-' + month + '-' + day;
+            return createTime;
+        },
     //查询黑名单列表
     async search(pageNo, pageSize) {
       //修改当前页码
@@ -86,12 +169,6 @@ export default {
       if (res.success) {
         //获取数据
         this.tableData = res.data.records;
-        for (let i = 0; i < this.tableData.length; i++) {
-          this.tableData[i].memberSex =
-            this.tableData[i].memberSex == 0 ? "女" : "男";
-          this.tableData[i].memberType =
-            this.tableData[i].memberType == 0 ? "体验会员" : "正式会员";
-        }
         //当前数据数量
         this.total = res.data.total;
       }
@@ -103,8 +180,6 @@ export default {
       let confirm = await this.$myconfirm("确定要移出黑名单吗?"); //await代表同步
       if (confirm) {
         //发送修改请求
-        row.memberSex = row.memberSex == "男" ? 1 : 0;
-        row.memberType = row.memberType == "体验会员" ? 0 : 1;
         let res = await BlackApi.outUpdMemberState(row);
         //判断是否发送成功
         if (res.success) {
@@ -118,6 +193,37 @@ export default {
         }
       }
     },
+    //打开退费框
+    async openTF(row) {
+      this.TFDialog.title="退费"
+      let res=await BlackApi.findBlackMemberMeal({memberId:row.memberId})
+      console.log("sssssssssssssss",res);
+      if(res.success){
+        this.returnPremium.memberId=row.memberId
+        this.mealSJ=res.data
+      }
+      this.TFDialog.visible=true
+    },
+    //退费函数
+    async tuiFei(){
+      let res=await BlackApi.delMemberAllMeal(this.returnPremium)
+      if (res.success) {
+          //提示成功
+          this.$message.success(res.message);
+          this.TFDialog.visible=false
+        } else {
+          //提示失败
+          this.$message.error(res.message);
+        }
+    },
+    TFConfirm(){
+      this.TFDialog.visible=false
+    },
+    TFClose(){
+      this.TFDialog.visible=false
+    },
+
+
     handleSizeChange(size) {
       //修改每页显示数量
       this.pageSize = size;

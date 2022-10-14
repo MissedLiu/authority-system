@@ -7,7 +7,8 @@
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
-                <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow()" v-if="hasPermission('members:ptmember:add')">新增</el-button>
+                <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow()"
+                    v-if="hasPermission('members:ptmember:add')">新增</el-button>
                 <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
             </el-form-item>
         </el-form>
@@ -16,26 +17,14 @@
             default-expand-all :tree-props="{ children: 'children' }">
             <el-table-column prop="memberName" label="会员姓名"></el-table-column>
             <el-table-column prop="memberSex" label="会员性别" :formatter="playbackFormat"></el-table-column>
-            <el-table-column prop="memberPhone" label="会员电话" width="110"></el-table-column>
+            <el-table-column prop="memberPhone" label="会员电话"></el-table-column>
             <el-table-column prop="memberAddress" label="地址"></el-table-column>
             <el-table-column prop="memberType" label="状态" :formatter="playbackFormat2"></el-table-column>
-            <el-table-column prop="mealName" label="套餐名称"></el-table-column>
-            <el-table-column prop="mealType" label="套餐类型"></el-table-column>
-            <el-table-column prop="mmTime" label="办理时间"></el-table-column>
-            <el-table-column prop="mmDate" label="到期时间"></el-table-column>
             <el-table-column label="套餐操作" width="280" align="center">
                 <template slot-scope="scope">
                     <el-button icon="el-icon-edit-outline" plain type="primary" size="small"
                         @click="selectCommonMeal(scope.row)" v-if="hasPermission('members:ptmember:xiangqing')">
                         详情
-                    </el-button>
-                    <el-button type="success" plain icon="el-icon-plus" size="small" @click="renew(scope.row)"
-                    v-if="hasPermission('members:ptmember:xufei')">
-                        续费
-                    </el-button>
-                    <el-button icon="el-icon-close" plain type="danger" size="small" @click="del(scope.row)"
-                    v-if="hasPermission('members:ptmember:delete')">
-                        删除
                     </el-button>
                 </template>
             </el-table-column>
@@ -90,20 +79,32 @@
         <system-dialog :title="mealDialog.title" :visible="mealDialog.visible" :width="mealDialog.width"
             :height="mealDialog.height" @onClose="pageClose()" @onConfirm="pageConfirm()">
             <div slot="content">
-                <el-form ref="memberFormXq" label-width="80px" size="small">
-                    <el-form-item label="套餐编号">
-                        <el-input readonly v-model="mealSJ.cmId"></el-input>
-                    </el-form-item>
-                    <el-form-item label="套餐名称">
-                        <el-input readonly v-model="mealSJ.cmName"></el-input>
-                    </el-form-item>
-                    <el-form-item label="套餐时长">
-                        <el-input readonly v-model="mealSJ.cmTime"></el-input>
-                    </el-form-item>
-                    <el-form-item label="套餐价格">
-                        <el-input readonly v-model="mealSJ.cmPrice"></el-input>
-                    </el-form-item>
-                </el-form>
+                <el-table border :data="mealSJ">
+                    <el-table-column label="套餐名称" align="center" prop="mealName">
+                    </el-table-column>
+                    <el-table-column label="套餐类型" align="center" prop="mealType">
+                    </el-table-column>
+                    <el-table-column label="套餐价格" align="center" prop="mealPrice">
+                    </el-table-column>
+                    <el-table-column label="套餐时长" align="center" prop="mealTime">
+                    </el-table-column>
+                    <el-table-column label="办理时间" align="center" prop="mmTime">
+                    </el-table-column>
+                    <el-table-column label="到期时间" align="center" prop="mmDate">
+                    </el-table-column>
+                    <el-table-column label="到期状态" align="center" :formatter="time">
+                    </el-table-column>
+                    <el-table-column label="套餐操作" width="280" align="center">
+                        <template slot-scope="scope">
+                            <el-button type="success" plain icon="el-icon-plus" size="small" @click="renew(scope.row)">
+                                续费
+                            </el-button>
+                            <el-button icon="el-icon-close" plain type="danger" size="small" @click="del(scope.row)">
+                                删除
+                            </el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
             </div>
         </system-dialog>
 
@@ -169,13 +170,12 @@ export default {
             mealDialog: {
                 title: "套餐详情",//窗口标题
                 visible: false,//是否显示窗口
-                width: 400,//窗口宽度
-                height: 300//窗口高度
+                width: 1000,//窗口宽度
+                height: 800//窗口高度
             },
             //详情数据
-            mealSJ: {
-
-            },
+            mealSJ: [],
+            memberId: {},
 
         }
     },
@@ -198,6 +198,24 @@ export default {
                 return '正式会员'
             }
         },
+        //判断到期状态
+        time(row, column) {
+            let date = new Date();  // Mon Oct 11 2021 08:39:50 GMT+0800 (中国标准时间)
+            let afterDate = this.formateDate(date);  // 2021-10-11 
+            if (row.mmDate >= afterDate) {
+                return '未过期'
+            } else if (row.mmDate <= afterDate) {
+                return '已过期'
+            }
+        },
+        // 格式化日期
+        formateDate(date) {
+            let year = date.getFullYear();
+            let month = (date.getMonth() + 1).toString().padStart(2, '0');  // 月要+1
+            let day = date.getDate().toString().padStart(2, '0');  // 获取天是getDate，而不是 getDay
+            let createTime = year + '-' + month + '-' + day;
+            return createTime;
+        },
         //查询普通会员列表
         async search(pageNo, pageSize) {
             //修改当前页码
@@ -206,6 +224,7 @@ export default {
             this.phone.pageSize = pageSize
             //发送查询请求
             let res = await CommonMember.getFindCommentMemberList(this.phone);
+            console.log("--------------", res);
             //判断是否存在数据
             if (res.success) {
                 //获取数据
@@ -215,153 +234,160 @@ export default {
             }
 
         },
-    //打开添加窗口
-    openAddwindow() {
-        this.$restForm("memberForm", this.member);
-        //设置属性
-        this.ptmbDialog.title = '新增普通会员',
-            this.ptmbDialog.visible = true
-    },
-    //窗口关闭事件
-    onClose() {
-        this.ptmbDialog.visible = false
-    },
-    //窗口确认事件
-    onConfirm() {
-        //进行表单验证
-        console.log(this.member);
-        this.$refs.memberForm.validate(async (valid) => {
-            //如果验证通过
-            if (valid) {
-                let res = null;
-                //发送添加请求
-                console.log(this.member);
-                res = await CommonMember.getAddCommonMember(this.member)
-                //判断是否成功
+        //打开添加窗口
+        openAddwindow() {
+            this.$restForm("memberForm", this.member);
+            //设置属性
+            this.ptmbDialog.title = '新增普通会员',
+                this.ptmbDialog.visible = true
+        },
+        //窗口关闭事件
+        onClose() {
+            this.ptmbDialog.visible = false
+        },
+        //窗口确认事件
+        onConfirm() {
+            //进行表单验证
+            console.log(this.member);
+            this.$refs.memberForm.validate(async (valid) => {
+                //如果验证通过
+                if (valid) {
+                    let res = null;
+                    //发送添加请求
+                    console.log(this.member);
+                    res = await CommonMember.getAddCommonMember(this.member)
+                    //判断是否成功
+                    if (res.success) {
+                        //提示成功
+                        this.$message.success(res.message)
+                        //关闭窗口事件
+                        this.ptmbDialog.visible = false
+                        //刷新数据
+                        this.search(this.pageNo, this.size)
+                    } else {
+                        //提示失败
+                        this.$message.error(res.message)
+                    }
+
+                }
+            })
+
+        },
+        //打开套餐选择的窗口
+        async openCommonMealWindow() {
+            this.parentDialog.visible = true
+            let res = await CommonMember.getCommenMealList();
+            //判断是否成功
+            if (res.success) {
+                this.mealList = res.data
+            }
+        },
+        //套餐选择取消关闭事件 
+        onParentClose() {
+            this.parentDialog.visible = false
+        },
+        //套餐选择确认事件
+        onParentConfirm() {
+            this.parentDialog.visible = false
+        },
+        //选择套餐
+        addMmId(row) {
+            this.member.mealId = row.cmId
+            this.member.mealName = row.cmName
+            this.parentDialog.visible = false
+            console.log(this.member.mealId)
+        },
+        //根据会员办理套餐id删除
+        async del(row) {
+            //提示是否确认删除
+            let confirm = await this.$myconfirm("确定要删除该数据嘛?")//await代表同步
+            if (confirm) {
+                //发送删除请求
+                let res = await CommonMember.delCommonMemberById({ mmId: row.mmId })
+                //判断是否发送成功
                 if (res.success) {
                     //提示成功
                     this.$message.success(res.message)
-                    //关闭窗口事件
-                    this.ptmbDialog.visible = false
                     //刷新数据
                     this.search(this.pageNo, this.size)
+                    //关闭窗口
+                    this.mealDialog.visible = false
                 } else {
                     //提示失败
                     this.$message.error(res.message)
                 }
-
             }
-        })
+        },
 
-    },
-    //打开套餐选择的窗口
-    async openCommonMealWindow() {
-        this.parentDialog.visible = true
-        let res = await CommonMember.getCommenMealList();
-        //判断是否成功
-        if (res.success) {
-            this.mealList = res.data
-        }
-    },
-    //套餐选择取消关闭事件 
-    onParentClose() {
-        this.parentDialog.visible = false
-    },
-    //套餐选择确认事件
-    onParentConfirm() {
-        this.parentDialog.visible = false
-    },
-    //选择套餐
-    addMmId(row) {
-        this.member.mealId = row.cmId
-        this.member.mealName = row.cmName
-        this.parentDialog.visible = false
-        console.log(this.member.mealId)
-    },
-    //根据会员办理套餐id删除
-    async del(row) {
-        //提示是否确认删除
-        let confirm = await this.$myconfirm("确定要删除该数据嘛?")//await代表同步
-        if (confirm) {
-            //发送删除请求
-            let res = await CommonMember.delCommonMemberById({ mmId: row.mmId })
-            //判断是否发送成功
-            if (res.success) {
-                //提示成功
-                this.$message.success(res.message)
-                //刷新数据
-                this.search(this.pageNo, this.size)
-            } else {
-                //提示失败
-                this.$message.error(res.message)
-            }
-        }
-    },
-    //查看套餐详情窗口
-    async selectCommonMeal(row) {
-        this.mealDialog.visible = true
-        let res = await CommonMember.getFindCommenMeal({ id: row.mealId });
-        //判断是否成功
-        if (res.success) {
+        //查看套餐详情窗口
+        async selectCommonMeal(row) {
+            console.log("---", row);
+            //通过会员id查询办理的私教套餐
+            let res = await CommonMember.findCommonByMemberId({ memberId: row.memberId })
             this.mealSJ = res.data
-        }
+            //储存memberId
+            this.memberId = row.memberId
+            this.mealDialog.visible = true
+        },
 
-    },
-    //查看套餐详情窗口关闭事件 
-    pageClose() {
-        this.mealDialog.visible = false
-    },
-    //查看套餐详情窗口确认事件
-    pageConfirm() {
-        this.mealDialog.visible = false
-    },
-    //续费
-    async renew(row){
-        let confirm = await this.$myconfirm("确定续费吗?")//await代表同步
-        if (confirm) {
-            //发送续费请求
-            let res = await CommonMember.renewCommonMember(row)
-            //判断是否发送成功
-            if (res.success) {
-                //提示成功
-                this.$message.success(res.message)
-                //刷新数据
-                this.search(this.pageNo, this.size)
-            } else {
-                //提示失败
-                this.$message.error(res.message)
+        //查看套餐详情窗口关闭事件 
+        pageClose() {
+            this.mealDialog.visible = false
+        },
+        //查看套餐详情窗口确认事件
+        pageConfirm() {
+            this.mealDialog.visible = false
+        },
+        //续费
+        async renew(row) {
+            row.memberId = this.memberId;
+            console.log("ssssssssss", row);
+            let confirm = await this.$myconfirm("确定续费吗?")//await代表同步
+            if (confirm) {
+                //发送续费请求
+                let res = await CommonMember.renewCommonMember(row)
+                //判断是否发送成功
+                if (res.success) {
+                    //提示成功
+                    this.$message.success(res.message)
+                    //刷新数据
+                    this.search(this.pageNo, this.size)
+                    //关闭窗口
+                    this.mealDialog.visible = false
+                } else {
+                    //提示失败
+                    this.$message.error(res.message)
+                }
             }
-        }
-    },
+        },
 
 
+        handleSizeChange(size) {
+            //修改每页显示数量
+            this.pageSize = size
+            //调用查询方法
+            this.search(this.pageNo, size)
+        },
 
-    handleSizeChange(size) {
-        //修改每页显示数量
-        this.pageSize = size
-        //调用查询方法
-        this.search(this.pageNo, size)
-    },
-
-    /**
-    * 当页码发生变化时触发该事件
+        /**
+        * 当页码发生变化时触发该事件
+        */
+        handleCurrentChange(page) {
+            //修改当前页码
+            this.pageNo = page
+            //调用查询方法
+            this.search(page, this.pageSize)
+        },
+        /**
+    * 重置查询条件
     */
-    handleCurrentChange(page) {
-        //修改当前页码
-        this.pageNo = page
-        //调用查询方法
-        this.search(page, this.pageSize)
-    },
-    /**
-* 重置查询条件
-*/
-    resetValue() {
-        //清空数据
-        this.phone.memberPhone = "";
-        //调用查询方法
-        this.search()
-    },
-}
+        resetValue() {
+            //清空数据
+            this.phone.memberPhone = "";
+            //调用查询方法
+            this.search()
+        },
+    }
 }
 
 

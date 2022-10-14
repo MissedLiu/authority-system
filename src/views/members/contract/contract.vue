@@ -7,7 +7,8 @@
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo, pageSize)">查询</el-button>
-                <el-button type="success" plain icon="el-icon-plus" @click="opencompactWindow()" v-if="hasPermission('members:contract:add')">签订合同</el-button>
+                <el-button type="success" plain icon="el-icon-plus" @click="opencompactWindow()"
+                    v-if="hasPermission('members:contract:add')">签订合同</el-button>
                 <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
             </el-form-item>
         </el-form>
@@ -22,10 +23,12 @@
             <el-table-column prop="salesman" label="业务员"></el-table-column>
             <el-table-column label="操作" width="250" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-edit-outline" plain type="primary" size="small" @click="detialwindow(scope.row)" >
+                    <el-button icon="el-icon-edit-outline" plain type="primary" size="small"
+                        @click="detialwindow(scope.row)">
                         合同详情
                     </el-button>
-                    <el-button type="danger" plain size="small" @click="delDetial(scope.row)" v-if="hasPermission('members:contract:delete')">
+                    <el-button type="danger" plain size="small" @click="delDetial(scope.row)"
+                        v-if="hasPermission('members:contract:delete')">
                         删除合同
                     </el-button>
                 </template>
@@ -70,6 +73,7 @@
         <system-dialog :title="signingDialog.title" :visible="signingDialog.visible" :width="signingDialog.width"
             :height="signingDialog.height" @onClose="signingClose" @onConfirm="signingConfirm">
             <div slot="content">
+
                 <el-form :model="signing" ref="signingForm" :rules="rules" label-width="110px" size="small">
                     <el-form-item label="会员姓名" prop="memberName">
                         <el-input v-model="signing.memberName"></el-input>
@@ -94,13 +98,50 @@
                     <el-form-item label="业务员" prop="salesman">
                         <el-input v-model="signing.salesman"></el-input>
                     </el-form-item>
-                    <el-form-item label="图片" prop="photoAddress">
-                        <el-upload :show-file-list="false" :on-success="handleAvatarSuccess"
-                            :before-upload="beforeAvatarUpload" class="avatar-uploader" :data="uploadHeader"
-                            action="http://localhost:8888/api/oss/file/upload?module=photoAddress">
-                            <img v-if="signing.photoAddress" :src="signing.photoAddress">
-                            <i v-else class="el-icon-plus avatar-uploader-icon" />
-                        </el-upload>
+                    <el-form-item label="合同图片" prop="photoAddress">
+                        <div class="upload-deom">
+                            <el-upload :show-file-list="false" :on-success="handleAvatarSuccess"
+                                :before-upload="beforeAvatarUpload" class="avatar-uploader" :data="uploadHeader"
+                                action="http://localhost:8888/api/oss/file/upload?module=photoAddress">
+                                <img v-if="signing.photoAddress" :src="signing.photoAddress">
+                                <i v-else class="el-icon-plus avatar-uploader-icon" />
+                            </el-upload>
+                        </div>
+                        <div class="upload-deom">
+                            <el-upload :show-file-list="false" :on-success="handleAvatarSuccess2"
+                                :before-upload="beforeAvatarUpload" class="avatar-uploader" :data="uploadHeader"
+                                action="http://localhost:8888/api/oss/file/upload?module=photoAddress2">
+                                <img v-if="signing.photoAddress2" :src="signing.photoAddress2">
+                                <i v-else class="el-icon-plus avatar-uploader-icon" />
+                            </el-upload>
+                        </div>
+                        <div class="upload-deom">
+                            <el-upload :show-file-list="false" :on-success="handleAvatarSuccess3"
+                                :before-upload="beforeAvatarUpload" class="avatar-uploader" :data="uploadHeader"
+                                action="http://localhost:8888/api/oss/file/upload?module=photoAddress3">
+                                <img v-if="signing.photoAddress3" :src="signing.photoAddress3">
+                                <i v-else class="el-icon-plus avatar-uploader-icon" />
+                            </el-upload>
+                        </div>
+
+                    </el-form-item>
+                    <el-form-item label="合同备用图片">
+                        <div class="upload-deom">
+                            <el-upload :show-file-list="false" :on-success="handleAvatarSuccess4"
+                                :before-upload="beforeAvatarUpload" class="avatar-uploader" :data="uploadHeader"
+                                action="http://localhost:8888/api/oss/file/upload?module=photoAddress4">
+                                <img v-if="signing.photoAddress4" :src="signing.photoAddress4">
+                                <i v-else class="el-icon-plus avatar-uploader-icon" />
+                            </el-upload>
+                        </div>
+                        <div class="upload-deom">
+                            <el-upload :show-file-list="false" :on-success="handleAvatarSuccess5"
+                                :before-upload="beforeAvatarUpload" class="avatar-uploader" :data="uploadHeader"
+                                action="http://localhost:8888/api/oss/file/upload?module=photoAddress5">
+                                <img v-if="signing.photoAddress5" :src="signing.photoAddress5">
+                                <i v-else class="el-icon-plus avatar-uploader-icon" />
+                            </el-upload>
+                        </div>
                     </el-form-item>
                 </el-form>
             </div>
@@ -110,7 +151,7 @@
         <system-dialog :title="parentDialog.title" :visible="parentDialog.visible" :width="parentDialog.width"
             :height="parentDialog.height" @onClose="onParentClose()" @onConfirm="onParentConfirm()">
             <div slot="content">
-                <el-table border style="margin-top: 50px;" :data="mealList">
+                <el-table border :data="mealList">
                     <el-table-column label="办理套餐编号" align="center" prop="mmId">
                     </el-table-column>
                     <el-table-column label="套餐编号" align="center" prop="mealId">
@@ -134,7 +175,11 @@
         <system-dialog :title="detialDialog.title" :visible="detialDialog.visible" :width="detialDialog.width"
             :height="detialDialog.height" @onClose="closedetial" @onConfirm="closedetial">
             <div slot="content">
-                <img :src=this.src style="width:650px;height:400px">
+                <img :src=this.src style="width:300px;height:200px">
+                <img :src=this.src2 style="width:300px;height:200px">
+                <img :src=this.src3 style="width:300px;height:200px">
+                <img :src=this.src4 style="width:300px;height:200px">
+                <img :src=this.src5 style="width:300px;height:200px">
             </div>
         </system-dialog>
     </el-main>
@@ -174,7 +219,7 @@ export default {
                 meal: [{ required: true, message: '请选择套餐办理编号', trigger: 'change' }],
                 createDate: [{ required: true, message: '请选择签订时间', trigger: 'change' }],
                 salesman: [{ required: true, message: '请输入业务员', trigger: 'blur' }],
-                photoAddress: [{ required: true, message: '合同图片不能为空', trigger: 'blur' }],
+                photoAddress: [{ required: true, message: '合同图片至少三张,最多五张', trigger: 'blur' }],
             },
 
             //合同签订窗口的电话查询参数
@@ -196,7 +241,7 @@ export default {
             signingDialog: {
                 title: "会员签约",//窗口标题
                 visible: false,//是否显示窗口
-                width: 500,//窗口宽度
+                width: 550,//窗口宽度
                 height: 600//窗口高度
             },
             //签约框绑定数据
@@ -210,7 +255,10 @@ export default {
                 endDate: "",
                 salesman: "",
                 photoAddress: "",//合同详情
-
+                photoAddress2: "",
+                photoAddress3: "",
+                photoAddress4: "",
+                photoAddress5: ""
             },
             //选择套餐的窗口属性
             parentDialog: {
@@ -230,6 +278,10 @@ export default {
                 height: 500//窗口高度
             },
             src: "",
+            src2: "",
+            src3: "",
+            src4: "",
+            src5: "",
         };
     },
     created() {
@@ -259,13 +311,16 @@ export default {
             this.detialDialog.title = "合同原件"
             this.detialDialog.visible = true
             this.src = row.photoAddress
+            this.src2 = row.photoAddress2
+            this.src3 = row.photoAddress3
+            this.src4 = row.photoAddress4
+            this.src5 = row.photoAddress5
             console.log("xxxx", row);
         },
         //关闭查看合同详情窗口
         closedetial() {
             this.detialDialog.visible = false
         },
-
 
 
         //打开签订合同的窗口
@@ -321,6 +376,10 @@ export default {
                         createDate: this.signing.createDate,
                         endDate: this.signing.endDate,
                         photoAddress: this.signing.photoAddress,
+                        photoAddress2: this.signing.photoAddress2,
+                        photoAddress3: this.signing.photoAddress3,
+                        photoAddress4: this.signing.photoAddress4,
+                        photoAddress5: this.signing.photoAddress5,
                         compactType: this.signing.compactType,
                         salesman: this.signing.salesman,
                         mmId: this.signing.meal
@@ -381,18 +440,39 @@ export default {
             // 强制重新渲染
             this.$forceUpdate()
         },
+        handleAvatarSuccess2(res, file) {
+            this.signing.photoAddress2 = res.data
+            // 强制重新渲染
+            this.$forceUpdate()
+        },
+        handleAvatarSuccess3(res, file) {
+            this.signing.photoAddress3 = res.data
+            // 强制重新渲染
+            this.$forceUpdate()
+        },
+        handleAvatarSuccess4(res, file) {
+            this.signing.photoAddress4 = res.data
+            // 强制重新渲染
+            this.$forceUpdate()
+        },
+        handleAvatarSuccess5(res, file) {
+            this.signing.photoAddress5 = res.data
+            // 强制重新渲染
+            this.$forceUpdate()
+        },
         //上传校验
         beforeAvatarUpload(file) {
             const isJPG = file.type === 'image/jpeg'
-            const isLt2M = file.size / 1024 / 1024 < 2
+            const isLt2M = file.size / 1024 / 1024 < 10
             if (!isJPG) {
-                this.$message.error('上传头像图片只能是 JPG 格式!')
+                this.$message.error('上传合同图片只能是 JPG 格式!')
             }
             if (!isLt2M) {
-                this.$message.error('上传头像图片大小不能超过 2MB!')
+                this.$message.error('上传合同图片大小不能超过 10MB!')
             }
             return isJPG && isLt2M
         },
+
         //删除合同
         async delDetial(row) {
             let confirm = await this.$myconfirm("确定删除该记录吗?")//await代表同步
@@ -411,8 +491,6 @@ export default {
                 }
             }
         },
-
-
 
         handleSizeChange(size) {
             //修改每页显示数量
@@ -446,7 +524,10 @@ export default {
 
 
 <style lang="scss">
-//用户头像
+.upload-deom {
+    display: inline-block;
+}
+
 .avatar-uploader .el-upload {
     border: 1px dashed #d9d9d9 !important;
     border-radius: 6px;
@@ -462,16 +543,16 @@ export default {
 .avatar-uploader .avatar-uploader-icon {
     font-size: 28px;
     color: #8c939d;
-    width: 178px;
-    height: 178px;
-    line-height: 178px;
+    width: 120px;
+    height: 120px;
+    line-height: 120px;
     text-align: center;
 }
 
 .avatar-uploader img {
-    width: 178px;
-    height: 178px;
-    display: block;
+    width: 120px;
+    height: 120px;
+    // display: block;
 }
 </style>
   

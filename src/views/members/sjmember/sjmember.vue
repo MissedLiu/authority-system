@@ -7,7 +7,8 @@
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
-                <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow" v-if="hasPermission('members:sjmember:add')">新增</el-button>
+                <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow"
+                    v-if="hasPermission('members:sjmember:add')">新增</el-button>
                 <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
             </el-form-item>
         </el-form>
@@ -16,27 +17,14 @@
             default-expand-all :tree-props="{ children: 'children' }">
             <el-table-column prop="memberName" label="会员姓名"></el-table-column>
             <el-table-column prop="memberSex" label="会员性别" :formatter="playbackFormat"></el-table-column>
-            <el-table-column prop="memberPhone" label="会员电话" width="110"></el-table-column>
+            <el-table-column prop="memberPhone" label="会员电话"></el-table-column>
+            <el-table-column prop="memberAddress" label="地址"></el-table-column>
             <el-table-column prop="memberType" label="状态" :formatter="playbackFormat2"></el-table-column>
-            <el-table-column prop="mealName" label="套餐名称"></el-table-column>
-            <el-table-column prop="empName" label="教练名称"></el-table-column>
-            <el-table-column prop="projectName" label="项目名称"></el-table-column>
-            <el-table-column prop="mealType" label="套餐类型"></el-table-column>
-            <el-table-column prop="mmTime" label="办理时间"></el-table-column>
-            <el-table-column prop="mmDate" label="到期时间"></el-table-column>
             <el-table-column label="套餐操作" width="280" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-edit-outline" plain type="primary" size="small" @click="selectPtMeal(scope.row)"
-                    v-if="hasPermission('members:sjmember:xiangqing')">
+                    <el-button icon="el-icon-edit-outline" plain type="primary" size="small"
+                        @click="selectPtMeal(scope.row)" v-if="hasPermission('members:sjmember:xiangqing')">
                         详情
-                    </el-button>
-                    <el-button type="success" plain icon="el-icon-plus" size="small" @click="renew(scope.row)"
-                    v-if="hasPermission('members:sjmember:xufei')">
-                        续费
-                    </el-button>
-                    <el-button icon="el-icon-close" plain type="danger" size="small" @click="del(scope.row)"
-                    v-if="hasPermission('members:sjmember:delete')">
-                        删除
                     </el-button>
                 </template>
             </el-table-column>
@@ -149,38 +137,30 @@
         <system-dialog :title="mealDialog.title" :visible="mealDialog.visible" :width="mealDialog.width"
             :height="mealDialog.height" @onClose="pageClose()" @onConfirm="pageConfirm()">
             <div slot="content">
-                <el-form ref="memberFormXQ" label-width="80px" size="small" :inline="true">
-                    <el-form-item label="套餐编号">
-                        <el-input readonly v-model="mealSJ.ptId"></el-input>
-                    </el-form-item>
-                    <el-form-item label="套餐名称">
-                        <el-input readonly v-model="mealSJ.ptName"></el-input>
-                    </el-form-item>
-                    <el-form-item label="套餐时长">
-                        <el-input readonly v-model="mealSJ.ptTime"></el-input>
-                    </el-form-item>
-                    <el-form-item label="套餐价格">
-                        <el-input readonly v-model="mealSJ.ptPrice"></el-input>
-                    </el-form-item>
-                    <el-form-item label="教练姓名">
-                        <el-input readonly v-model="mealSJ.empName"></el-input>
-                    </el-form-item>
-                    <el-form-item label="教练年龄">
-                        <el-input readonly v-model="mealSJ.empAge"></el-input>
-                    </el-form-item>
-                    <el-form-item label="教练性别">
-                        <el-input readonly v-model="mealSJ.empSex"></el-input>
-                    </el-form-item>
-                    <el-form-item label="教练电话">
-                        <el-input readonly v-model="mealSJ.empPhone"></el-input>
-                    </el-form-item>
-                    <el-form-item label="教练微信">
-                        <el-input readonly v-model="mealSJ.weix"></el-input>
-                    </el-form-item>
-                    <el-form-item label="教练邮箱">
-                        <el-input readonly v-model="mealSJ.emil"></el-input>
-                    </el-form-item>
-                </el-form>
+                <el-table :data="mealSJ" border stripe style="width: 100%; margin-bottom: 20px" row-key="id"
+                    default-expand-all :tree-props="{ children: 'children' }">
+                    <el-table-column prop="mealName" label="套餐名称"></el-table-column>
+                    <el-table-column prop="mealTime" label="套餐时长"></el-table-column>
+                    <el-table-column prop="mealPrice" label="套餐价格"></el-table-column>
+                    <el-table-column prop="mealType" label="套餐类型"></el-table-column>
+                    <el-table-column prop="empName" label="教练名称"></el-table-column>
+                    <el-table-column prop="empPhone" label="教练电话"></el-table-column>
+                    <el-table-column prop="projectName" label="项目名称"></el-table-column>
+                    <el-table-column prop="mmTime" label="办理时间"></el-table-column>
+                    <el-table-column prop="mmDate" label="到期时间"></el-table-column>
+                    <el-table-column label="到期状态" align="center" :formatter="time">
+                    </el-table-column>
+                    <el-table-column label="套餐操作" width="200" align="center">
+                        <template slot-scope="scope">
+                            <el-button type="success" plain icon="el-icon-plus" size="small" @click="renew(scope.row)">
+                                续费
+                            </el-button>
+                            <el-button icon="el-icon-close" plain type="danger" size="small" @click="del(scope.row)">
+                                删除
+                            </el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
             </div>
         </system-dialog>
 
@@ -271,11 +251,12 @@ export default {
             mealDialog: {
                 title: "套餐详情",//窗口标题
                 visible: false,//是否显示窗口
-                width: 600,//窗口宽度
-                height: 400//窗口高度
+                width: 1200,//窗口宽度
+                height: 800//窗口高度
             },
             //详情数据
-            mealSJ: {},
+            mealSJ: [],
+            memberId:{},
             //详情参数
             XQ: {
                 mealId: "",//套餐id
@@ -303,6 +284,24 @@ export default {
                 return '正式会员'
             }
         },
+         //判断到期状态
+         time(row, column) {
+            let date = new Date();  // Mon Oct 11 2021 08:39:50 GMT+0800 (中国标准时间)
+            let afterDate = this.formateDate(date);  // 2021-10-11 
+            if (row.mmDate >= afterDate) {
+                return '未过期'
+            } else if (row.mmDate <= afterDate) {
+                return '已过期'
+            }
+        },
+        // 格式化日期
+        formateDate(date) {
+            let year = date.getFullYear();
+            let month = (date.getMonth() + 1).toString().padStart(2, '0');  // 月要+1
+            let day = date.getDate().toString().padStart(2, '0');  // 获取天是getDate，而不是 getDay
+            let createTime = year + '-' + month + '-' + day;
+            return createTime;
+        },
         //查询私教会员列表
         async search(pageNo, pageSize) {
             //修改当前页码
@@ -311,7 +310,7 @@ export default {
             this.phone.pageSize = pageSize
             //发送查询请求
             let res = await PtMemberApi.getPtMemberList(this.phone);
-            console.log("----------",res);
+            console.log("----------", res);
             //判断是否存在数据
             if (res.success) {
                 //获取数据
@@ -480,14 +479,15 @@ export default {
 
         //查看套餐详情窗口
         async selectPtMeal(row) {
-            this.mealDialog.visible = true
-            this.XQ.mealId = row.mealId
-            let res = await PtMemberApi.getselectPtMeal({ mmId: row.mmId });
+            let res = await PtMemberApi.findPtByMemberId({ memberId: row.memberId });
             console.log(res.data);
             //判断是否成功
             if (res.success) {
                 this.mealSJ = res.data
             }
+            this.mealDialog.visible = true
+            //储存memberId
+            this.memberId = row.memberId
         },
         //查看套餐详情窗口关闭事件 
         pageClose() {
@@ -503,6 +503,8 @@ export default {
         },
         //续费
         async renew(row) {
+            console.log("-=-=--==-=",this.memberId);
+            row.memberId = this.memberId;
             let confirm = await this.$myconfirm("确定续费吗?")//await代表同步
             if (confirm) {
                 //发送续费请求
@@ -513,6 +515,7 @@ export default {
                     this.$message.success(res.message)
                     //刷新数据
                     this.search(this.pageNo, this.size)
+                    this.mealDialog.visible = false
                 } else {
                     //提示失败
                     this.$message.error(res.message)

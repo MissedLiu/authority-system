@@ -25,6 +25,21 @@ export default {
     */
     async outUpdMemberState(params){
         return await request.put("/api/black/outUpdMemberState",params)
-    }
-   
+    },
+        /*
+    *
+    *查询黑名单下套餐
+    * 
+    */
+    async findBlackMemberMeal(params){
+        return await request.get("/api/black/findBlackMemberMeal",params)
+    },
+           /*
+    *
+    *退费
+    * 
+    */
+    async delMemberAllMeal(params){
+        return await request.post("/api/black/delMemberAllMeal",params)
+    },
 }

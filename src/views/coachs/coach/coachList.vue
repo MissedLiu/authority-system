@@ -84,7 +84,7 @@
         <system-dialog :title="ptMealDialog.title" :visible=" ptMealDialog.visible" :width=" ptMealDialog.width"
             :height="ptMealDialog.height" @onClose="ptMealClose" @onConfirm="ptMealConfirm">
             <div slot="content">
-                <el-table border style="margin-top: 50px;" ref="ptMealTable" :data="ptMealData" stripe
+                <el-table border  ref="ptMealTable" :data="ptMealData" stripe
                     @selection-change="handleSelectionChange">
                     <el-table-column type="selection" width="55" align="center"></el-table-column>
                     <el-table-column label="套餐编号" align="center" prop="ptId">
@@ -104,7 +104,7 @@
         <system-dialog :title="teamMealDialog.title" :visible=" teamMealDialog.visible" :width=" teamMealDialog.width"
             :height="teamMealDialog.height" @onClose="teamMealClose" @onConfirm="teamMealConfirm">
             <div slot="content">
-                <el-table border style="margin-top: 50px;" ref="teamMealTable" :data="teamMealData" stripe
+                <el-table border  ref="teamMealTable" :data="teamMealData" stripe
                     @selection-change="handleSelectionChange2">
                     <el-table-column type="selection" width="55" align="center"></el-table-column>
                     <el-table-column label="套餐编号" align="center" prop="teamId">
@@ -117,7 +117,6 @@
                     </el-table-column>
                 </el-table>
             </div>
-
         </system-dialog>
 
     </el-main>
