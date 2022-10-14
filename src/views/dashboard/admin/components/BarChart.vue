@@ -1,7 +1,7 @@
 <template>
 
   <div>
-    <div ref="main" style="width: 600px;height:400px;" class="dashboard-container"></div>
+    <div ref="main" style="width: 600px;height:500px;" class="dashboard-container"></div>
   </div>
 </template>
 
@@ -10,17 +10,16 @@ import echarts from 'echarts'
 require('echarts/theme/macarons') // echarts theme
 const animationDuration = 6000
 export default {
-  props: ["JiaoXue","tuanNum","sijiao"],
+  props: ["xiaoshou"],
   data() {
     return {
-      JiaoXue2: [],
+      xiaoshou2: [],
 
     }
   },
   created() {
-    this.JiaoXue2 = this.JiaoXue
-    console.log("emp=", this.JiaoXue)
-    console.log("tuanNum2=", this.tuanNum)
+    this.xiaoshou2 = this.xiaoshou
+    console.log("emp=", this.xiaoshou2)
     this.showMain();
   },
 
@@ -45,6 +44,14 @@ export default {
             type: 'line' // 默认为直线，可选为：'line' | 'shadow'
           }
         },
+        toolbox: {
+          feature: {
+            magicType: {
+              type: ['line', 'bar'] //图表类型切换
+            },
+            icon: "circle"
+          },
+        },
         grid: {
           top: 10,
           left: '1%',
@@ -54,7 +61,7 @@ export default {
         },
         xAxis: [{
           type: 'category',
-          data: this.JiaoXue2.map(d=>d.name),
+          data: this.xiaoshou2.map(d=>d.name),
           axisTick: {
             alignWithLabel: true
           }
@@ -65,26 +72,12 @@ export default {
             show: false
           }
         }],
-        series: [{
-          name: '总人数',
+        series: [ {
+          name: '销售量',
           type: 'bar',
           stack: 'vistors',
-          barWidth: '60%',
-          data:this.JiaoXue2.map(d=>d.value),
-          animationDuration
-        }, {
-          name: '私教套餐人数',
-          type: 'bar',
-          stack: 'vistors',
-          barWidth: '60%',
-          data:  this.sijiao.map(d=>d.value),
-          animationDuration
-        }, {
-          name: '团操套餐人数',
-          type: 'bar',
-          stack: 'vistors',
-          barWidth: '60%',
-          data: this.tuanNum.map(d=>d.value),
+          barWidth: '10%',
+          data:  this.xiaoshou2.map(d=>d.value),
           animationDuration
         }]
       });

@@ -8,7 +8,8 @@
             <el-form-item>
                 <el-button type="primary" icon="el-icon-search" @click="search(pageNo,pageSize)">查询</el-button>
                 <el-button icon="el-icon-refresh-right" @click="resetValue()">重置</el-button>
-                <el-button type="success" icon="el-icon-plus" @click="openAddwindow()" v-if="hasPermission('stores:plan:add')">新增</el-button>
+                <el-button type="success" icon="el-icon-plus" @click="openAddwindow()"
+                    v-if="hasPermission('stores:plan:add')">新增</el-button>
                 <el-button type="success" plain @click="handleDownload">导出</el-button>
             </el-form-item>
         </el-form>
@@ -32,17 +33,28 @@
             <el-table-column prop="brand" label="品牌" />
             <el-table-column prop="scheduleTime" label="创建时间" />
             <el-table-column prop="scheduleState" label="状态" />
-            <el-table-column label="操作" width="450" align="center">
+            <el-table-column label="操作" width="300" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="PlanToPo(scope.row)" v-if="hasPermission('stores:plan:toPo')">
+                    <el-button icon="el-icon-edit-outline" plain type="primary" size="small"
+                        v-if="scope.row.scheduleState=='审核通过'" @click="PlanToPo(scope.row)">
                         已购 </el-button>
-                    <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handleEdit(scope.row)" v-if="hasPermission('stores:plan:edit')">编辑
+                    <el-button icon="el-icon-edit-outline" plain type="primary" size="small"
+                        v-if="scope.row.scheduleState=='未审核'||scope.row.scheduleState=='已撤销'"
+                        @click="handleEdit(scope.row)">编辑
                     </el-button>
-                    <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete(scope.row)" v-if="hasPermission('stores:plan:delete')">删除
+                    <el-button icon="el-icon-close" type="danger" size="small"
+                        v-if="scope.row.scheduleState=='未审核' ||  scope.row.scheduleState=='已撤销' "
+                        @click="handleDelete(scope.row)" plain>删除
                     </el-button>
-                    <el-button type="success" icon="el-icon-plus" size="small" @click="shenhe(scope.row)" v-if="hasPermission('stores:plan:shenhe')">审核
+                    <el-button type="success" plain icon="el-icon-plus" size="small"
+                        v-if="scope.row.scheduleState=='未审核'||scope.row.scheduleState=='已撤销' "
+                        @click="shenhe(scope.row)">审核
                     </el-button>
-                    <el-button type="success" icon="el-icon-plus" size="small" @click="romve(scope.row)" v-if="hasPermission('stores:plan:cxshenhe')">撤销
+                    <el-button type="success" plain icon="el-icon-plus" size="small"
+                        v-if="scope.row.scheduleState=='待审核'" @click="romve(scope.row)">撤销
+                    </el-button>
+                    <el-button type="warning" plain icon="el-icon-plus" size="small"
+                        v-if="scope.row.scheduleState=='待审核'||scope.row.scheduleState=='审核不通过'" @click="jindu(scope.row)">审核进度
                     </el-button>
                 </template>
             </el-table-column>
@@ -93,7 +105,7 @@
         <system-dialog :title="shenheDialog.title" :height="shenheDialog.height" :width="shenheDialog.width"
             :visible="shenheDialog.visible" @onClose="onshenheClose" @onConfirm="onshenheConfirm">
             <div slot="content">
-               
+
                 <el-table ref="assignPtTable" :data="shenheList" border stripe :height="shenheHeight"
                     style="width: 100%; margin-bottom: 10px" @selection-change="handleSelectionChange">
                     <el-table-column type="selection" width="55" align="center"></el-table-column>
@@ -103,6 +115,25 @@
 
             </div>
         </system-dialog>
+        <!-- 分配审核人窗口 -->
+        <system-dialog :title="jinduDialog.title" :height="jinduDialog.height" :width="jinduDialog.width"
+            :visible="jinduDialog.visible" @onClose="onjinduClose" @onConfirm="onjinduConfirm">
+            <div slot="content">
+                <template>
+                    <el-steps :active="active" align-center>
+                        <el-step :title="item.empName" :description="item.result" :key="item.id"
+                            v-for="item in singleStepData" :status="item.state==1?'success':'error' && item.state==2?'error':'wait '  ">
+                        </el-step>
+                    </el-steps>
+                </template>
+            </div>
+        </system-dialog>
+          <!-- <el-table ref="jinduTable" :data="jinduList" border stripe :height="jinduHeight"
+                    style="width: 100%; margin-bottom: 10px">
+                    <el-table-column prop="emp.empName" label="审核人" />
+                    <el-table-column prop="emp.empName" label="审核状态" />
+                    <el-table-column prop="emp.empName" label="审核意见" />
+                </el-table> -->
     </el-main>
 
 </template>
@@ -110,6 +141,8 @@
 <script>
 //导入department.js脚本文件
 import planApi from "@/api/planApi"
+//导入department.js脚本文件
+import caigouShenHeApi from "@/api/caigouShenHeApi"
 //先导入systemDialog组件
 import SystemDialog from "@/components/system/SystemDialog.vue";
 export default {
@@ -126,19 +159,19 @@ export default {
                 pageNo: 1,//当前页码
                 pageSize: 10,//每页显示条数
             },
-
+            singleStepData: [],//审核人信息
             downloadLoading: false,
             filename: "采购计划表",
             autoWidth: true,
             bookType: "xlsx",
-
+            active:0,//步骤显示
             tableData: [],//表格数据
 
             //分页组件所需的属性
             pageNo: 1,//当前页码
             total: 0,//数据总数量
             pageSize: 10,//每页显示数量
-
+            state:"wait ",
             //新增或编辑的表单属性
             planDialog: {
                 title: "",//窗口标题
@@ -185,10 +218,20 @@ export default {
                 width: 560,//窗口宽度
                 height: 210,//窗口高度
             },
+            //审核进度表单属性
+            jinduDialog: {
+                title: "审核进度",//窗口标题
+                visible: false,//是否显示窗口
+                width: 800,//窗口宽度
+                height: 210,//窗口高度
+            },
             shenheHeight: 500,
             shenheList: [],//财务部门员工数据,
             id: [],//选择的员工id
-            scheduleId: ""//当前采购计划编号
+            scheduleId: "",//当前采购计划编号,
+            JingliId: "",//财务部经理id
+            JingliId2: [],//财务部经理id
+
         }
     },
     //初始化时调用
@@ -250,7 +293,7 @@ export default {
                         res.data.records[i].scheduleState = "审核不通过"
                     } else if (res.data.records[i].scheduleState == 4) {
                         res.data.records[i].scheduleState = "已执行"
-                    }else if (res.data.records[i].scheduleState == 5) {
+                    } else if (res.data.records[i].scheduleState == 5) {
                         res.data.records[i].scheduleState = "已撤销"
                     }
                 }
@@ -258,7 +301,7 @@ export default {
 
         },
 
-    
+
 
 
         //打开添加窗口
@@ -312,6 +355,7 @@ export default {
         },
         //修改按钮实现
         async handleEdit(row) {
+            console.log(row)
             let res = await planApi.checkJihua({ id: row.scheduleId })
             if (res.success) {
                 //数据回显
@@ -365,24 +409,24 @@ export default {
             console.log(this.plan);
             let confirm = await this.$myconfirm("该采购计划是否已完成？")
             if (confirm) {
-            let res = await planApi.toPo(this.plan)
-            console.log(res)
-           
-            if (res.success) {
-                //提示成功
-                this.$message.success(res.message)
-                //刷新数据
-                this.search()
+                let res = await planApi.toPo(this.plan)
+                console.log(res)
 
-            } else {
-                console.log(this.plan);
-                //刷新数据                
-                this.search()
-                //提示失败
-                this.$message.error(res.message)
+                if (res.success) {
+                    //提示成功
+                    this.$message.success(res.message)
+                    //刷新数据
+                    this.search()
 
+                } else {
+                    console.log(this.plan);
+                    //刷新数据                
+                    this.search()
+                    //提示失败
+                    this.$message.error(res.message)
+
+                }
             }
-        }
         },
         //审核窗口打开事件
         async shenhe(row) {
@@ -393,10 +437,32 @@ export default {
             console.log(res1);
             if (res1.success) {
                 this.scheduleId = row.scheduleId;
-                let res = await planApi.findcaiwuEmp();
+                let res = await planApi.findcaiwuEmp();   
                 if (res.success) {
+                  
+                   
                     this.shenheList = res.data;
-                    console.log(res.data);
+                    //将查询出来财务部经理的id获取出来
+                    for (const key in this.shenheList) {
+                        console.log(this.shenheList[key].emp.station)
+                        if (this.shenheList[key].emp.station === "财务部经理") {
+                            this.JingliId = this.shenheList[key].id
+                            this.JingliId2.push(this.JingliId)
+                            console.log("id=", this.JingliId)
+                        }
+
+                    }
+                    console.log("id=", this.JingliId)
+                    this.$nextTick(function () {
+                        //循环遍历
+                        this.shenheList.forEach((item) => {
+                            console.log(item)
+                            if (this.JingliId === item.id) {
+                                //如果相等则复选框选中
+                                this.$refs.assignPtTable.toggleRowSelection(item, true)
+                            }
+                        })
+                    })
                 }
                 this.shenheDialog.visible = true;
             } else {
@@ -415,6 +481,7 @@ export default {
                 scheduleId: this.scheduleId,
                 id: this.id,
             }
+            console.log("====", params.id)
             let res = await planApi.addCaiGouSh(params)
             if (res.success) {
                 //提示成功
@@ -435,45 +502,45 @@ export default {
             this.id = row.map(item => item.id);
         },
         //撤销申请
-       async romve(row){
-        let confirm = await this.$myconfirm("确定要撤销该申请嘛?")
+        async romve(row) {
+            let confirm = await this.$myconfirm("确定要撤销该申请嘛?")
             if (confirm) {
-            let res=await planApi.chexiao({id:row.scheduleId})
-            if (res.success) {
-                //提示成功
-                this.$message.success(res.message)
-                //刷新数据
-                this.search()
-                
-            } else {
-                //提示失败
-                this.$message.error(res.message)
-            }
+                let res = await planApi.chexiao({ id: row.scheduleId })
+                if (res.success) {
+                    //提示成功
+                    this.$message.success(res.message)
+                    //刷新数据
+                    this.search()
+
+                } else {
+                    //提示失败
+                    this.$message.error(res.message)
+                }
             }
         },
 
-       async handleDownload() {
+        async handleDownload() {
             let confirm = await this.$myconfirm("确定要导出吗?")
-            if(confirm){
+            if (confirm) {
                 this.downloadLoading = true
                 import('@/vendor/Export2Excel').then(excel => {
-                const tHeader = ['物品名称', '物品类型', '供货名称', '单位', '供货地址','数量','单价','品牌','创建时间','状态'] 
-                const filterVal = ['scheduleName', 'scheduleType', 'scheduleSupplier', 'unit',
-                                 'scheduleAddress','scheduleNum','schedulePrice','brand','scheduleTime','scheduleState']
-                const list = this.tableData 
-                const data = this.formatJson(filterVal, list)
-                excel.export_json_to_excel({
-                    header: tHeader,
-                    data,
-                    filename: this.filename, 
-                    autoWidth: this.autoWidth,
-                    bookType: this.bookType
+                    const tHeader = ['物品名称', '物品类型', '供货名称', '单位', '供货地址', '数量', '单价', '品牌', '创建时间', '状态']
+                    const filterVal = ['scheduleName', 'scheduleType', 'scheduleSupplier', 'unit',
+                        'scheduleAddress', 'scheduleNum', 'schedulePrice', 'brand', 'scheduleTime', 'scheduleState']
+                    const list = this.tableData
+                    const data = this.formatJson(filterVal, list)
+                    excel.export_json_to_excel({
+                        header: tHeader,
+                        data,
+                        filename: this.filename,
+                        autoWidth: this.autoWidth,
+                        bookType: this.bookType
+                    })
+                    this.downloadLoading = false
                 })
-                this.downloadLoading = false
-            })
-            this.$message.success("导出成功")
+                this.$message.success("导出成功")
             }
-            
+
         },
         formatJson(filterVal, jsonData) {
             return jsonData.map(v => filterVal.map(j => {
@@ -485,9 +552,27 @@ export default {
             }))
 
         },
+        //审核进度弹框打开窗口
+        async jindu(row) {
+            let res = await caigouShenHeApi.fingShengheJiHua({ id: row.scheduleId })
+            this.singleStepData = res.data
+            console.log("长度=",res.data)
+            this.active=res.data.length           
+            console.log(res.data)
+            this.jinduDialog.visible = true;
+        },
+        //审核进度弹框关闭窗口
+        onjinduClose() {
+            this.jinduDialog.visible = false;
+        },
+        //审核进度弹框确认事件
+        onjinduConfirm() {
+            this.jinduDialog.visible = false;
+      
+        }
     },
 
-    }
+}
 
 
 

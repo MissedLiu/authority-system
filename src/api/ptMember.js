@@ -59,12 +59,19 @@ export default {
     return await request.get("api/ptMember/selectPtProjectByPtId", params);
   },
 
-      /**
+  //     /**
+  //  * 通过私教套餐id查详情
+  //  * @returns
+  //  */
+  //      async getselectPtMeal(params) {
+  //       return await request.getRestApi("api/ptMember/selectPtMealByMealId",params);
+  //     },
+        /**
    * 通过私教套餐id查详情
    * @returns
    */
-       async getselectPtMeal(params) {
-        return await request.getRestApi("api/ptMember/selectPtMealByMealId",params);
+       async findPtByMemberId(params) {
+        return await request.getRestApi("api/ptMember/findPtByMemberId",params);
       },
 
 }

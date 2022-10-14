@@ -16,7 +16,7 @@
             default-expand-all属性:默认展开树形表格数据
             tree-props属性:树形表格配置属性选型
          -->
-        <div v-if="falg1">
+        <div v-show="falg1">
             <el-table :data="tableData1" border stripe style="width: 100%; margin-bottom: 20px" row-key="planId"
                 default-expand-all>
                 <el-table-column prop="scheduleName" label="物品名称" />
@@ -31,11 +31,14 @@
                 <el-table-column prop="caigouShenhe.state" label="状态" />
                 <el-table-column label="操作" width="300" align="center">
                     <template slot-scope="scope">
-                        <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handle1(scope.row)" v-if="hasPermission('shenhes:caigou:cl')">
+                        <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handle1(scope.row)"
+                            v-if="hasPermission('shenhes:caigou:cl')">
                             同意
                         </el-button>
-
-                        <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete1(scope.row)" v-if="hasPermission('shenhes:caigou:cl')">拒绝
+                        <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete1(scope.row)"
+                            v-if="hasPermission('shenhes:caigou:cl')">拒绝
+                        </el-button>
+                        <el-button type="warning" plain icon="el-icon-plus" size="small" @click="jindu(scope.row)">审核进度
                         </el-button>
                     </template>
                 </el-table-column>
@@ -46,9 +49,8 @@
                 layout="total, sizes, prev, pager, next, jumper" :total="total1">
             </el-pagination>
         </div>
-        <div v-if="falg2">
-            <el-table :data="tableData2" border stripe style="width: 100%; margin-bottom: 20px" row-key="planId"
-                default-expand-all>
+        <div v-show="falg2">
+            <el-table :data="tableData2" border stripe style="width: 100%; margin-bottom: 20px" default-expand-all>
                 <el-table-column prop="scheduleName" label="名称" />
                 <el-table-column prop="scheduleType" label="物品类型" />
                 <el-table-column prop="scheduleSupplier" label="供货名称" />
@@ -59,10 +61,13 @@
                 <el-table-column prop="brand" label="品牌" />
                 <el-table-column prop="scheduleTime" label="创建时间" />
                 <el-table-column prop="caigouShenhe.state" label="状态" />
-                <el-table-column label="操作2" width="200" align="center">
+                <el-table-column prop="caigouShenhe.result" label="备注" />
+                <el-table-column label="操作" width="250" align="center">
                     <template slot-scope="scope">
-                        <el-button icon="el-icon-close" type="danger" size="small"
-                            @click="handle2(scope.row)" v-if="hasPermission('shenhes:caigou:delete')">删除
+                        <el-button icon="el-icon-close" type="danger" size="small" @click="handle2(scope.row)"
+                            v-if="hasPermission('shenhes:caigou:delete')">删除
+                        </el-button>
+                        <el-button type="warning" plain icon="el-icon-plus" size="small" @click="jindu(scope.row)">审核进度
                         </el-button>
                     </template>
                 </el-table-column>
@@ -73,6 +78,32 @@
                 layout="total, sizes, prev, pager, next, jumper" :total="total2">
             </el-pagination>
         </div>
+        <!-- 备注窗口 -->
+        <system-dialog :title="beizhuDialog.title" :height="beizhuDialog.height" :width="beizhuDialog.width"
+            :visible="beizhuDialog.visible" @onClose="onbeizhuClose" @onConfirm="onbeizhuConfirm">
+            <div slot="content">
+                <el-form :model="beizhu" ref="beizhuForm" :rules="beizhurules" label-width="100px" :inline="true"
+                    size="small">
+                    <el-form-item label="访谈内容" prop="result">
+                        <el-input v-model="beizhu.result" type="textarea" clearable placeholder="请输入描述" maxlength="200"
+                            :rows="10"></el-input>
+                    </el-form-item>
+                </el-form>
+            </div>
+        </system-dialog>
+        <system-dialog :title="jinduDialog.title" :height="jinduDialog.height" :width="jinduDialog.width"
+            :visible="jinduDialog.visible" @onClose="onjinduClose" @onConfirm="onjinduConfirm">
+            <div slot="content">
+                <template>
+                    <el-steps :active="active" align-center>
+                        <el-step :title="item.empName" :description="item.result" :key="item.id"
+                            v-for="item in singleStepData"
+                            :status="item.state==1?'success':'error' && item.state==2?'error':'wait '  ">
+                        </el-step>
+                    </el-steps>
+                </template>
+            </div>
+        </system-dialog>
     </el-main>
 
 </template>
@@ -80,20 +111,23 @@
 <script>
 //导入department.js脚本文件
 import caigouShenHeApi from "@/api/caigouShenHeApi"
-//先导入systemDialog组件
-// import SystemDialog from "@/components/system/SystemDialog.vue";
+// 先导入systemDialog组件
+import SystemDialog from "@/components/system/SystemDialog.vue";
 export default {
     name: "plan",
     //注册组件
-    // components: {
-    //     SystemDialog
-    // },
+    components: {
+        SystemDialog
+    },
     data() {
         return {
             searchModel1: {
                 shenheempId: "",//
                 pageNo: 1,//当前页码
                 pageSize: 10,//每页显示条数
+            },
+            beizhu: {
+                result: "",
             },
             searchModel2: {
                 shenheempId: "",//
@@ -112,12 +146,29 @@ export default {
             pageNo2: 1,//当前页码
             total2: 0,//数据总数量
             pageSize2: 10,//每页显示数量
-            params:{
-                id:"",
-                scheduleId:"",
-                shenheempId:"",
-            
-            }
+            params: {
+                id: "",
+                scheduleId: "",
+                shenheempId: "",
+                result: "",//意见
+
+            },
+            //新增或编辑的表单属性
+            beizhuDialog: {
+                title: "审核进度",//窗口标题
+                visible: false,//是否显示窗口
+                width: 400,//窗口宽度
+                height: 310,//窗口高度
+            },
+            falgDelete: "",//判断是拒绝还是同意
+            active: 0,//步骤显示
+            //审核进度表单属性
+            jinduDialog: {
+                title: "审核进度",//窗口标题
+                visible: false,//是否显示窗口
+                width: 800,//窗口宽度
+                height: 210,//窗口高度
+            },
 
         }
     },
@@ -162,8 +213,8 @@ export default {
                 this.tableData1 = res.data.records
                 this.total1 = res.data.total;
                 for (let i = 0; i < res.data.records.length; i++) {
-                    if( res.data.records[i].caigouShenhe.state==0){
-                        res.data.records[i].caigouShenhe.state="待审"
+                    if (res.data.records[i].caigouShenhe.state == 0) {
+                        res.data.records[i].caigouShenhe.state = "待审"
                     }
                 }
             }
@@ -182,10 +233,10 @@ export default {
                 this.tableData2 = res.data.records
                 this.total2 = res.data.total;
                 for (let i = 0; i < res.data.records.length; i++) {
-                    if( res.data.records[i].caigouShenhe.state==1){
-                        res.data.records[i].caigouShenhe.state="已同意"
-                    }else if(res.data.records[i].caigouShenhe.state==2){
-                        res.data.records[i].caigouShenhe.state="已拒绝"
+                    if (res.data.records[i].caigouShenhe.state == 1) {
+                        res.data.records[i].caigouShenhe.state = "已同意"
+                    } else if (res.data.records[i].caigouShenhe.state == 2) {
+                        res.data.records[i].caigouShenhe.state = "已拒绝"
                     }
                 }
             }
@@ -198,49 +249,66 @@ export default {
             this.falg2 = false
         },
         //同意事件
-       async handle1(row){
-        this.params.id=row.caigouShenhe.id;
-        this.params.scheduleId=row.caigouShenhe.scheduleId;
-        this.params.shenheempId=row.caigouShenhe.shenheempId;
-        let res=await caigouShenHeApi.agress(this.params)
-        if (res.success) {
-                    //提示成功
-                    this.$message.success(res.message)
-                    //刷新数据
-                    this.search1(this.pageNo1, this.pageSize1)
-                } else {
-                    //提示失败
-                    this.$message.error(res.message)
-                }
-            console.log(row)
+        handle1(row) {
+            this.falgDelete = "同意";
+            this.params.id = row.caigouShenhe.id;
+            this.params.scheduleId = row.caigouShenhe.scheduleId;
+            this.params.shenheempId = row.caigouShenhe.shenheempId;
+            //打开一个窗口填写备注的窗口
+            this.beizhuDialog.visible = true
+
+        },
+        //同意确认按钮事件
+        async onbeizhuConfirm() {
+            this.params.result = this.beizhu.result
+            let res = null;
+            if (this.falgDelete == "同意") {
+                //同意事件
+                res = await caigouShenHeApi.agress(this.params)
+            } else {
+                // 拒绝事件
+                res = await caigouShenHeApi.refuse(this.params)
+            }
+
+            if (res.success) {
+                //提示成功
+                this.$message.success(res.message)
+                //刷新数据
+                this.search1(this.pageNo1, this.pageSize1)
+            } else {
+                //提示失败
+                this.$message.error(res.message)
+            }
+            //关闭窗口
+            this.beizhuDialog.visible = false
+        },
+        //取消同意事件
+        onbeizhuClose() {
+            //关闭窗口
+            this.beizhuDialog.visible = false
         },
         //拒绝按钮实现
-        async handleDelete1(row) {
-            this.params.id=row.caigouShenhe.id;
-             this.params.scheduleId=row.caigouShenhe.scheduleId;
-             this.params.shenheempId=row.caigouShenhe.shenheempId;
-        let res=await caigouShenHeApi.refuse(this.params)
-        if (res.success) {
-                    //提示成功
-                    this.$message.success(res.message)
-                    //刷新数据
-                    this.search1(this.pageNo1, this.pageSize1)
-                } else {
-                    //提示失败
-                    this.$message.error(res.message)
-                }
+        handleDelete1(row) {
+            this.falgDelete = "拒绝"
+
+            this.params.id = row.caigouShenhe.id;
+            this.params.scheduleId = row.caigouShenhe.scheduleId;
+            this.params.shenheempId = row.caigouShenhe.shenheempId;
+            //大开窗口
+            this.beizhuDialog.visible = true
+
         },
         //删除事件
-       async handle2(row){
-        this.params.id=row.caigouShenhe.id;
-             this.params.scheduleId=row.caigouShenhe.scheduleId;
-             this.params.shenheempId=row.caigouShenhe.shenheempId;
-             let confirm = await this.$myconfirm("确定要删除该数据嘛?"); //await代表同步
-      if (confirm) {
+        async handle2(row) {
+            this.params.id = row.caigouShenhe.id;
+            this.params.scheduleId = row.caigouShenhe.scheduleId;
+            this.params.shenheempId = row.caigouShenhe.shenheempId;
+            let confirm = await this.$myconfirm("确定要删除该数据嘛?"); //await代表同步
+            if (confirm) {
 
-     
-        let res=await caigouShenHeApi.delete(this.params)
-        if (res.success) {
+
+                let res = await caigouShenHeApi.delete(this.params)
+                if (res.success) {
                     //提示成功
                     this.$message.success(res.message)
                     //刷新数据
@@ -250,6 +318,24 @@ export default {
                     this.$message.error(res.message)
                 }
             }
+        },
+          //审核进度弹框打开窗口
+          async jindu(row) {
+            let res = await caigouShenHeApi.fingShengheJiHua({ id: row.scheduleId })
+            this.singleStepData = res.data
+            console.log("长度=",res.data)
+            this.active=res.data.length           
+            console.log(res.data)
+            this.jinduDialog.visible = true;
+        },
+        //审核进度弹框关闭窗口
+        onjinduClose() {
+            this.jinduDialog.visible = false;
+        },
+        //审核进度弹框确认事件
+        onjinduConfirm() {
+            this.jinduDialog.visible = false;
+      
         }
 
 
