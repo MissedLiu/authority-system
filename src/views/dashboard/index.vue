@@ -13,19 +13,18 @@
         </el-col>
       </el-row>
       <el-row :gutter="20">
-        <el-col :span="24">
+        <el-col :span="12">
+          <jiao-xue v-if="flag" :num="this.CountNum"></jiao-xue>
+         
+        </el-col>
+        <el-col :span="8">
           <div>
-            <BarChart v-if="flag" :JiaoXue="this.JiaoXue" ></BarChart>
-            <!-- <BarChart v-if="flag" :JiaoXue="this.JiaoXue" :tuanNum="this.countTeamNum" :sijiao="this.countPtNum"></BarChart> -->
+            <BarChart v-if="flag"  :xiaoshou="this.xiaoshou"></BarChart>
           </div>
         </el-col>
       </el-row>
-      <el-row :gutter="20">
-        <el-col :span="4">
-        
-        </el-col>
+      <el-row :gutter="20" >
         <el-col :span="16">
-          <div class="grid-content ep-bg-purple" />
         </el-col>
         <el-col :span="4">
           <div class="grid-content ep-bg-purple" />
@@ -40,7 +39,6 @@
 </template>
 
 <script>
-require('echarts/theme/macarons') // echarts theme
 import BarChart from './admin/components/BarChart'
 import BoxCard from './admin/components/BoxCard.vue'
 import LineChart from './admin/components/LineChart.vue'
@@ -49,13 +47,16 @@ import PieChart from './admin/components/PieChart.vue'
 import RaddarChart from './admin/components/RaddarChart.vue'
 import TransactionTable from './admin/components/TransactionTable.vue'
 import BinZhuang from './admin/components/BinZhuang.vue'
+import JiaoXue from './admin/components/JiaoXue.vue'
+import XiaoShou from './admin/components/XiaoShou.vue'
 import empApi from '@/api/empApi'
 import memberApi from '@/api/member'
 import xueyuanApi from '@/api/xueyuanApi'
 import teamApi from '@/api/team'
 import ptApi from '@/api/pt'
+import salesApi from '@/api/salesApi'
 export default {
-  components: { BarChart,LineChart, PanelGroup, BoxCard, PieChart, RaddarChart, TransactionTable, BinZhuang },
+  components: { BarChart,XiaoShou,LineChart,JiaoXue, PanelGroup, BoxCard, PieChart, RaddarChart, TransactionTable, BinZhuang },
 
   data() {
     return {
@@ -64,6 +65,8 @@ export default {
       JiaoXue:{},
       countTeamNum:{},
       countPtNum:{},
+      CountNum: {},
+      xiaoshou :{},
       flag: false,
     }
   },
@@ -82,19 +85,13 @@ export default {
       //统计套餐办理数
       let mealNum = await memberApi.findNum();
       this.TeamlNum = mealNum.data;
-      //统计教练下学员数   
-      // let jaioxueNum = await xueyuanApi.findNumJiaoLian();
-      // this.JiaoXue = jaioxueNum.data;
-      // //统计团操人数
-      // let countteamnum=await teamApi.countTeamNum();
-      // this.countTeamNum=countteamnum.data;
-      // console.log("团操",this.countTeamNum)
-      //  //统计私教人数
-      //  let countptnum=await ptApi.countPtNum();
-      // this.countPtNum=countptnum.data;
-      let jaioxueNum = await xueyuanApi.CountTongJi();
-      this.JiaoXue = jaioxueNum.data;
-      console.log("私教",this.JiaoXue)
+   //统计每个教练下的总人数
+   let num=await xueyuanApi.findJiaoXueCount()
+     this.CountNum=num.data
+     //统计销售额
+     let xiaoshou2=await salesApi.findSalesCount();
+     this.xiaoshou=xiaoshou2.data;
+     console.log("==", this.xiaoshou)
       this.flag = true;
     },
 
