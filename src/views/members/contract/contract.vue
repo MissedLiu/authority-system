@@ -102,51 +102,69 @@
                     <el-form-item label="业务员" prop="salesman">
                         <el-input v-model="signing.salesman"></el-input>
                     </el-form-item>
-                    <el-form-item label="合同图片" prop="photoAddress">
-                        <div class="upload-deom">
-                            <el-upload :show-file-list="false" :on-success="handleAvatarSuccess"
-                                :before-upload="beforeAvatarUpload" class="avatar-uploader" :data="uploadHeader"
-                                action="http://localhost:8888/api/oss/file/upload?module=photoAddress">
-                                <img v-if="signing.photoAddress" :src="signing.photoAddress">
-                                <i v-else class="el-icon-plus avatar-uploader-icon" />
-                            </el-upload>
-                        </div>
-                        <div class="upload-deom">
-                            <el-upload :show-file-list="false" :on-success="handleAvatarSuccess2"
-                                :before-upload="beforeAvatarUpload" class="avatar-uploader" :data="uploadHeader"
-                                action="http://localhost:8888/api/oss/file/upload?module=photoAddress2">
-                                <img v-if="signing.photoAddress2" :src="signing.photoAddress2">
-                                <i v-else class="el-icon-plus avatar-uploader-icon" />
-                            </el-upload>
-                        </div>
-                        <div class="upload-deom">
-                            <el-upload :show-file-list="false" :on-success="handleAvatarSuccess3"
-                                :before-upload="beforeAvatarUpload" class="avatar-uploader" :data="uploadHeader"
-                                action="http://localhost:8888/api/oss/file/upload?module=photoAddress3">
-                                <img v-if="signing.photoAddress3" :src="signing.photoAddress3">
-                                <i v-else class="el-icon-plus avatar-uploader-icon" />
-                            </el-upload>
-                        </div>
+                    <el-row>
+                        <el-col :span="10">
+                            <el-form-item label="合同图片1" prop="photoAddress">
+                                <div class="upload-deom" prop="photoAddress">
+                                    <el-upload :show-file-list="false" :on-success="handleAvatarSuccess"
+                                        :before-upload="beforeAvatarUpload" class="avatar-uploader" :data="uploadHeader"
+                                        action="http://localhost:8888/api/oss/file/upload?module=photoAddress">
+                                        <img v-if="signing.photoAddress" :src="signing.photoAddress">
+                                        <i v-else class="el-icon-plus avatar-uploader-icon" />
+                                    </el-upload>
+                                </div>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="10">
+                            <el-form-item label="合同图片2" prop="photoAddress">
+                                <div class="upload-deom" prop="photoAddress">
+                                    <el-upload :show-file-list="false" :on-success="handleAvatarSuccess2"
+                                        :before-upload="beforeAvatarUpload" class="avatar-uploader" :data="uploadHeader"
+                                        action="http://localhost:8888/api/oss/file/upload?module=photoAddress2">
+                                        <img v-if="signing.photoAddress2" :src="signing.photoAddress2">
+                                        <i v-else class="el-icon-plus avatar-uploader-icon" />
+                                    </el-upload>
+                                </div>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="10">
+                            <el-form-item label="合同图片3" prop="photoAddress">
+                                <div class="upload-deom">
+                                    <el-upload :show-file-list="false" :on-success="handleAvatarSuccess3"
+                                        :before-upload="beforeAvatarUpload" class="avatar-uploader" :data="uploadHeader"
+                                        action="http://localhost:8888/api/oss/file/upload?module=photoAddress3">
+                                        <img v-if="signing.photoAddress3" :src="signing.photoAddress3">
+                                        <i v-else class="el-icon-plus avatar-uploader-icon" />
+                                    </el-upload>
+                                </div>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="10">
+                            <el-form-item label="合同图片4">
+                                <div class="upload-deom">
+                                    <el-upload :show-file-list="false" :on-success="handleAvatarSuccess3"
+                                        :before-upload="beforeAvatarUpload" class="avatar-uploader" :data="uploadHeader"
+                                        action="http://localhost:8888/api/oss/file/upload?module=photoAddress3">
+                                        <img v-if="signing.photoAddress3" :src="signing.photoAddress3">
+                                        <i v-else class="el-icon-plus avatar-uploader-icon" />
+                                    </el-upload>
+                                </div>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="10">
+                            <el-form-item label="合同图片5">
+                                <div class="upload-deom">
+                                    <el-upload :show-file-list="false" :on-success="handleAvatarSuccess5"
+                                        :before-upload="beforeAvatarUpload" class="avatar-uploader" :data="uploadHeader"
+                                        action="http://localhost:8888/api/oss/file/upload?module=photoAddress5">
+                                        <img v-if="signing.photoAddress5" :src="signing.photoAddress5">
+                                        <i v-else class="el-icon-plus avatar-uploader-icon" />
+                                    </el-upload>
+                                </div>
+                            </el-form-item>
+                        </el-col>
 
-                    </el-form-item>
-                    <el-form-item label="合同备用图片">
-                        <div class="upload-deom">
-                            <el-upload :show-file-list="false" :on-success="handleAvatarSuccess4"
-                                :before-upload="beforeAvatarUpload" class="avatar-uploader" :data="uploadHeader"
-                                action="http://localhost:8888/api/oss/file/upload?module=photoAddress4">
-                                <img v-if="signing.photoAddress4" :src="signing.photoAddress4">
-                                <i v-else class="el-icon-plus avatar-uploader-icon" />
-                            </el-upload>
-                        </div>
-                        <div class="upload-deom">
-                            <el-upload :show-file-list="false" :on-success="handleAvatarSuccess5"
-                                :before-upload="beforeAvatarUpload" class="avatar-uploader" :data="uploadHeader"
-                                action="http://localhost:8888/api/oss/file/upload?module=photoAddress5">
-                                <img v-if="signing.photoAddress5" :src="signing.photoAddress5">
-                                <i v-else class="el-icon-plus avatar-uploader-icon" />
-                            </el-upload>
-                        </div>
-                    </el-form-item>
+                    </el-row>
                 </el-form>
             </div>
         </system-dialog>
@@ -181,13 +199,60 @@
         <system-dialog :title="detialDialog.title" :visible="detialDialog.visible" :width="detialDialog.width"
             :height="detialDialog.height" @onClose="closedetial" @onConfirm="closedetial">
             <div slot="content">
-                <img :src=this.src style="width:300px;height:200px">
-                <img :src=this.src2 style="width:300px;height:200px">
-                <img :src=this.src3 style="width:300px;height:200px">
-                <img :src=this.src4 style="width:300px;height:200px">
-                <img :src=this.src5 style="width:300px;height:200px">
+
+                   <div slot="file" style="display:inline-block;">
+                    <img :src=src style="width:200px;height:150px">
+                    <span class="el-upload-list__item-actions">
+                        <span class="el-upload-list__item-preview" @click="handlePictureCardPreview(src)">
+                            <i class="el-icon-zoom-in"></i>
+                        </span>
+                    </span>
+                </div> 
+                <div slot="file2" style="display:inline-block;">
+                    <img :src=src2 style="width:200px;height:150px">
+                    <span class="el-upload-list__item-actions">
+                        <span class="el-upload-list__item-preview" @click="handlePictureCardPreview(src2)">
+                            <i class="el-icon-zoom-in"></i>
+                        </span>
+                    </span>
+                </div>
+                <div slot="file3" style="display:inline-block;">
+                    <img :src=src3 style="width:200px;height:150px">
+                    <span class="el-upload-list__item-actions">
+                        <span class="el-upload-list__item-preview" @click="handlePictureCardPreview(src3)">
+                            <i class="el-icon-zoom-in"></i>
+                        </span>
+                    </span>
+                </div>
+                <div slot="file4" v-if="src4!=''">
+                    <img :src=src4 style="width:100px;height:80px">
+                    <span class="el-upload-list__item-actions">
+                        <span class="el-upload-list__item-preview" @click="handlePictureCardPreview(src4)">
+                            <i class="el-icon-zoom-in"></i>
+                        </span>
+                    </span>
+                </div>
+                <div slot="file5" v-if="src5!=''">
+                    <img :src=src5 style="width:100px;height:80px">
+                    <span class="el-upload-list__item-actions">
+                        <span class="el-upload-list__item-preview" @click="handlePictureCardPreview(src5)">
+                            <i class="el-icon-zoom-in"></i>
+                        </span>
+                    </span>
+                </div>
+<!--                                 
+                <img :src=src style="width:300px;height:200px">
+                <img :src=src2 style="width:300px;height:200px">
+                <img :src=src3 style="width:300px;height:200px">
+                <img v-if="src4!=''" :src=this.src4 style="width:300px;height:200px">
+                <img v-if="src5!=''" :src=this.src5 style="width:300px;height:200px"> -->
             </div>
         </system-dialog>
+
+        <!-- 放大框 -->
+        <el-dialog :visible.sync="dialogVisible">
+            <img width="100%" :src="dialogImageUrl">
+        </el-dialog>
     </el-main>
 </template>
   
@@ -226,7 +291,7 @@ export default {
                 meal: [{ required: true, message: '请选择套餐办理编号', trigger: 'change' }],
                 createDate: [{ required: true, message: '请选择签订时间', trigger: 'change' }],
                 salesman: [{ required: true, message: '请输入业务员', trigger: 'blur' }],
-                photoAddress: [{ required: true, message: '合同图片至少三张,最多五张', trigger: 'blur' }],
+                photoAddress: [{ required: true, message: '此图片不能为空', trigger: 'blur' }],
             },
 
             //合同签订窗口的电话查询参数
@@ -289,12 +354,19 @@ export default {
             src3: "",
             src4: "",
             src5: "",
+            //放大照片URL
+            dialogImageUrl: "",
+            dialogVisible: false,
         };
     },
     created() {
         this.search();
     },
     methods: {
+        handlePictureCardPreview(src) {
+            this.dialogImageUrl = src
+            this.dialogVisible = true
+        },
 
         async search(pageNo, pageSize) {
             //修改当前页码
@@ -322,7 +394,6 @@ export default {
             this.src3 = row.photoAddress3
             this.src4 = row.photoAddress4
             this.src5 = row.photoAddress5
-            console.log("xxxx", row);
         },
         //关闭查看合同详情窗口
         closedetial() {
@@ -501,12 +572,13 @@ export default {
 
 
         //判断到期状态
-        time(row, column) {
+        time(row) {
+            console.log(row);
             let date = new Date();  // Mon Oct 11 2021 08:39:50 GMT+0800 (中国标准时间)
             let afterDate = this.formateDate(date);  // 2021-10-11 
-            if (row.mmDate >= afterDate) {
+            if (row.endDate >= afterDate) {
                 return '未过期'
-            } else if (row.mmDate < afterDate) {
+            } else if (row.endDate < afterDate) {
                 return '已过期'
             }
         },
