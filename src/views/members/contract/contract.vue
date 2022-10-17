@@ -142,10 +142,10 @@
                         <el-col :span="10">
                             <el-form-item label="合同图片4">
                                 <div class="upload-deom">
-                                    <el-upload :show-file-list="false" :on-success="handleAvatarSuccess3"
+                                    <el-upload :show-file-list="false" :on-success="handleAvatarSuccess4"
                                         :before-upload="beforeAvatarUpload" class="avatar-uploader" :data="uploadHeader"
-                                        action="http://localhost:8888/api/oss/file/upload?module=photoAddress3">
-                                        <img v-if="signing.photoAddress3" :src="signing.photoAddress3">
+                                        action="http://localhost:8888/api/oss/file/upload?module=photoAddress4">
+                                        <img v-if="signing.photoAddress4" :src="signing.photoAddress4">
                                         <i v-else class="el-icon-plus avatar-uploader-icon" />
                                     </el-upload>
                                 </div>
@@ -199,15 +199,14 @@
         <system-dialog :title="detialDialog.title" :visible="detialDialog.visible" :width="detialDialog.width"
             :height="detialDialog.height" @onClose="closedetial" @onConfirm="closedetial">
             <div slot="content">
-
-                   <div slot="file" style="display:inline-block;">
+                <div slot="file" style="display:inline-block;">
                     <img :src=src style="width:200px;height:150px">
                     <span class="el-upload-list__item-actions">
                         <span class="el-upload-list__item-preview" @click="handlePictureCardPreview(src)">
                             <i class="el-icon-zoom-in"></i>
                         </span>
                     </span>
-                </div> 
+                </div>
                 <div slot="file2" style="display:inline-block;">
                     <img :src=src2 style="width:200px;height:150px">
                     <span class="el-upload-list__item-actions">
@@ -224,28 +223,24 @@
                         </span>
                     </span>
                 </div>
-                <div slot="file4" v-if="src4!=''">
-                    <img :src=src4 style="width:100px;height:80px">
+            </div>
+            <div slot="content">
+                <div slot="file4" v-if="src4!=''" style="display:inline-block;">
+                    <img :src=src4 style="width:200px;height:150px">
                     <span class="el-upload-list__item-actions">
                         <span class="el-upload-list__item-preview" @click="handlePictureCardPreview(src4)">
                             <i class="el-icon-zoom-in"></i>
                         </span>
                     </span>
                 </div>
-                <div slot="file5" v-if="src5!=''">
-                    <img :src=src5 style="width:100px;height:80px">
+                <div slot="file5" v-if="src5!=''" style="display:inline-block;">
+                    <img :src=src5 style="width:200px;height:150px">
                     <span class="el-upload-list__item-actions">
                         <span class="el-upload-list__item-preview" @click="handlePictureCardPreview(src5)">
                             <i class="el-icon-zoom-in"></i>
                         </span>
                     </span>
                 </div>
-<!--                                 
-                <img :src=src style="width:300px;height:200px">
-                <img :src=src2 style="width:300px;height:200px">
-                <img :src=src3 style="width:300px;height:200px">
-                <img v-if="src4!=''" :src=this.src4 style="width:300px;height:200px">
-                <img v-if="src5!=''" :src=this.src5 style="width:300px;height:200px"> -->
             </div>
         </system-dialog>
 
@@ -650,7 +645,7 @@ export default {
 .avatar-uploader img {
     width: 120px;
     height: 120px;
-    // display: block;
+    display: block;
 }
 </style>
   
