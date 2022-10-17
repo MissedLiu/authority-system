@@ -26,10 +26,10 @@
                     <el-button icon="el-icon-edit-outline"  plain  type="primary" @click="openupdwindow(scope.row)"
                     v-if="hasPermission('coachs:coach:edit')">修改
                     </el-button>
-                    <el-button icon="el-icon-edit-outline"  plain  type="primary"  @click="openPtMealWindow(scope.row)"
+                    <el-button type="success" plain icon="el-icon-edit-outline"  @click="openPtMealWindow(scope.row)"
                     v-if="hasPermission('coachs:coach:sjmeal')">分配私教套餐
                     </el-button>
-                    <el-button icon="el-icon-edit-outline" plain  type="primary" @click="openTeamMealWindow(scope.row)"
+                    <el-button icon="el-icon-edit-outline" type="warning" plain @click="openTeamMealWindow(scope.row)"
                     v-if="hasPermission('coachs:coach:tcmeal')">分配团操套餐
                     </el-button>
                 </template>

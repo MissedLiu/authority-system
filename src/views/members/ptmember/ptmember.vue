@@ -6,6 +6,15 @@
                 <el-input placeholder="请输入电话" v-model="phone.memberPhone"></el-input>
             </el-form-item>
             <el-form-item>
+                <el-input placeholder="请输入姓名" v-model="phone.memberName"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-select v-model="phone.mealId" placeholder="请选择套餐">
+                    <el-option v-for="item in ptMeal" :key="item.cmId" :label="item.cmName" :value="item.cmId">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item>
                 <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
                 <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow()"
                     v-if="hasPermission('members:ptmember:add')">新增</el-button>
@@ -68,7 +77,7 @@
                     </el-table-column>
                     <el-table-column label="操作" align="center">
                         <template slot-scope="scope">
-                            <el-button type="success" icon="el-icon-plus" @click="addMmId(scope.row)">选择</el-button>
+                            <el-button type="success" plain icon="el-icon-plus" @click="addMmId(scope.row)">选择</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -128,11 +137,14 @@ export default {
             total: 0,//数据总数量
             pageSize: 10,//每页显示数量
             //表格数据列表
-            tableData: [
-            ],
+            tableData: [],
+            //套餐查询数据
+            ptMeal:[],
             //查询参数
             phone: {
                 memberPhone: "",
+                memberName: "",
+                mealId: "",
                 pageNo: 1,//当前页码
                 pageSize: 10,//每页显示数量
             },
@@ -181,6 +193,7 @@ export default {
     },
     created() {
         this.search();
+        this.selctMeal();
     },
     methods: {
         playbackFormat(row, column) {
@@ -224,7 +237,6 @@ export default {
             this.phone.pageSize = pageSize
             //发送查询请求
             let res = await CommonMember.getFindCommentMemberList(this.phone);
-            console.log("--------------", res);
             //判断是否存在数据
             if (res.success) {
                 //获取数据
@@ -233,6 +245,13 @@ export default {
                 this.total = res.data.total;
             }
 
+        },
+        //查询套餐列表
+        async selctMeal(){
+            let res = await CommonMember.getCommenMealList();
+            if(res.success){
+                this.ptMeal=res.data
+            }
         },
         //打开添加窗口
         openAddwindow() {
@@ -383,7 +402,9 @@ export default {
     */
         resetValue() {
             //清空数据
-            this.phone.memberPhone = "";
+            this.phone.memberPhone = ""
+            this.phone.memberName = ""
+            this.phone.mealId = ""
             //调用查询方法
             this.search()
         },

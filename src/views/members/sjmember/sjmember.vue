@@ -6,7 +6,17 @@
                 <el-input placeholder="请输入电话" v-model="phone.memberPhone"></el-input>
             </el-form-item>
             <el-form-item>
+                <el-input placeholder="请输入姓名" v-model="phone.memberName"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-select v-model="phone.mealId" placeholder="请选择套餐">
+                    <el-option v-for="item in ptMeal" :key="item.ptId" :label="item.ptName" :value="item.ptId">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item>
                 <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
+
                 <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow"
                     v-if="hasPermission('members:sjmember:add')">新增</el-button>
                 <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
@@ -77,7 +87,7 @@
                     </el-table-column>
                     <el-table-column label="操作" align="center">
                         <template slot-scope="scope">
-                            <el-button type="success" icon="el-icon-plus" @click="addMmId(scope.row)">选择</el-button>
+                            <el-button type="success" plain icon="el-icon-plus" @click="addMmId(scope.row)">选择</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -107,8 +117,8 @@
                     </el-table-column>
                     <el-table-column label="操作" align="center" width="300">
                         <template slot-scope="scope">
-                            <el-button type="success" icon="el-icon-plus" @click="synopsis(scope.row)">查看简介</el-button>
-                            <el-button type="success" icon="el-icon-plus" @click="addEmpId(scope.row)">选择</el-button>
+                            <el-button type="primary" plain icon="el-icon-search" @click="synopsis(scope.row)">查看简介</el-button>
+                            <el-button type="success" plain icon="el-icon-plus" @click="addEmpId(scope.row)">选择</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -125,7 +135,7 @@
                     </el-table-column>
                     <el-table-column label="操作" align="center">
                         <template slot-scope="scope">
-                            <el-button type="success" icon="el-icon-plus" @click="addPtpId(scope.row)">选择</el-button>
+                            <el-button type="success" plain icon="el-icon-plus" @click="addPtpId(scope.row)">选择</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -189,6 +199,8 @@ export default {
             //查询参数
             phone: {
                 memberPhone: "",
+                memberName:"",
+                mealId:"",
                 pageNo: 1,//当前页码
                 pageSize: 10,//每页显示数量
             },
@@ -256,7 +268,7 @@ export default {
             },
             //详情数据
             mealSJ: [],
-            memberId:{},
+            memberId: {},
             //详情参数
             XQ: {
                 mealId: "",//套餐id
@@ -267,6 +279,7 @@ export default {
     },
     created() {
         this.search();
+        this.ptMeals()
     },
     methods: {
         playbackFormat(row, column) {
@@ -284,8 +297,8 @@ export default {
                 return '正式会员'
             }
         },
-         //判断到期状态
-         time(row, column) {
+        //判断到期状态
+        time(row, column) {
             let date = new Date();  // Mon Oct 11 2021 08:39:50 GMT+0800 (中国标准时间)
             let afterDate = this.formateDate(date);  // 2021-10-11 
             if (row.mmDate >= afterDate) {
@@ -310,7 +323,6 @@ export default {
             this.phone.pageSize = pageSize
             //发送查询请求
             let res = await PtMemberApi.getPtMemberList(this.phone);
-            console.log("----------", res);
             //判断是否存在数据
             if (res.success) {
                 //获取数据
@@ -357,15 +369,19 @@ export default {
             })
 
         },
-        //打开套餐选择的窗口
-        async openPtMealWindow() {
-            this.ptMealDialog.visible = true
+        //获取私教套餐方法
+        async ptMeals(){
             //获取私教套餐
             let res = await PtMemberApi.getPtMealList();
             //判断是否成功
             if (res.success) {
                 this.ptMeal = res.data
             }
+        },
+        //打开套餐选择的窗口
+         openPtMealWindow() {
+            //this.ptMeals()
+            this.ptMealDialog.visible = true
         },
 
         //套餐选择取消事件 
@@ -381,8 +397,8 @@ export default {
         //选择套餐
         addMmId(row) {
             //清空教练，项目框
-            this.member.empId = "";
-            this.member.ptpId = "";
+            this.member.empName = ""
+            this.member.projectName = ""
             this.member.mealId = row.ptId
             this.member.mealName = row.ptName
             this.ptMealDialog.visible = false
@@ -470,6 +486,7 @@ export default {
                     this.$message.success(res.message)
                     //刷新数据
                     this.search(this.pageNo, this.size)
+                    this.mealDialog.visible = false
                 } else {
                     //提示失败
                     this.$message.error(res.message)
@@ -503,7 +520,7 @@ export default {
         },
         //续费
         async renew(row) {
-            console.log("-=-=--==-=",this.memberId);
+            console.log("-=-=--==-=", this.memberId);
             row.memberId = this.memberId;
             let confirm = await this.$myconfirm("确定续费吗?")//await代表同步
             if (confirm) {
@@ -539,6 +556,8 @@ export default {
         resetValue() {
             //清空数据
             this.phone.memberPhone = "";
+            this.phone.memberName = ""
+            this.phone.mealId = ""
             //调用查询方法
             this.search()
         },

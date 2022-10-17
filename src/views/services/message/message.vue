@@ -22,7 +22,7 @@
             <el-table-column prop="weix" label="微信"></el-table-column>
             <el-table-column label="操作" width="510" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-edit-outline" plain  type="primary" size="small"
+                    <el-button icon="el-icon-edit-outline" type="warning" plain size="small"
                         @click="openmemberMessageDialog(scope.row)" v-if="hasPermission('services:message:sllotmember')">
                         分配会员
                     </el-button>
@@ -30,7 +30,7 @@
                         @click="openprosperctDialog(scope.row)" v-if="hasPermission('services:message:sllotpotential')">
                         分配潜在用户
                     </el-button>
-                    <el-button type="success" plain icon="el-icon-search" size="small"
+                    <el-button icon="el-icon-search" type="warning" plain size="small"
                         @click="openmemberMessageDialog2(scope.row)" v-if="hasPermission('services:message:selectmember')">
                         查看会员
                     </el-button>

@@ -1,27 +1,21 @@
 import request from "@/utils/request";
 
 export default {
-  /***********************************会员接口***************************************************/
-   /**
-   * 查询会员列表无分页
-   * @returns
-   */
-    async getlistAllNoPage(params) {
-      return await request.get("/api/member/listAllNoPage",params);
-    },
   /**
-   * 查询会员列表ok
+   * 查询会员列表（分页）
    * @returns
    */
   async getMemberList(params) {
-    return await request.get("/api/member/listAll", params);
+    return await request.get("/api/member/listMemberAll", params);
   },
+
+  
   /**
-   * 通过电话查询会员ok
+   * 查询会员列表无分页
    * @returns
    */
-  async getFindMemberByPhone(params) {
-    return await request.get("/api/member/findMemberByMemberPhone", params);
+  async getlistAllNoPage(params) {
+    return await request.get("/api/member/listMemberAllNoPage", params);
   },
   /**
    * 新增会员ok
@@ -42,13 +36,18 @@ export default {
    * @returns
    */
   async updataMemberByMemberPhone(params) {
-    return await request.put("/api/member/updataMemberByMemberPhone", params);
+    return await request.put("/api/member/updMemberByMemberPhone", params);
   },
   /**
    * 统计每个套餐办理的次数
    */
-  async findNum(){
-    return await request.get("/api/Comsune/findNum")
-  }
-
+  async findNum() {
+    return await request.get("/api/Comsune/findNum");
+  },
+   /**
+   * 查询会员办理的所有套餐
+   */
+    async listMealByMemberId(params) {
+      return await request.get("/api/member/listMealByMemberId",params);
+    },
 };
