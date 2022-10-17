@@ -7,7 +7,8 @@
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
-                <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow" v-if="hasPermission('loses:lose:add')">新增</el-button>
+                <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow"
+                    v-if="hasPermission('loses:lose:add')">新增</el-button>
                 <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
             </el-form-item>
         </el-form>
@@ -24,7 +25,7 @@
             <el-table-column label="操作" width="200" align="center">
                 <template slot-scope="scope">
                     <el-button type="success" plain icon="el-icon-plus" size="small" @click="openReceive(scope.row)"
-                    v-if="hasPermission('loses:lose:get')">
+                        v-if="hasPermission('loses:lose:get')">
                         领取
                     </el-button>
                 </template>
@@ -95,7 +96,7 @@ export default {
             loserules: {
                 itemName: [{ required: true, message: '请输入失物名称', trigger: 'blur' }],
                 uname: [{ required: true, message: '请输入会员姓名', trigger: 'blur' }],
-                phone: [{ required: true, message: '请输入会员电话', trigger: 'blur' },{pattern: new RegExp(/^((1[34578]\d{9}))$/), message: '请正确输入电话号码' }],
+                phone: [{ required: true, message: '请输入会员电话', trigger: 'blur' }, { pattern: new RegExp(/^((1[34578]\d{9}))$/), message: '请正确输入电话号码' }],
             },
             //添加窗口属性
             addloseDialog: {
@@ -154,7 +155,7 @@ export default {
             //进行表单验证
             this.$refs.addloseForm.validate(async (valid) => {
                 //如果验证通过
-                if (valid) { 
+                if (valid) {
                     //发送添加请求
                     let res = await LoseApi.addLose(this.addlose);
                     //判断是否成功
@@ -180,10 +181,16 @@ export default {
 
         //打开领取窗口
         openReceive(row) {
-            this.receiveDialog.visible = true
-            this.receive.id = row.id
-            this.receive.itemName = row.itemName
-            this.receive.createTtime = row.createTtime
+            if (row.state!="已领取") {
+                this.receiveDialog.visible = true
+                this.receive.id = row.id
+                this.receive.itemName = row.itemName
+                this.receive.createTtime = row.createTtime
+            }else{
+                 //提示失败
+                 this.$message.error("该物品已被领取")
+            }
+
 
         },
         //领取窗口确定事件

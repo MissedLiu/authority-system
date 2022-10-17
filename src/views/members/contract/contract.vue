@@ -504,9 +504,9 @@ export default {
         time(row, column) {
             let date = new Date();  // Mon Oct 11 2021 08:39:50 GMT+0800 (中国标准时间)
             let afterDate = this.formateDate(date);  // 2021-10-11 
-            if (row.mmDate >= afterDate) {
+            if (row.endDate >= afterDate) {
                 return '未过期'
-            } else if (row.mmDate < afterDate) {
+            } else if (row.endDate < afterDate) {
                 return '已过期'
             }
         },
