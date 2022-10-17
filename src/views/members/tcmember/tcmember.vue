@@ -6,6 +6,15 @@
         <el-input placeholder="请输入电话" v-model="phone.memberPhone"></el-input>
       </el-form-item>
       <el-form-item>
+        <el-input placeholder="请输入姓名" v-model="phone.memberName"></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-select v-model="phone.mealId" placeholder="请选择套餐">
+          <el-option v-for="item in ptMeal" :key="item.teamId" :label="item.teamName" :value="item.teamId">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item>
         <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo, pageSize)">查询</el-button>
         <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow"
           v-if="hasPermission('members:tcmember:add')">新增</el-button>
@@ -74,7 +83,7 @@
           </el-table-column>
           <el-table-column label="操作" align="center">
             <template slot-scope="scope">
-              <el-button type="success" icon="el-icon-plus" @click="addMmId(scope.row)">选择</el-button>
+              <el-button type="success" plain icon="el-icon-plus" @click="addMmId(scope.row)">选择</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -104,8 +113,8 @@
           </el-table-column>
           <el-table-column label="操作" align="center" width="300">
             <template slot-scope="scope">
-              <el-button type="success" icon="el-icon-plus" @click="synopsis(scope.row)">查看简介</el-button>
-              <el-button type="success" icon="el-icon-plus" @click="addEmpId(scope.row)">选择</el-button>
+              <el-button type="primary" plain icon="el-icon-search" @click="synopsis(scope.row)">查看简介</el-button>
+              <el-button type="success" plain icon="el-icon-plus" @click="addEmpId(scope.row)">选择</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -122,7 +131,7 @@
           </el-table-column>
           <el-table-column label="操作" align="center">
             <template slot-scope="scope">
-              <el-button type="success" icon="el-icon-plus" @click="addPtpId(scope.row)">选择</el-button>
+              <el-button type="success" plain icon="el-icon-plus" @click="addPtpId(scope.row)">选择</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -183,6 +192,8 @@ export default {
       //电话查询参数
       phone: {
         memberPhone: "",
+        memberName:"",
+        mealId:"",
         pageNo: 1, //当前页码
         pageSize: 10, //每页显示数量
       },
@@ -260,11 +271,12 @@ export default {
       },
       //详情数据
       mealSJ: [],
-      memberId:{},
+      memberId: {},
     }
   },
   created() {
-    this.search();
+    this.search()
+    this.tcMeals()
   },
   methods: {
     playbackFormat(row, column) {
@@ -353,9 +365,8 @@ export default {
         }
       });
     },
-    //打开套餐选择的窗口
-    async openPtMealWindow() {
-      this.ptMealDialog.visible = true;
+
+    async tcMeals(){
       //获取团操套餐
       let res = await teamMemberApi.getTeamMealList();
       console.log(res);
@@ -363,6 +374,11 @@ export default {
       if (res.success) {
         this.ptMeal = res.data;
       }
+    },
+
+    //打开套餐选择的窗口
+    async openPtMealWindow() {
+      this.ptMealDialog.visible = true;
     },
 
     //套餐选择取消事件
@@ -377,8 +393,8 @@ export default {
     //选择套餐
     addMmId(row) {
       //清空教练，项目框
-      this.member.empId = "";
-      this.member.ptpId = "";
+      this.member.empName = "";
+      this.member.projectName = "";
       this.member.mealId = row.teamId;
       this.member.mealName = row.teamName;
       this.ptMealDialog.visible = false;
@@ -477,13 +493,13 @@ export default {
     //查看套餐详情窗口
     async selectPtMeal(row) {
       let res = await teamMemberApi.findTeamByMemberId({ memberId: row.memberId });
-      console.log("ssss",res.data);
+      console.log("ssss", res.data);
       //判断是否成功
       if (res.success) {
         this.mealSJ = res.data;
       }
       this.mealDialog.visible = true
-      this.memberId=row.memberId
+      this.memberId = row.memberId
     },
     //查看套餐详情窗口关闭事件
     pageClose() {
@@ -534,7 +550,9 @@ export default {
      */
     resetValue() {
       //清空数据
-      this.phone.memberPhone = "";
+      this.phone.memberPhone = ""
+      this.phone.memberName = ""
+      this.phone.mealId = ""
       //调用查询方法
       this.search();
     },

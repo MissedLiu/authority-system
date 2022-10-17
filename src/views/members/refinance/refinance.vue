@@ -6,6 +6,9 @@
                 <el-input placeholder="请输入电话" v-model="phone.memberPhone"></el-input>
             </el-form-item>
             <el-form-item>
+                <el-input placeholder="请输入姓名" v-model="phone.memberName"></el-input>
+            </el-form-item>
+            <el-form-item>
                 <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
                 <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow"
                     v-if="hasPermission('members:refinance:add')">新增</el-button>
@@ -15,18 +18,23 @@
         <!-- 数据表格 -->
         <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="id"
             default-expand-all :tree-props="{ children: 'children' }">
-            <el-table-column prop="memberName" label="会员姓名"></el-table-column>
-            <el-table-column prop="memberSex" label="会员性别" :formatter="playbackFormat"></el-table-column>
-            <el-table-column prop="memberPhone" label="会员电话"></el-table-column>
-            <el-table-column prop="memberDate" label="出生日期"></el-table-column>
-            <el-table-column prop="memberAge" label="年龄"></el-table-column>
-            <el-table-column prop="memberAddress" label="地址"></el-table-column>
-            <el-table-column prop="memberType" label="状态" :formatter="playbackFormat2"></el-table-column>
-            <el-table-column prop="createTime" label="注册时间"></el-table-column>
-            <el-table-column label="操作" width="350" align="center">
+            <el-table-column prop="memberName" label="会员姓名" align="center" width="100"></el-table-column>
+            <el-table-column prop="memberSex" label="会员性别" align="center" :formatter="playbackFormat" width="80">
+            </el-table-column>
+            <el-table-column prop="memberPhone" label="会员电话" align="center" width="120"></el-table-column>
+            <el-table-column prop="memberDate" label="出生日期" align="center" width="100"></el-table-column>
+            <el-table-column prop="memberAge" label="年龄" align="center" width="50"></el-table-column>
+            <el-table-column prop="memberAddress" label="地址" align="center"></el-table-column>
+            <el-table-column prop="memberType" label="状态" :formatter="playbackFormat2" align="center" width="100">
+            </el-table-column>
+            <el-table-column prop="createTime" label="注册时间" align="center" width="100"></el-table-column>
+            <el-table-column label="操作" width="450" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-edit-outline" plain type="primary" size="small" @click="selectCommonMeal(scope.row)" 
-                        v-if="hasPermission('members:refinance:edit')">
+                    <el-button type="primary" plain icon="el-icon-search" size="small" @click="openmeal(scope.row)">
+                        查看套餐
+                    </el-button>
+                    <el-button icon="el-icon-edit-outline" plain type="success" size="small"
+                        @click="selectCommonMeal(scope.row)" v-if="hasPermission('members:refinance:edit')">
                         修改
                     </el-button>
                     <el-button icon="el-icon-plus" plain type="warning" size="small" @click="upd(scope.row)"
@@ -61,7 +69,7 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item label="出生日期" prop="memberDate">
-                        <el-date-picker v-model="member.memberDate" type="datetime" style="width:180px"
+                        <el-date-picker v-model="member.memberDate" type="datetime" style="width:180px" @input="getAge"
                             placeholder="选择出生日期" format="yyyy-MM-dd" value-format="yyyy-MM-dd">
                         </el-date-picker>
                     </el-form-item>
@@ -96,13 +104,40 @@
             </div>
         </system-dialog>
 
+        <!-- 查看套餐窗口 -->
+        <system-dialog :title="MealDialog.title" :visible="MealDialog.visible" :width="MealDialog.width"
+            :height="MealDialog.height" @onClose="MealClose()" @onConfirm="MealConfirm()">
+            <div slot="content">
+                <el-table border :data="MealSj">
+                    <el-table-column label="套餐名称" align="center" prop="mealName">
+                    </el-table-column>
+                    <el-table-column label="套餐类型" align="center" prop="mealType">
+                    </el-table-column>
+                    <el-table-column label="套餐价格" align="center" prop="mealPrice">
+                    </el-table-column>
+                    <el-table-column label="项目名称" align="center" prop="projectName">
+                    </el-table-column>
+                    <el-table-column label="教练名称" align="center" prop="empName">
+                    </el-table-column>
+                    <el-table-column label="教练电话" align="center" prop="empPhone">
+                    </el-table-column>
+                    <el-table-column label="办理时间" align="center" prop="mmTime">
+                    </el-table-column>
+                    <el-table-column label="到期时间" align="center" prop="mmDate">
+                    </el-table-column>
+                    <el-table-column label="到期状态" align="center" :formatter="time">
+                    </el-table-column>
+                </el-table>
+            </div>
+        </system-dialog>
+
+
     </el-main>
 </template>
 
 <script>
 import MemberApi from '@/api/member'
 import BlackApi from '@/api/black'
-
 //导入对话框组件
 import SystemDialog from '@/components/system/SystemDialog.vue';
 export default {
@@ -118,12 +153,7 @@ export default {
             total: 0,//数据总数量
             pageSize: 10,//每页显示数量
             tableData: [],//表格数据列表
-            ptmbDialog: {
-                title: "",//窗口标题
-                visible: false,//是否显示窗口
-                width: 400,//窗口宽度
-                height: 400//窗口高度
-            },
+            MealSj: [],//会员套餐数据
             //添加窗口绑定数据
             member: {
                 memberId: "",//会员id
@@ -135,32 +165,46 @@ export default {
                 memberAddress: "",//住址 
                 memberType: "",//会员状态
             },
-            //查询传递数据
-            phone: {
-                memberPhone: "",//电话号码
-                pageNo: 1,//当前页码
-                pageSize: 10,//每页显示数量
-            },
-            //验证
+            //校验
             mbrules: {
                 memberName: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
                 memberSex: [{ required: true, message: '请选择性别', trigger: 'change' }],
                 memberDate: [{ required: true, message: '请选择出生日期', trigger: 'change' }],
                 memberPhone: [{ required: true, message: '请输入电话', trigger: 'blur' }, { pattern: new RegExp(/^((1[34578]\d{9}))$/), message: '请正确输入电话号码' }],
                 memberAge: [{ required: true, message: '请输入年龄', trigger: 'blur' }, { pattern: new RegExp(/^(?:[1-9][0-9]?|1[01][0-9]|100)$/), message: '请正确输入年龄' }],
-                memberAddress: [{ required: true, message: '请输入地址', trigger: 'blur' }, { pattern: new RegExp(/^[\u4e00-\u9fa5]{0,20}$/), message: '请正确输入地址' }],
+                memberAddress: [{ required: true, message: '请输入地址', trigger: 'blur' }, { pattern: new RegExp(/^[\u4e00-\u9fa5|0-9]{0,20}$/), message: '请正确输入地址' }],
                 memberType: [{ required: true, message: '请选择会员状态', trigger: 'change' }],
                 why: [{ required: true, message: '请输入原因', trigger: 'blur' }],
             },
-            //黑名单的属性
+            //添加,修改窗口参数
+            ptmbDialog: {
+                title: "",//窗口标题
+                visible: false,//是否显示窗口
+                width: 400,//窗口宽度
+                height: 400//窗口高度
+            },
+            //添加黑名单窗口的属性
             blackDialog: {
                 title: "黑名单",//窗口标题
                 visible: false,//是否显示窗口
                 width: 500,//窗口宽度
                 height: 100,//窗口高度
-
             },
-            //黑名单传递参数
+            //查看套餐窗口的属性
+            MealDialog: {
+                title: "所选套餐",//窗口标题
+                visible: false,//是否显示窗口
+                width: 1200,//窗口宽度
+                height: 800,//窗口高度
+            },
+            //查询列表传递对象
+            phone: {
+                memberPhone: "",//电话号码
+                memberName: "",//姓名
+                pageNo: 1,//当前页码
+                pageSize: 10,//每页显示数量
+            },
+            //黑名单传递对象
             black: {
                 memberId: "",//会员id
                 why: ""//原因
@@ -187,30 +231,7 @@ export default {
                 this.total = res.data.total;
             }
         },
-        playbackFormat(row, column) {
-            if (row.memberSex == 0) {
-                return '女'
-            } else if (row.memberSex == 1) {
-                return '男'
-            }
 
-        },
-        playbackFormat2(row, column) {
-            if (row.memberType == 0) {
-                return '体验会员'
-            } else if (row.memberType == 1) {
-                return '正式会员'
-            }
-        },
-        /**
-        * 重置查询条件
-        */
-        resetValue() {
-            //清空数据
-            this.phone.memberPhone = "";
-            //调用查询方法
-            this.search()
-        },
         //打开添加窗口
         openAddwindow() {
             //清空表单数据
@@ -219,11 +240,18 @@ export default {
             this.ptmbDialog.title = '新增会员'
             this.ptmbDialog.visible = true
         },
-        //窗口关闭事件
+        //打开修改窗口
+        async selectCommonMeal(row) {
+            //数据回显
+            this.$objCopy(row, this.member);
+            this.ptmbDialog.title = "修改会员信息"
+            this.ptmbDialog.visible = true
+        },
+        //添加，修改窗口关闭事件
         onClose() {
             this.ptmbDialog.visible = false
         },
-        //窗口确认事件
+        //添加，修改窗口确认事件
         onConfirm() {
             //进行表单验证
             this.$refs.memberForm.validate(async (valid) => {
@@ -238,7 +266,6 @@ export default {
                         //修改事件
                         res = await MemberApi.updataMemberByMemberPhone(this.member)
                     }
-
                     //判断是否成功
                     if (res.success) {
                         //提示成功
@@ -254,18 +281,27 @@ export default {
                 }
             })
         },
-
+        //打开黑名单窗口
+        upd(row) {
+            //清空表单数据
+            this.$restForm("blackForm", this.black);
+            this.black.memberId = row.memberId
+            this.blackDialog.visible = true
+        },
+        //黑名单关闭
+        Closeblack() {
+            this.blackDialog.visible = false
+        },
         //黑名单确认事件
         Confirmblack() {
             //进行表单验证
             this.$refs.blackForm.validate(async (valids) => {
-                //提示是否确认
                 if (valids) {
-                    let confirm = await this.$myconfirm("确定加入黑名单?")//await代表同步
+                    //提示是否确认
+                    let confirm = await this.$myconfirm("确定加入黑名单?")
                     if (confirm) {
                         //发送请求
-                        console.log("黑名单参数:", this.black);
-                        let res = await BlackApi.updMemberState(this.black)
+                        let res = await BlackApi.goBlack(this.black)
                         //判断是否发送成功
                         if (res.success) {
                             //提示成功
@@ -281,19 +317,24 @@ export default {
                 }
             })
         },
-
-        //黑名单关闭
-        Closeblack() {
-            this.blackDialog.visible = false
+        //打开套餐窗口
+        async openmeal(row) {
+            //发送请求
+            let res = await MemberApi.listMealByMemberId({ memberId: row.memberId })
+            if (res.success) {
+                this.MealSj = res.data
+            }
+            this.MealDialog.visible = true
         },
+        //套餐窗口关闭
+        MealClose() {
 
-        //打开黑名单
-        upd(row) {
-            this.$restForm("blackForm", this.black);
-            this.black.memberId = row.memberId
-            this.blackDialog.visible = true
+            this.MealDialog.visible = false
         },
-
+        //套餐窗口确定
+        MealConfirm() {
+            this.MealDialog.visible = false
+        },
         //根据会员id删除
         async del(row) {
             //提示是否确认删除
@@ -312,31 +353,67 @@ export default {
                     this.$message.error(res.message)
                 }
             }
-
-        },
-        //打开修改窗口
-        async selectCommonMeal(row) {
-            //数据回显
-            this.$objCopy(row, this.member);
-            this.ptmbDialog.title = "修改"
-            this.ptmbDialog.visible = true
-            //this.member = row
-        },
-        //修改窗口关闭事件 
-        pageClose() {
-            this.ptmbDialog.visible = false
         },
 
+        //判断到期状态
+        time(row) {
+            let date = new Date();  // Mon Oct 11 2021 08:39:50 GMT+0800 (中国标准时间)
+            let afterDate = this.formateDate(date);  // 2021-10-11 
+            if (row.mmDate >= afterDate) {
+                return '未过期'
+            } else if (row.mmDate <= afterDate) {
+                return '已过期'
+            }
+        },
+        // 格式化日期
+        formateDate(date) {
+            let year = date.getFullYear();
+            let month = (date.getMonth() + 1).toString().padStart(2, '0');  // 月要+1
+            let day = date.getDate().toString().padStart(2, '0');  // 获取天是getDate，而不是 getDay
+            let createTime = year + '-' + month + '-' + day;
+            return createTime;
+        },
+        //自动生成年龄
+        getAge() {
+            //出生时间 毫秒
+            var birthDayTime = new Date(this.member.memberDate).getTime();
+            //当前时间 毫秒
+            var nowTime = new Date().getTime();
+            //一年毫秒数(365 * 86400000 = 31536000000)
+            console.log("ss", nowTime);
+            this.member.memberAge = Math.ceil((nowTime - birthDayTime) / 31536000000 - 1)
+        },
+        //重置查询条件
+        resetValue() {
+            //清空数据
+            this.phone.memberPhone = ""
+            this.phone.memberName = ""
+            //调用查询方法
+            this.search()
+        },
+        //转换显示
+        playbackFormat(row) {
+            if (row.memberSex == 0) {
+                return '女'
+            } else if (row.memberSex == 1) {
+                return '男'
+            }
+        },
+        playbackFormat2(row) {
+            if (row.memberType == 0) {
+                return '体验会员'
+            } else if (row.memberType == 1) {
+                return '正式会员'
+            }
+        },
+        //分页改变每页条数
         handleSizeChange(size) {
             //修改每页显示数量
             this.pageSize = size
             //调用查询方法
             this.search(this.pageNo, size)
         },
-
-        /**
-        * 当页码发生变化时触发该事件
-        */
+        //当页码发生变化时触发该事件
         handleCurrentChange(page) {
             //修改当前页码
             this.pageNo = page

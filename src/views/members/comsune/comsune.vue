@@ -6,6 +6,17 @@
           <el-input placeholder="请输入电话" v-model="phone.memberPhone"></el-input>
         </el-form-item>
         <el-form-item>
+          <el-input placeholder="请输入姓名" v-model="phone.memberName"></el-input>
+        </el-form-item>
+        <el-form-item>
+                <el-select v-model="phone.mealType" placeholder="请选择套餐类型">
+                    <el-option value="普通" :label="普通"/>
+                    <el-option value="私教" :label="私教"/>
+                    <el-option value="团操" :label="团操"/>
+
+                </el-select>
+            </el-form-item>
+        <el-form-item>
           <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo, pageSize)">查询</el-button>
           <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
         </el-form-item>
@@ -54,6 +65,8 @@
         //电话查询参数
         phone: {
           memberPhone: "", //电话号码
+          memberName:"",
+          nealType:"",
           pageNo: 1, //当前页码
           pageSize: 10, //每页显示数量
         },
@@ -103,7 +116,9 @@
   */
       resetValue() {
         //清空数据
-        this.phone.memberPhone = "";
+        this.phone.memberPhone = ""
+        this.phone.memberName = ""
+        this.phone.mealType = ""
         //调用查询方法
         this.search()
       },

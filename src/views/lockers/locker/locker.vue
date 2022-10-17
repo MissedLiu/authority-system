@@ -6,7 +6,7 @@
         <el-input placeholder="请输入电话" v-model="phone.memberPhone"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo, pageSize)">电话查询</el-button>
+        <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo, pageSize)">查询</el-button>
         <el-button type="primary" plain icon="el-icon-search" @click="selectNullLocker(pageNo, pageSize)">查询空储物柜
         </el-button>
         <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow()" 
@@ -24,18 +24,18 @@
       <el-table-column prop="memberPhone" label="会员电话"></el-table-column>
       <el-table-column prop="createTime" label="办理时间"></el-table-column>
       <el-table-column prop="endTime" label="到期时间"></el-table-column>
-      <el-table-column label="操作" width="550" align="center">
+      <el-table-column label="操作" width="350" align="center">
         <template slot-scope="scope">
           <el-button type="success" plain icon="el-icon-plus" :disabled="item2(scope.$index, scope.row)" size="small"
-            @click="updeteOpen(scope.row)">启用</el-button>
+            @click="updeteOpen(scope.row)" v-if="scope.row.lockerState==2">启用</el-button>
           <el-button type="danger" plain icon="el-icon-minus" :disabled="item(scope.$index, scope.row)" size="small"
-            @click="updeteClose(scope.row)">禁用</el-button>
+            @click="updeteClose(scope.row)" v-if="scope.row.lockerState==1">禁用</el-button>
           <el-button icon="el-icon-close" type="warning" plain size="small" @click="del(scope.row)"
-          v-if="hasPermission('members:locker:delete')">删除储物柜</el-button>
+          v-if="hasPermission('members:locker:delete') && scope.row.lockerState!=0">删除储物柜</el-button>
           <el-button type="success" plain icon="el-icon-plus" :disabled="item(scope.$index, scope.row)" size="small"
-            @click="openMemwindow(scope.row)" v-if="hasPermission('members:locker:addmember')">添加会员</el-button>
+            @click="openMemwindow(scope.row)" v-if="hasPermission('members:locker:addmember') && scope.row.lockerState==1">添加会员</el-button>
           <el-button type="danger" plain icon="el-icon-minus" :disabled="item(scope.$index, scope.row)" size="small"
-            @click="deleteMember(scope.row)" v-if="hasPermission('members:locker:deletemember')">移除会员</el-button>
+            @click="deleteMember(scope.row)" v-if="hasPermission('members:locker:deletemember') && scope.row.lockerState==0">移除会员</el-button>
         </template>
       </el-table-column>
     </el-table>

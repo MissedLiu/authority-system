@@ -6,6 +6,9 @@
                 <el-input placeholder="请输入电话" v-model="phone.memberPhone"></el-input>
             </el-form-item>
             <el-form-item>
+                <el-input placeholder="请输入姓名" v-model="phone.memberName"></el-input>
+            </el-form-item>
+            <el-form-item>
                 <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo, pageSize)">查询</el-button>
                 <el-button type="success" plain icon="el-icon-plus" @click="opencompactWindow()"
                     v-if="hasPermission('members:contract:add')">签订合同</el-button>
@@ -15,12 +18,13 @@
         <!-- 数据表格 -->
         <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="id"
             default-expand-all :tree-props="{ children: 'children' }">
-            <el-table-column prop="memberName" label="会员姓名"></el-table-column>
-            <el-table-column prop="memberPhone" label="会员电话"></el-table-column>
-            <el-table-column prop="createDate" label="签订日期"></el-table-column>
-            <el-table-column prop="endDate" label="结束日期"></el-table-column>
-            <el-table-column prop="compactType" label="合同类型"></el-table-column>
-            <el-table-column prop="salesman" label="业务员"></el-table-column>
+            <el-table-column prop="memberName" label="会员姓名" align="center"></el-table-column>
+            <el-table-column prop="memberPhone" label="会员电话" align="center"></el-table-column>
+            <el-table-column prop="createDate" label="签订日期" align="center"></el-table-column>
+            <el-table-column prop="endDate" label="结束日期" align="center"></el-table-column>
+            <el-table-column label="到期状态" align="center" :formatter="time"></el-table-column>
+            <el-table-column prop="compactType" label="合同类型" align="center"></el-table-column>
+            <el-table-column prop="salesman" label="业务员" align="center"></el-table-column>
             <el-table-column label="操作" width="250" align="center">
                 <template slot-scope="scope">
                     <el-button icon="el-icon-edit-outline" plain type="primary" size="small"
@@ -152,11 +156,13 @@
             :height="parentDialog.height" @onClose="onParentClose()" @onConfirm="onParentConfirm()">
             <div slot="content">
                 <el-table border :data="mealList">
-                    <el-table-column label="办理套餐编号" align="center" prop="mmId">
-                    </el-table-column>
-                    <el-table-column label="套餐编号" align="center" prop="mealId">
+                    <el-table-column label="套餐名称" align="center" prop="mealName">
                     </el-table-column>
                     <el-table-column label="套餐类型" align="center" prop="mealType">
+                    </el-table-column>
+                    <el-table-column label="项目名称" align="center" prop="projectName">
+                    </el-table-column>
+                    <el-table-column label="教练名称" align="center" prop="empName">
                     </el-table-column>
                     <el-table-column label="办理时间" align="center" prop="mmTime">
                     </el-table-column>
@@ -171,7 +177,7 @@
             </div>
         </system-dialog>
 
-        <!-- 选择套餐的窗口 -->
+        <!-- 查看合同详情的窗口 -->
         <system-dialog :title="detialDialog.title" :visible="detialDialog.visible" :width="detialDialog.width"
             :height="detialDialog.height" @onClose="closedetial" @onConfirm="closedetial">
             <div slot="content">
@@ -209,6 +215,7 @@ export default {
             //电话查询参数
             phone: {
                 memberPhone: "", //电话号码
+                memberName: "",
                 pageNo: 1, //当前页码
                 pageSize: 10, //每页显示数量
             },
@@ -226,7 +233,7 @@ export default {
             compactPhone: {
                 memberPhone: ""
             },
-            //  //上传需要携带的数据
+            //上传需要携带的数据
             uploadHeader: { "token": getToken() },
             //合同签订窗口的属性
             compactDialog: {
@@ -492,6 +499,25 @@ export default {
             }
         },
 
+
+        //判断到期状态
+        time(row, column) {
+            let date = new Date();  // Mon Oct 11 2021 08:39:50 GMT+0800 (中国标准时间)
+            let afterDate = this.formateDate(date);  // 2021-10-11 
+            if (row.mmDate >= afterDate) {
+                return '未过期'
+            } else if (row.mmDate < afterDate) {
+                return '已过期'
+            }
+        },
+        // 格式化日期
+        formateDate(date) {
+            let year = date.getFullYear();
+            let month = (date.getMonth() + 1).toString().padStart(2, '0');  // 月要+1
+            let day = date.getDate().toString().padStart(2, '0');  // 获取天是getDate，而不是 getDay
+            let createTime = year + '-' + month + '-' + day;
+            return createTime;
+        },
         handleSizeChange(size) {
             //修改每页显示数量
             this.pageSize = size;

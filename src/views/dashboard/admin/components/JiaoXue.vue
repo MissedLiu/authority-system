@@ -1,7 +1,7 @@
 <template>
 
     <div>
-        <div ref="main" style="width: 600px;height:420px;" class="dashboard-container"></div>
+        <div ref="main" style="width: 600px;height:500px;" class="dashboard-container"></div>
     </div>
 </template>
     

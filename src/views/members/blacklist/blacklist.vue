@@ -6,6 +6,9 @@
         <el-input placeholder="请输入电话" v-model="phone.memberPhone"></el-input>
       </el-form-item>
       <el-form-item>
+        <el-input placeholder="请输入姓名" v-model="phone.memberName"></el-input>
+      </el-form-item>
+      <el-form-item>
         <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo, pageSize)">查询</el-button>
         <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
       </el-form-item>
@@ -67,7 +70,7 @@
           </el-table-column>
           <el-table-column label="到期时间" align="center" prop="mmDate">
           </el-table-column>
-          <el-table-column label="到期状态" align="center" :formatter="time" >
+          <el-table-column label="到期状态" align="center" :formatter="time">
           </el-table-column>
         </el-table>
       </div>
@@ -92,70 +95,36 @@ export default {
       pageNo: 1, //当前页码
       total: 0, //数据总数量
       pageSize: 10, //每页显示数量
-      //表格数据列表1
-      tableData: [],
-      //查询会员属性
-      memberData: "",
-      //电话查询参数
+      tableData: [],//黑名单信息列表
+      mealSJ: [],//退费套餐信息
+      //查询参数
       phone: {
         memberPhone: "", //电话号码
+        memberName: "", //姓名
         pageNo: 1, //当前页码
         pageSize: 10, //每页显示数量
       },
-      //显示套餐框参数
+      //退费查询套餐参数
+      returnPremium: {
+        memberId: "",
+        disbursePrice: "",
+        beizhu: "",
+      },
+      //显示套餐窗口框属性
       TFDialog: {
         title: "",//窗口标题
         visible: false,//是否显示窗口
         width: 900,//窗口宽度
         height: 500//窗口高度
       },
-      mealSJ:[],
-      //退费传入参数
-      returnPremium:{
-          memberId:"",
-          disbursePrice:"",
-          beizhu:"",
-      },
+
+
     };
   },
   created() {
     this.search();
   },
   methods: {
-
-    playbackFormat(row, column) {
-            if (row.memberSex == 0) {
-                return '女'
-            } else if (row.memberSex == 1) {
-                return '男'
-            }
-
-        },
-        playbackFormat2(row, column) {
-            if (row.memberType == 0) {
-                return '体验会员'
-            } else if (row.memberType == 1) {
-                return '正式会员'
-            }
-        },
-         //判断到期状态
-         time(row, column) {
-            let date = new Date();  // Mon Oct 11 2021 08:39:50 GMT+0800 (中国标准时间)
-            let afterDate = this.formateDate(date);  // 2021-10-11 
-            if (row.mmDate >= afterDate) {
-                return '未过期'
-            } else if (row.mmDate <= afterDate) {
-                return '已过期'
-            }
-        },
-        // 格式化日期
-        formateDate(date) {
-            let year = date.getFullYear();
-            let month = (date.getMonth() + 1).toString().padStart(2, '0');  // 月要+1
-            let day = date.getDate().toString().padStart(2, '0');  // 获取天是getDate，而不是 getDay
-            let createTime = year + '-' + month + '-' + day;
-            return createTime;
-        },
     //查询黑名单列表
     async search(pageNo, pageSize) {
       //修改当前页码
@@ -195,42 +164,76 @@ export default {
     },
     //打开退费框
     async openTF(row) {
-      this.TFDialog.title="退费"
-      let res=await BlackApi.findBlackMemberMeal({memberId:row.memberId})
-      console.log("sssssssssssssss",res);
-      if(res.success){
-        this.returnPremium.memberId=row.memberId
-        this.mealSJ=res.data
-      }
-      this.TFDialog.visible=true
-    },
-    //退费函数
-    async tuiFei(){
-      let res=await BlackApi.delMemberAllMeal(this.returnPremium)
+      this.TFDialog.title = "退费"
+      let res = await BlackApi.findBlackMemberMeal({ memberId: row.memberId })
+      console.log("sssssssssssssss", res);
       if (res.success) {
-          //提示成功
-          this.$message.success(res.message);
-          this.TFDialog.visible=false
-        } else {
-          //提示失败
-          this.$message.error(res.message);
-        }
+        this.returnPremium.memberId = row.memberId
+        this.mealSJ = res.data
+      }
+      this.TFDialog.visible = true
     },
-    TFConfirm(){
-      this.TFDialog.visible=false
+    //退费功能
+    async tuiFei() {
+      let res = await BlackApi.delMemberAllMeal(this.returnPremium)
+      if (res.success) {
+        //提示成功
+        this.$message.success(res.message);
+        this.TFDialog.visible = false
+      } else {
+        //提示失败
+        this.$message.error(res.message);
+      }
     },
-    TFClose(){
-      this.TFDialog.visible=false
+    // 退费框确定
+    TFConfirm() {
+      this.TFDialog.visible = false
+    },
+    //退费框取消
+    TFClose() {
+      this.TFDialog.visible = false
     },
 
-
+    //转换显示
+    playbackFormat(row, column) {
+      if (row.memberSex == 0) {
+        return '女'
+      } else if (row.memberSex == 1) {
+        return '男'
+      }
+    },
+    playbackFormat2(row, column) {
+      if (row.memberType == 0) {
+        return '体验会员'
+      } else if (row.memberType == 1) {
+        return '正式会员'
+      }
+    },
+    //判断到期状态
+    time(row, column) {
+      let date = new Date();  // Mon Oct 11 2021 08:39:50 GMT+0800 (中国标准时间)
+      let afterDate = this.formateDate(date);  // 2021-10-11 
+      if (row.mmDate >= afterDate) {
+        return '未过期'
+      } else if (row.mmDate <= afterDate) {
+        return '已过期'
+      }
+    },
+    // 格式化日期
+    formateDate(date) {
+      let year = date.getFullYear();
+      let month = (date.getMonth() + 1).toString().padStart(2, '0');  // 月要+1
+      let day = date.getDate().toString().padStart(2, '0');  // 获取天是getDate，而不是 getDay
+      let createTime = year + '-' + month + '-' + day;
+      return createTime;
+    },
+    //分页改变每页条数
     handleSizeChange(size) {
       //修改每页显示数量
       this.pageSize = size;
       //调用查询方法
       this.search(this.pageNo, size);
     },
-
     /**
      * 当页码发生变化时触发该事件
      */
@@ -241,11 +244,12 @@ export default {
       this.search(page, this.pageSize);
     },
     /**
-* 重置查询条件
-*/
+    * 重置查询条件
+    */
     resetValue() {
       //清空数据
       this.phone.memberPhone = "";
+      this.phone.memberName = "";
       //调用查询方法
       this.search()
     },
