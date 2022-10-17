@@ -57,7 +57,7 @@ export default {
                     {
                         name: '教练下的学员数',
                         type: 'pie',
-                        radius: [80, 200],
+                        radius: [80, 150],
                         center: ['50%', '50%'],
                         roseType: 'area',
                         itemStyle: {

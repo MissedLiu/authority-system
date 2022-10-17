@@ -30,4 +30,16 @@ export default {
    async findJiaoXueCount() {
     return await http.getRestApi("/api/XueYuan/findJiaoXueCount");
   },
+    /**
+   *查询私教套餐信息
+   */
+     async findMealPt(params) {
+      return await http.get("/api/XueYuan/findMealPt",params);
+    },
+      /**
+   *查询团操套餐信息
+   */
+   async findMealTm(params) {
+    return await http.get("/api/XueYuan/findMealTm",params);
+  },
 };
