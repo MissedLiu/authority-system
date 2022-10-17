@@ -10,13 +10,13 @@
       </el-form-item>
       <el-form-item>
 
-        <el-button type="success" icon="el-icon-plus" @click="pt()">私教</el-button>
+        <el-button type="success" icon="el-icon-plus" plain @click="pt()">私教</el-button>
         <el-button icon="el-icon-refresh-right" @click="resetValue()">重置</el-button>
-        <el-button type="success" icon="el-icon-plus" @click="tm()">团操</el-button>
+        <el-button type="success" icon="el-icon-plus" plain @click="tm()">团操</el-button>
 
       </el-form-item>
     </el-form>
-    <div v-if="falg1">
+    <div v-show="falg1">
       <!-- 数据表格 -->
       <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="id"
         default-expand-all>
@@ -24,16 +24,14 @@
         <el-table-column prop="memberSex" label="会员性别"></el-table-column>
         <el-table-column prop="memberPhone" label="会员电话"></el-table-column>
         <el-table-column prop="memberType" label="状态"></el-table-column>
-        <el-table-column prop="ptName" label="套餐名称"></el-table-column>
-        <el-table-column prop="ptpName" label="项目名称"></el-table-column>
-        <el-table-column prop="mealType" label="套餐类型"></el-table-column>
+
         <el-table-column label="操作" width="300" align="center">
           <template slot-scope="scope">
+            <el-button plain icon="el-icon-edit-outline" type="primary" size="small" @click="ptxiangqing(scope.row)">
+              详情
+            </el-button>
             <el-button plain icon="el-icon-edit-outline" type="primary" size="small" @click="selectPtMeal(scope.row)">
               添加体检单
-            </el-button>
-            <el-button plain icon="el-icon-edit-outline" type="primary" size="small" @click="fantan(scope.row)">
-              添加访谈
             </el-button>
           </template>
         </el-table-column>
@@ -45,7 +43,7 @@
         layout="total, sizes, prev, pager, next, jumper" :total="total">
       </el-pagination>
     </div>
-    <div v-if="falg2">
+    <div v-show="falg2">
       <!-- 数据表格 -->
       <el-table :data="tableData2" border stripe style="width: 100%; margin-bottom: 20px" row-key="id"
         default-expand-all>
@@ -53,16 +51,14 @@
         <el-table-column prop="memberSex" label="会员性别"></el-table-column>
         <el-table-column prop="memberPhone" label="会员电话"></el-table-column>
         <el-table-column prop="memberType" label="状态"></el-table-column>
-        <el-table-column prop="teamName" label="套餐名称"></el-table-column>
-        <el-table-column prop="tpName" label="项目名称"></el-table-column>
-        <el-table-column prop="mealType" label="套餐类型"></el-table-column>
+
         <el-table-column label="操作" width="300" align="center">
           <template slot-scope="scope">
             <el-button plain icon="el-icon-edit-outline" type="primary" size="small" @click="selectPtMeal(scope.row)">
               添加体检单
             </el-button>
-            <el-button plain icon="el-icon-edit-outline" type="primary" size="small" @click="fantan(scope.row)">
-              添加访谈
+            <el-button plain icon="el-icon-edit-outline" type="primary" size="small" @click="tmxiangqing(scope.row)">
+              详情
             </el-button>
           </template>
         </el-table-column>
@@ -73,6 +69,7 @@
         layout="total, sizes, prev, pager, next, jumper" :total="total2">
       </el-pagination>
     </div>
+
     <!-- 添加体检单窗口 -->
     <system-dialog :title="TiDialog.title" :visible="TiDialog.visible" :width="TiDialog.width" :height="TiDialog.height"
       @onClose="onClose" @onConfirm="onConfirm()">
@@ -138,15 +135,62 @@
         </el-form>
       </div>
     </system-dialog>
-     <!-- 添加访谈记录窗口 -->
-     <system-dialog :title="tanDialog.title" :visible="tanDialog.visible" :width="tanDialog.width" :height="tanDialog.height"
-      @onClose="ontanClose" @onConfirm="ontanConfirm()">
+    <!-- 添加访谈记录窗口 -->
+    <system-dialog :title="tanDialog.title" :visible="tanDialog.visible" :width="tanDialog.width"
+      :height="tanDialog.height" @onClose="ontanClose" @onConfirm="ontanConfirm()">
       <div slot="content">
         <el-form :model="tan" ref="tanForm" :rules="tanrules" label-width="100px" :inline="true" size="small">
           <el-form-item label="访谈内容" prop="interview">
-            <el-input v-model="tan.interview" type="textarea" clearable placeholder="请输入描述" maxlength="200" :rows="10"></el-input>          
+            <el-input v-model="tan.interview" type="textarea" clearable placeholder="请输入描述" maxlength="200" :rows="10">
+            </el-input>
           </el-form-item>
         </el-form>
+      </div>
+    </system-dialog>
+    <!-- 私教套餐详情窗口 -->
+    <system-dialog :title="ptxxDialog.title" :height="ptxxDialog.height" :width="ptxxDialog.width"
+      :visible="ptxxDialog.visible" @onClose="ptxxClose" @onConfirm="ptxxConfirm">
+      <div slot="content">
+        <!-- 分配角色数据列表 -->
+        <el-table ref="ptxxTable" :data="ptxxList" border stripe :height="ptxxHeight"
+          style="width: 100%; margin-bottom: 10px">
+          <el-table-column prop="ptName" label="套餐名称"></el-table-column>
+          <el-table-column prop="ptpName" label="项目名称"></el-table-column>
+          <el-table-column prop="mealType" label="套餐类型"></el-table-column>
+          <el-table-column label="操作" width="300" align="center">
+            <template slot-scope="scope">
+             
+              <el-button plain icon="el-icon-edit-outline" type="primary" size="small" @click="fantan(scope.row)">
+                添加访谈
+              </el-button>
+
+            </template>
+          </el-table-column>
+        </el-table>
+
+      </div>
+    </system-dialog>
+    <!-- 团操套餐详情窗口 -->
+    <system-dialog :title="tmxxDialog.title" :height="tmxxDialog.height" :width="tmxxDialog.width"
+      :visible="tmxxDialog.visible" @onClose="tmxxClose" @onConfirm="tmxxConfirm">
+      <div slot="content">
+        <!-- 分配角色数据列表 -->
+        <el-table ref="tmxxTable" :data="tmxxList" border stripe :height="tmxxHeight"
+          style="width: 100%; margin-bottom: 10px">
+          <el-table-column prop="teamName" label="套餐名称"></el-table-column>
+          <el-table-column prop="tpName" label="项目名称"></el-table-column>
+          <el-table-column prop="mealType" label="套餐类型"></el-table-column>
+          <el-table-column label="操作" width="300" align="center">
+            <template slot-scope="scope">
+             
+              <el-button plain icon="el-icon-edit-outline" type="primary" size="small" @click="fantan(scope.row)">
+                添加访谈
+              </el-button>
+
+            </template>
+          </el-table-column>
+        </el-table>
+
       </div>
     </system-dialog>
   </el-main>
@@ -172,8 +216,8 @@ export default {
         empId: "",
         mealType: "",
       },
-      tan:{
-        interview:"",//文本内容
+      tan: {
+        interview: "",//文本内容
       },
       searchModel2: {
         memberName: "",
@@ -202,8 +246,8 @@ export default {
         height: 530,
         width: 500
       },
-       //添加访谈窗口属性
-       tanDialog: {
+      //添加访谈窗口属性
+      tanDialog: {
         title: '',
         visible: false,
         height: 300,
@@ -230,7 +274,7 @@ export default {
         obpm: [{ required: true, message: '请输入数字', pattern: /[1-9]\d*/, trigger: 'blur' }],
         hrrest: [{ required: true, message: '请输入数字', pattern: /[1-9]\d*/, trigger: 'blur' }],
       },
-      tanrules:{
+      tanrules: {
         interview: [{ required: true, trigger: 'blur', message: '请输入内容' }]
       },
       //角色对象
@@ -258,12 +302,36 @@ export default {
         obpm: "",
         hrrest: "",
       },
-      fanTan:{
-        empId:"",
-        memberId:"",
-        memberName:"",
-        memberType:"",
-        interview:"",
+      fanTan: {
+        empId: "",
+        memberId: "",
+        memberName: "",
+        memberType: "",
+        interview: "",
+      },
+      //私教详情窗口属性
+      ptxxDialog: {
+        title: '详情',
+        visible: false,
+        height: 400,
+        width: 800
+      },
+      //详细私教查询条件
+      ptSearchModel: {
+        memberIds: "",//会员id,
+        empId: "",//教练id
+      },
+      //团操详情窗口属性
+      tmxxDialog: {
+        title: '详情',
+        visible: false,
+        height: 400,
+        width: 800
+      },
+      //团操私教查询条件
+      tmSearchModel: {
+        memberIds: "",//会员id,
+        empId: "",//教练id
       }
     }
   },
@@ -273,15 +341,17 @@ export default {
   },
   methods: {
     //查询当前登录的人的员工姓名
- 
+
     //查询
     async search(pageNo, pageSize) {
-      let userId= this.$store.getters.userId;
-    let res2=await userApi.empByUserId({id:userId});
-    this.searchModel.empId=res2.data.empId
+      let userId = this.$store.getters.userId;
+      let res2 = await userApi.empByUserId({ id: userId });
+      this.searchModel.empId = res2.data.empId
+      this.ptSearchModel.empId = res2.data.empId
+      this.tmSearchModel.empId = res2.data.empId
       this.searchModel.pageNo = pageNo;
       this.searchModel.pageSize = pageSize;
-     
+
       console.log("cc=", this.searchModel.empId)//账号id
       this.searchModel.mealType = "私教";
       console.log(this.searchModel)
@@ -292,7 +362,7 @@ export default {
         console.log(res.data);
         for (let i = 0; i < res.data.records.length; i++) {
           res.data.records[i].memberSex = res.data.records[i].memberSex == 0 ? "女" : "男";
-          res.data.records[i].memberType = res.data.records[i].memberType == 0 ? "体验会员" : "正式会员";
+          res.data.records[i].memberType = res.data.records[i].memberType == 1 ? "体验会员" : "正式会员";
         }
       }
     },
@@ -312,9 +382,9 @@ export default {
     async tm(pageNo2, pageSize2) {
       this.falg1 = false;
       this.falg2 = true;
-      let userId= this.$store.getters.userId;
-    let res2=await userApi.empByUserId({id:userId});
-    this.searchModel2.empId=res2.data.empId
+      let userId = this.$store.getters.userId;
+      let res2 = await userApi.empByUserId({ id: userId });
+      this.searchModel2.empId = res2.data.empId
       this.searchModel2.pageNo = pageNo2;
       this.searchModel2.pageSize = pageSize2;
 
@@ -326,25 +396,18 @@ export default {
         this.total2 = res.data.total
         for (let i = 0; i < res.data.records.length; i++) {
           res.data.records[i].memberSex = res.data.records[i].memberSex == 0 ? "女" : "男";
-          res.data.records[i].memberType = res.data.records[i].memberType == 0 ? "体验会员" : "正式会员";
+          res.data.records[i].memberType = res.data.records[i].memberType == 1 ? "体验会员" : "正式会员";
         }
         console.log(res.data);
       }
     },
     //添加体检单
-     selectPtMeal(row) {
-      // let res = await xueyuanApi.checkMemberId({ id: row.memberId });
-      // if (res.success) {
-        console.log(row)
-        this.Ti.memberId = row.memberId;
-        this.Ti.memberName = row.memberName;
-        this.TiDialog.title = "体检单"
-        this.TiDialog.visible = true;
-      // }else{
-      //    //提示失败
-      //    this.$message.error(res.message)
-      // }
-
+    selectPtMeal(row) {
+      console.log(row)
+      this.Ti.memberId = row.memberId;
+      this.Ti.memberName = row.memberName;
+      this.TiDialog.title = "体检单"
+      this.TiDialog.visible = true;
     },
     //体检单确认按钮
     async onConfirm(row) {
@@ -410,28 +473,28 @@ export default {
       this.tm(page, this.pageSize2)
     },
     //访谈
-    fantan(row){
+    fantan(row) {
       console.log(row)
       this.$restForm("tanForm", this.tan);
-      this.fanTan.empId=this.$store.getters.userId;
-      this.fanTan.memberId=row.memberId;
-      this.fanTan.memberName=row.memberName;
-      this.fanTan.memberType=row.memberState = "正式会员" ? 1 : 0;
-      this.tanDialog.title="添加访谈记录"
-      
-      this.tanDialog.visible=true;
+      this.fanTan.empId = this.$store.getters.userId;
+      this.fanTan.memberId = row.memberId;
+      this.fanTan.memberName = row.memberName;
+      this.fanTan.memberType = row.memberState = "正式会员" ? 1 : 0;
+      this.tanDialog.title = "添加访谈记录"
+
+      this.tanDialog.visible = true;
 
     },
     //关闭访谈窗口
-    ontanClose(){
-      this.tanDialog.visible=false;
+    ontanClose() {
+      this.tanDialog.visible = false;
     },
     //提交访谈窗口
-   async ontanConfirm(row){
-    this.$refs.tanForm.validate(async (valid) => {
+    async ontanConfirm(row) {
+      this.$refs.tanForm.validate(async (valid) => {
         if (valid) {
-          this.fanTan.interview=this.tan.interview
-      let res=await  interviewApi.addInterview(this.fanTan);
+          this.fanTan.interview = this.tan.interview
+          let res = await interviewApi.addInterview(this.fanTan);
           if (res.success) {
             //提示成功
             this.$message.success(res.message)
@@ -447,8 +510,47 @@ export default {
           }
         }
       });
-     
 
+
+    },
+    //私教详情弹框
+    async ptxiangqing(row) {
+      this.ptSearchModel.memberIds = row.memberId;
+      let res = await xueyuanApi.findMealPt(this.ptSearchModel)
+      if (res.success) {
+        this.ptxxList = res.data
+        console.log(res.data);
+      }
+
+      this.ptxxDialog.visible = true
+    },
+    //私教详情窗口关闭事件
+    ptxxClose() {
+      this.ptxxDialog.visible = false
+    },
+    //私教详情窗口确认事件
+    ptxxConfirm() {
+      this.ptxxDialog.visible = false
+    },
+    //团操详情弹框
+    async tmxiangqing(row) {
+      this.tmSearchModel.memberIds = row.memberId; 
+      console.log(this.tmSearchModel)
+      let res = await xueyuanApi.findMealTm(this.tmSearchModel)
+      if (res.success) {
+        this.tmxxList = res.data
+        console.log(res.data);
+      }
+
+      this.tmxxDialog.visible = true
+    },
+    //团操详情窗口关闭事件
+    tmxxClose() {
+      this.tmxxDialog.visible = false
+    },
+    //团操详情窗口确认事件
+    tmxxConfirm() {
+      this.tmxxDialog.visible = false
     }
   }
 
