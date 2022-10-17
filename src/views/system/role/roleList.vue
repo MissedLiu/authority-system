@@ -55,7 +55,7 @@
             :height="assignDialog.height" @onClose="onAssignClose" @onConfirm="onAssignConfirm">
             <div slot="content">
                 <el-tree ref="assignTree" :data="assignTreeData" node-key="id" :props="defaultProps" empty-text="暂无数据"
-                    :show-checkbox="true" :highlight-current="true" default-expand-all></el-tree>
+                    :show-checkbox="true" :highlight-current="true" ></el-tree>
             </div>
         </system-dialog>
 

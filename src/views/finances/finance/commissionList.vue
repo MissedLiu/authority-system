@@ -8,7 +8,7 @@
             <el-form-item>
                 <el-button type="primary" icon="el-icon-search" @click="search(pageNo, pageSize)">查询</el-button>
                 <el-button icon="el-icon-refresh-right " @click="resetValue()">重置</el-button>
-                <el-button type="success" plain @click="handleDownload">导出</el-button>
+                <el-button type="success" plain @click="handleDownload">导出当页数据到Excel表格</el-button>
             </el-form-item>
         </el-form>
 

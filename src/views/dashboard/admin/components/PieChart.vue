@@ -1,5 +1,5 @@
 <template>
-  <div ref="main" style="height:400px;" class="dashboard2-container" />
+  <div ref="main" style="height:300px;" class="dashboard2-container" />
 </template>
 
 <script>
@@ -9,14 +9,14 @@ import resize from './mixins/resize'
 
 export default {
   mixins: [resize],
-  props:["mealNum"],
+  props: ["mealNum"],
   data() {
     return {
       chart: null
     }
   },
-  created(){
-console.log(this.mealNum)
+  created() {
+    console.log(this.mealNum)
   },
   mounted() {
     this.$nextTick(() => {
@@ -36,25 +36,34 @@ console.log(this.mealNum)
 
       this.chart.setOption({
         tooltip: {
-          title: {//标题
-            text: '部门人数'
-          },
+          // title: {//标题
+          //   text: '人数'
+          // },
           trigger: 'item',
           formatter: '{a} <br/>{b} : {c} (次)'
+        },
+        title: {
+           text: '套餐销量',
+          x: 15,
+          y: 15,
+          textStyle: {  //标题文字设置
+           
+            color: '#070707'
+          }
         },
         legend: {
           left: 'center',
           bottom: '10',
-          data:this.mealNum.map(d=>d.name)
+          data: this.mealNum.map(d => d.name)
         },
         series: [
           {
             name: '销量',
             type: 'pie',
             roseType: 'radius',
-            radius: [15, 95],
+            radius: [15, 75],
             center: ['50%', '38%'],
-            data:this.mealNum,
+            data: this.mealNum,
             animationEasing: 'cubicInOut',
             animationDuration: 2600
           }

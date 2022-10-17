@@ -13,7 +13,7 @@
     </el-form>
     <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="ptId"
       default-expand-all>
-      <el-table-column prop="ptId" label="编号" />
+      <!-- <el-table-column prop="ptId" label="编号" /> -->
       <el-table-column prop="ptName" label="套餐名称" />
       <el-table-column prop="ptPrice" label="价格" />
       <el-table-column prop="ptTime" label="套餐时长" />

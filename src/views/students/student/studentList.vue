@@ -332,18 +332,18 @@ export default {
       }
     },
     //添加体检单
-    async selectPtMeal(row) {
-      let res = await xueyuanApi.checkMemberId({ id: row.memberId });
-      if (res.success) {
+     selectPtMeal(row) {
+      // let res = await xueyuanApi.checkMemberId({ id: row.memberId });
+      // if (res.success) {
         console.log(row)
         this.Ti.memberId = row.memberId;
         this.Ti.memberName = row.memberName;
         this.TiDialog.title = "体检单"
         this.TiDialog.visible = true;
-      }else{
-         //提示失败
-         this.$message.error(res.message)
-      }
+      // }else{
+      //    //提示失败
+      //    this.$message.error(res.message)
+      // }
 
     },
     //体检单确认按钮

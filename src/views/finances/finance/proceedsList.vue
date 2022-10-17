@@ -10,10 +10,15 @@
                 <el-select v-model="searchModel.type" class="m-2" placeholder="输入统计套餐类型" size="small">
                     <el-option v-for="item in tOptions" :key="item.value" :label="item.label" :value="item.value" />
                 </el-select>
-                <el-button type="primary" icon="el-icon-search" @click="toSumPrice()">统计</el-button>
+                <el-button type="primary" icon="el-icon-search" @click="toSumPrice()" plain>统计</el-button>
             </el-form-item>
             <el-form-item>
-                <el-button type="success" plain @click="handleDownload">导出</el-button>
+                <div class="block" style="position:relative; left:470px">
+                    <el-date-picker v-model="searchModel.changeTime" type="month" placeholder="请选择要查询的月份"
+                        @change="changeTimeb(pageNo,pageSize)" value-format="yyyy-MM" style="margin-left: 50px;"/>
+                    <el-button type="success" plain @click="toFile" style="margin-left:10px">归档</el-button>
+                    <el-button type="success" plain @click="handleDownload">导出当页数据到Excel表格</el-button>
+                </div>
             </el-form-item>
         </el-form>
         
@@ -54,6 +59,7 @@
 <script>
 //导入department.js脚本文件
 import proceedsApi from "@/api/proceedsApi";
+import onFileApi from "@/api/onFileApi"
 //先导入systemDialog组件
 import SystemDialog from "@/components/system/SystemDialog.vue";
 export default {
@@ -71,6 +77,8 @@ export default {
             bookType: "xlsx",
 
             searchModel: {
+                onFileType: "",
+                changeTime: "",
                 type: "",
                 typee: "",
                 pageNo: 1, //当前页码
@@ -169,13 +177,24 @@ export default {
             this.searchModel.pageSize = pageSize;
             //发送查询请求
             let res = await proceedsApi.selectList(this.searchModel);
-            console.log("w=",res.data.records)
             //判断是否成功
             if (res.success) {
                 this.tableData = res.data.records;
-                console.log(this.tableData)
                 this.total = res.data.total;
             }
+        },
+
+        changeTimeb(pageNo, pageSize) {
+            this.searchModel.pageNo = pageNo;
+            //修改每页显示条数
+            this.searchModel.pageSize = pageSize;
+            //发送查询请求
+            proceedsApi.selectList(this.searchModel).then((res) => {
+                if (res.success) {
+                    this.tableData = res.data.records;
+                    this.total = res.data.total;
+                }
+            });
         },
 
 
@@ -230,6 +249,21 @@ export default {
                         }
                     });
             }
+        },
+
+        async toFile() {
+            let confirm = await this.$myconfirm("确定要将该月套餐收入归档吗");
+            if (confirm) {
+                this.searchModel.onFileType = '套餐收入';
+                await onFileApi.toFile(this.searchModel).then(res => {
+                    if (res.success) {
+                        this.$message.success(res.message);
+                    } else {
+                        this.$message.error(res.message);
+                    }
+                })
+            }
+
         },
         
         async handleDownload() {

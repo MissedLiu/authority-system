@@ -34,6 +34,9 @@ export default {
             var myChart = echarts.init(this.$refs.main);
             // 绘制图表
             myChart.setOption({
+                title: {//标题
+                    text: '教练下的学员数'
+                },
                 tooltip: {
                     trigger: 'item',
                     formatter: "{b}:{c}(人数)"      //当鼠标移动到图形 显示数据(格式): 佛山（1111） 10%
@@ -61,7 +64,7 @@ export default {
                             borderRadius: 8
                         },
                         data: this.num2,
-                        
+
                     }
                 ]
             });

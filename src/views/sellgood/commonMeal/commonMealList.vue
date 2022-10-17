@@ -13,7 +13,7 @@
     </el-form>
     <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="cmId"
       default-expand-all>
-      <el-table-column prop="cmId" label="编号" />
+      <!-- <el-table-column prop="cmId" label="编号" /> -->
       <el-table-column prop="cmName" label="套餐名称" />
       <el-table-column prop="cmPrice" label="价格" />
       <el-table-column prop="cmTime" label="套餐时长" />

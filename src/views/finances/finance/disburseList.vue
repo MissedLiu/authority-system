@@ -4,12 +4,11 @@
     <el-form ref="searchForm" label-width="80px" :inline="true" size="small">
       <el-form-item>
         <div class="block">
-          <el-date-picker v-model="searchModel.changeTime" type="month" placeholder="请选择月份" value-format="yyyy-MM"
+          <el-date-picker v-model="searchModel.changeTime" type="month" placeholder="请选择要查询的月份" value-format="yyyy-MM"
             @change="changeTimeb(pageNo,pageSize)" />
+            <el-button type="success" plain @click="toFile" style="margin-left:10px">归档</el-button>
+            <el-button type="success" plain @click="handleDownload">导出当页数据到Excel表格</el-button>
         </div>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="success" plain @click="handleDownload">导出</el-button>
       </el-form-item>
     </el-form>
 
@@ -39,6 +38,7 @@
 <script>
 //导入department.js脚本文件
 import disburseApi from "@/api/disburseApi";
+import onFileApi from "@/api/onFileApi"
 //先导入systemDialog组件
 import SystemDialog from "@/components/system/SystemDialog.vue";
 export default {
@@ -56,6 +56,7 @@ export default {
       bookType: "xlsx",
 
       searchModel: {
+        onFileType:"",
         changeTime: "",
         pageNo: 1,
         pageSize: 10,
@@ -154,6 +155,21 @@ export default {
             }
           });
       }
+    },
+
+    async toFile() {
+      let confirm = await this.$myconfirm("确定要将该月支出归档吗");
+      if (confirm) {
+        this.searchModel.onFileType='支出';
+        await onFileApi.toFile(this.searchModel).then(res => {
+          if (res.success) {
+            this.$message.success(res.message);
+          } else {
+            this.$message.error(res.message);
+          }
+        })
+      }
+
     },
 
     async handleDownload() {

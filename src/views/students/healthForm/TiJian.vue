@@ -60,9 +60,9 @@ export default {
                     trigger: 'axis',
                     // 重写提示框内容样式
                     formatter: function (params, ticket, callback) {
-                        var showHtm = '数据' + '<br>';
+                     
 
-                        showHtm += params[0].data[1] + ':' + params[0].data[0] + '<br>'
+                        var showHtm = params[0].data[1] + ':' + params[0].data[0] + '<br>'
 
                         return showHtm;
                     }

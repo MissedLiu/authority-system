@@ -24,6 +24,12 @@ export default {
   async update(params) {
     return await http.put("/api/emp/update", params);
   },
+   /**
+   * 修改用户
+   */
+    async update2(params) {
+      return await http.put("/api/emp/update2", params);
+    },
   /**
    * 删除用户
    */
