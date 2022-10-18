@@ -88,9 +88,11 @@
             <div slot="content">
                 <el-row>
                     <el-col :span="12">
+                        今年每月套餐收入情况
                         <BarChart v-if="flag" :TbData="this.TbData"></BarChart>
                     </el-col>
                     <el-col :span="12">
+                        历年套餐收入情况
                         <BarChartA v-if="flag" :TbDataA="this.TbDataA"></BarChartA>
                     </el-col>
                 </el-row>
@@ -390,7 +392,7 @@ export default {
         },
 
         handleGetForms() {
-            this.DialogConfig2.title = "🐂";
+            this.DialogConfig2.title = "报表";
             this.DialogConfig2.visible = true;
         },
 
