@@ -2,24 +2,37 @@
     <el-main>
         <!-- 条件查询区 -->
         <el-form ref="searchForm" label-width="80px" :inline="true" size="small">
-            <el-form-item>
-                <el-input v-model="searchModel.stockinName" placeholder="请输入物品名" />
-            </el-form-item>
-            <el-form-item>
-                <el-button type="primary" icon="el-icon-search" @click="search(pageNo, pageSize)">查询</el-button>
-                <el-button icon="el-icon-refresh-right" @click="resetValue()">重置</el-button>
-            </el-form-item>
-            <el-form-item>
-                <div class="block" style="position:relative; left:444px">
+            <el-row>
+                <el-col :span="8">
+                    <el-form-item>
+                        <el-input v-model="searchModel.stockinName" placeholder="请输入物品名" />
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button type="primary" icon="el-icon-search" @click="search(pageNo, pageSize)">查询</el-button>
+                        <el-button icon="el-icon-refresh-right" @click="resetValue()">重置</el-button>
+                    </el-form-item>
+                </el-col>
+
+                <el-col :span="8">
+                    <el-form-item>
+                        <el-date-picker v-model="searchModel.changeTime" type="month" placeholder="请选择要查询的月份"
+                            @change="changeTimeb(pageNo,pageSize)" value-format="yyyy-MM" />
+                        <el-button type="success" plain @click="toFile" style="margin-left:10px">归档</el-button>
+                        <el-button type="success" plain @click="handleDownload">导出当页数据到Excel表格</el-button>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="4">
+                    <el-button type="primary" plain @click="handleGetForms">查看报表</el-button>
+                    <el-button type="primary" plain @click="handleGetOnFile(pageNo,pageSize)">查看归档记录</el-button>
+                </el-col>
+                <el-col :span="4">
                     <el-select v-model="tjType" class="m-2" placeholder="统计销售总值" size="small" @change="selectChange">
                         <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
                     </el-select>
-                    <el-date-picker v-model="searchModel.changeTime" type="month" placeholder="请选择要查询的月份"
-                        @change="changeTimeb(pageNo,pageSize)" value-format="yyyy-MM" />
-                    <el-button type="success" plain @click="toFile" style="margin-left:10px">归档</el-button>
-                    <el-button type="success" plain @click="handleDownload">导出当页数据到Excel表格</el-button>
-                </div>
-            </el-form-item>
+                </el-col>
+            </el-row>
+
+
         </el-form>
 
 
@@ -51,6 +64,47 @@
             </div>
         </system-dialog>
 
+        <system-dialog :title="DialogConfig2.title" :visible="DialogConfig2.visible" :width="DialogConfig2.width"
+            :height="DialogConfig2.height" @onClose="onClose" @onConfirm="onClose">
+            <div slot="content">
+                <el-row>
+                    <el-col :span="12">
+                        <BarChart v-if="flag" :TbData="this.TbData"></BarChart>
+                    </el-col>
+                    <el-col :span="12">
+                        <BarChartA v-if="flag" :TbDataA="this.TbDataA"></BarChartA>
+                    </el-col>
+                </el-row>
+            </div>
+        </system-dialog>
+
+
+        <system-dialog :title="DialogConfig3.title" :visible="DialogConfig3.visible" :width="DialogConfig3.width"
+            :height="DialogConfig3.height" @onClose="onClose" @onConfirm="onClose">
+            <div slot="content">
+                <!-- 条件查询区 -->
+                <el-form ref="searchForm" label-width="80px" :inline="true" size="small">
+                    <el-form-item>
+                        <el-date-picker v-model="searchModel.changeTime" type="year" placeholder="请选择要查询的年份"
+                            @change="handleGetOnFile(pageNo, pageSize)" value-format="yyyy" />
+                    </el-form-item>
+
+                </el-form>
+
+                <el-table :data="OnFileDate" border stripe style="width: 100%; margin-bottom: 10px">
+                    <el-table-column prop="type" label="类型"></el-table-column>
+                    <el-table-column prop="money" label="金额"></el-table-column>
+                    <el-table-column prop="date" label="时间"></el-table-column>
+                </el-table>
+
+                <!-- 分页工具栏 -->
+                <el-pagination @size-change="SizeChange" @current-change="CurrentChange" :current-pag="tablePage.pageNo"
+                    :page-sizes="[10, 20, 30, 40, 50]" :page-size="10" layout="total, sizes, prev, pager, next, jumper"
+                    :total="tablePage.total">
+                </el-pagination>
+            </div>
+        </system-dialog>
+
     </el-main>
 </template>
 
@@ -58,6 +112,8 @@
 
 import invoiceApi from "@/api/invoiceApi";
 import onFileApi from "@/api/onFileApi"
+import BarChart from "./BarChart.vue";
+import BarChartA from "./BarChartA.vue";
 //先导入systemDialog组件
 import SystemDialog from "@/components/system/SystemDialog.vue";
 export default {
@@ -65,9 +121,14 @@ export default {
     //注册组件
     components: {
         SystemDialog,
+        BarChart,
+        BarChartA,
     },
     data() {
         return {
+            TbData: {},
+            TbDataA: {},
+            flag: false,
 
             downloadLoading: false,
             filename: "商品收入报表",
@@ -76,19 +137,30 @@ export default {
 
             searchModel: {
                 onFileType: "",
+                type: "",
                 changeTime: "",
                 stockinName: "", //库存物品名
                 pageNo: 1, //当前页码
                 pageSize: 10, //每页显示条数
             },
             tableData: [], //表格数据
-
+            OnFileDate: [],
+            tablePage: {
+                pageNo: 1,
+                pageSize: 10,
+                totle: ""
+            },
             sumPrice: "",//总价
             //分页组件所需的属性
             pageNo: 1, //当前页码
             total: 0, //数据总数量
             pageSize: 10, //每页显示数量
-
+            DialogConfig3: {
+                title: "", //窗口标题
+                visible: false, //是否显示窗口
+                width: 1500, //窗口宽度
+                height: 600, //窗口高度
+            },
 
             tjType: "",
             xinxi: "",
@@ -124,6 +196,14 @@ export default {
                 width: 400, //窗口宽度
                 height: 30, //窗口高度
             },
+
+            DialogConfig2: {
+                title: "", //窗口标题
+                visible: false, //是否显示窗口
+                width: 1500, //窗口宽度
+                height: 600, //窗口高度
+            },
+
             invoice: {
                 invoiceId: "", //记录id
                 salesId: "", //销售记录编号
@@ -140,6 +220,8 @@ export default {
     //初始化时调用
     created() {
         this.search();
+        this.findSum();
+        this.findSumA();
     },
     methods: {
         /**
@@ -196,6 +278,25 @@ export default {
 
         onClose() {
             this.DialogConfig.visible = false;
+            this.DialogConfig2.visible = false;
+            this.DialogConfig3.visible = false;
+            this.searchModel.type = "";
+        },
+
+        async findSum() {
+            await invoiceApi.getCountPrice().then((res) => {
+                console.log(res.data);
+                this.TbData = res.data;
+                this.flag = true;
+            });
+        },
+
+        async findSumA() {
+            await invoiceApi.getCountPriceYear().then((res) => {
+                console.log(res.data);
+                this.TbDataA = res.data;
+                this.flag = true;
+            });
         },
 
         handleSizeChange(size) {
@@ -213,6 +314,21 @@ export default {
             this.pageNo = page;
             //调用查询方法
             this.search(page, this.pageSize);
+        },
+
+        SizeChange(size) {
+            //修改每页显示数量
+            this.tablePage.pageSize = size;
+            //调用查询方法
+            this.handleGetOnFile(this.tablePage.pageNo, size);
+        },
+
+        CurrentChange(page) {
+            //修改当前页码
+            this.tablePage.pageNo = page;
+            //调用查询方法
+            this.handleGetOnFile(page, this.tablePage.pageSize);
+
         },
 
         async toSumPrice() {
@@ -254,6 +370,23 @@ export default {
             }
         },
 
+        async handleGetOnFile(pageNo, pageSize) {
+            this.DialogConfig3.title = "归档记录";
+            this.DialogConfig3.visible = true;
+            //修改当前页码
+            this.searchModel.pageNo = pageNo;
+            //修改每页显示条数
+            this.searchModel.pageSize = pageSize;
+            this.searchModel.type = "商品收入"
+            await onFileApi.getOnFile(this.searchModel).then(res => {
+                if (res.success) {
+                    this.OnFileDate = res.data.records;
+                    this.tablePage.total = res.data.total;
+
+                }
+            })
+        },
+
         async handleDownload() {
             let confirm = await this.$myconfirm("确定要导出吗?")
             if (confirm) {
@@ -274,6 +407,11 @@ export default {
                 })
                 this.$message.success("导出成功")
             }
+        },
+
+        handleGetForms() {
+            this.DialogConfig2.title = "🐂";
+            this.DialogConfig2.visible = true;
         },
 
         async toFile() {

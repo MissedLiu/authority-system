@@ -393,7 +393,6 @@ export default {
         },
 
         async PlanToPo(row) {
-
             this.plan = row
             if (row.scheduleState == "未审核") {
                 this.plan.scheduleState = 0

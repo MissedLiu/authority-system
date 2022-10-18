@@ -24,10 +24,10 @@
     <!-- 数据表格 -->
     <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="id" default-expand-all
       :tree-props="{ children: 'children' }">
-      <el-table-column prop="memberName" label="会员姓名"></el-table-column>
-      <el-table-column prop="memberSex" label="会员性别" :formatter="playbackFormat"></el-table-column>
-      <el-table-column prop="memberPhone" label="会员电话"></el-table-column>
-      <el-table-column prop="memberType" label="状态" :formatter="playbackFormat2"></el-table-column>
+      <el-table-column prop="memberName" label="会员姓名" align="center"></el-table-column>
+      <el-table-column prop="memberSex" label="会员性别" :formatter="playbackFormat" align="center"></el-table-column>
+      <el-table-column prop="memberPhone" label="会员电话" align="center"></el-table-column>
+      <el-table-column prop="memberType" label="状态" :formatter="playbackFormat2" align="center"></el-table-column>
       <el-table-column label="套餐操作" width="280" align="center">
         <template slot-scope="scope">
           <el-button icon="el-icon-edit-outline" plain type="primary" size="small" @click="selectPtMeal(scope.row)"
@@ -285,7 +285,6 @@ export default {
       } else if (row.memberSex == 1) {
         return '男'
       }
-
     },
     playbackFormat2(row, column) {
       if (row.memberType == 0) {

@@ -36,10 +36,11 @@
             <el-table-column prop="poState" label="状态" />
             <el-table-column label="操作" width="300" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-edit-outline" type="primary" size="small"
-                        @click="handleToStock(scope.row)" v-if="hasPermission('stores:po:toStore')" >入库
+                    <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handleToStock(scope.row)"
+                        v-if="hasPermission('stores:po:toStore')">入库
                     </el-button>
-                    <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete(scope.row)" v-if="hasPermission('stores:po:delete')">删除
+                    <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete(scope.row)"
+                        v-if="hasPermission('stores:po:delete')">删除
                     </el-button>
                 </template>
             </el-table-column>
@@ -49,14 +50,14 @@
         <system-dialog :title="poDialog.title" :visible="poDialog.visible" :width="poDialog.width"
             :height="poDialog.height" @onClose="onClose" @onConfirm="toStock">
             <div slot="content">
-                
+
                 <el-form :model="po" ref="poForm" :rules="rules" label-width="80px" :inline="true" size="small">
                     <el-form-item label="物品报损" prop="changeLose">
                         <el-input v-model="po.changeLose"></el-input>
                     </el-form-item>
 
                     <el-form-item label="物品报溢" prop="changeMore">
-                        <el-input v-model="po.changeMore" ></el-input>
+                        <el-input v-model="po.changeMore"></el-input>
                     </el-form-item>
                 </el-form>
             </div>
@@ -230,42 +231,48 @@ export default {
         },
         // 将已购表的数据入库（添加到入库表、入库记录表、报溢报损表）
         async toStock() {
-            let res = await poApi.toStock(this.po);
-            if (res.success) {
-                //提示成功
-                this.$message.success(res.message);
-                //刷新数据
-                this.search();
-                //关闭窗口事件
-                this.poDialog.visible = false;
-            } else {
-                //提示失败
-                this.$message.error(res.message);
-            }
-            this.search(this.pageNo, this.pageSize);
+            this.$refs.planForm.validate(async (valid) => {
+                //如果验证通过
+                if (valid) {
+                    let res = await poApi.toStock(this.po);
+                    if (res.success) {
+                        //提示成功
+                        this.$message.success(res.message);
+                        //刷新数据
+                        this.search();
+                        //关闭窗口事件
+                        this.poDialog.visible = false;
+                    } else {
+                        //提示失败
+                        this.$message.error(res.message);
+                    }
+                    this.search(this.pageNo, this.pageSize);
+                }
+            })
+
         },
 
         async handleDownload() {
             let confirm = await this.$myconfirm("确定要导出吗?")
-            if(confirm){
+            if (confirm) {
                 this.downloadLoading = true
                 import('@/vendor/Export2Excel').then(excel => {
-                const tHeader = ['物品名称', '已购数量', '单价', '品牌', '供货地址','供货商名称','创建时间','物品类型','状态'] 
-                const filterVal = ['poName', 'poNum', 'poPrice', 'brand','scheduleAddress','scheduleSupplier','poTime','poType','poState']
-                const list = this.tableData 
-                const data = this.formatJson(filterVal, list)
-                excel.export_json_to_excel({
-                    header: tHeader,
-                    data,
-                    filename: this.filename, 
-                    autoWidth: this.autoWidth,
-                    bookType: this.bookType
+                    const tHeader = ['物品名称', '已购数量', '单价', '品牌', '供货地址', '供货商名称', '创建时间', '物品类型', '状态']
+                    const filterVal = ['poName', 'poNum', 'poPrice', 'brand', 'scheduleAddress', 'scheduleSupplier', 'poTime', 'poType', 'poState']
+                    const list = this.tableData
+                    const data = this.formatJson(filterVal, list)
+                    excel.export_json_to_excel({
+                        header: tHeader,
+                        data,
+                        filename: this.filename,
+                        autoWidth: this.autoWidth,
+                        bookType: this.bookType
+                    })
+                    this.downloadLoading = false
                 })
-                this.downloadLoading = false
-            })
-            this.$message.success("导出成功")
+                this.$message.success("导出成功")
             }
-            
+
         },
         formatJson(filterVal, jsonData) {
             return jsonData.map(v => filterVal.map(j => {
@@ -278,7 +285,7 @@ export default {
 
         },
     },
-    
+
 };
 </script>
     

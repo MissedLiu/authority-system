@@ -25,16 +25,16 @@
             <el-table-column prop="commTime" label="最后统计时间" />
             <el-table-column label="操作" width="470" align="center">
                 <template slot-scope="scope">
-                    <el-button type="primary" plain  size="small" @click="handlePtStatistics(scope.row)">
+                    <el-button type="primary" plain size="small" @click="handlePtStatistics(scope.row)">
                         普通提成
                     </el-button>
-                    <el-button type="success" plain  size="small" @click="handleSjStatistics(scope.row)">
+                    <el-button type="success" plain size="small" @click="handleSjStatistics(scope.row)">
                         私教提成
                     </el-button>
-                    <el-button type="primary" plain  size="small" @click="handleTcStatistics(scope.row)">
+                    <el-button type="primary" plain size="small" @click="handleTcStatistics(scope.row)">
                         团操提成
                     </el-button>
-                    <el-button type="success" plain  size="small" @click="handleSpStatistics(scope.row)">
+                    <el-button type="success" plain size="small" @click="handleSpStatistics(scope.row)">
                         商品提成
                     </el-button>
                 </template>
@@ -66,7 +66,8 @@
                     <el-table-column prop="projectName" label="项目名称" />
                     <el-table-column prop="type" label="会员类型" />
                     <el-table-column prop="salesPrice" label="价格" />
-                    <el-table-column prop="state" label="状态" />
+                    <el-table-column prop="state" label="状态" :filters="[{ text: '已购买', value: '已购买' },
+                    { text: '已统计', value: '已统计' }]" :filter-method="filterHandler" />
                     <el-table-column prop="salesTime" label="创建时间" />
                     <el-table-column prop="mealTime" label="时长" />
                 </el-table>
@@ -103,7 +104,8 @@
                     <el-table-column prop="projectName" label="项目名称" />
                     <el-table-column prop="type" label="会员类型" />
                     <el-table-column prop="salesPrice" label="价格" />
-                    <el-table-column prop="state" label="状态" />
+                    <el-table-column prop="state" label="状态" :filters="[{ text: '已购买', value: '已购买' },
+                    { text: '已统计', value: '已统计' }]" :filter-method="filterHandler"/>
                     <el-table-column prop="salesTime" label="创建时间" />
                     <el-table-column prop="mealTime" label="时长" />
                 </el-table>
@@ -141,7 +143,8 @@
                     <el-table-column prop="projectName" label="项目名称" />
                     <el-table-column prop="type" label="会员类型" />
                     <el-table-column prop="salesPrice" label="价格" />
-                    <el-table-column prop="state" label="状态" />
+                    <el-table-column prop="state" label="状态" :filters="[{ text: '已购买', value: '已购买' },
+                    { text: '已统计', value: '已统计' }]" :filter-method="filterHandler"/>
                     <el-table-column prop="salesTime" label="创建时间" />
                     <el-table-column prop="mealTime" label="时长" />
                 </el-table>
@@ -176,7 +179,8 @@
                     <el-table-column prop="stockinNum" label="购买数量" />
                     <el-table-column prop="brand" label="品牌" />
                     <el-table-column prop="salesTime" label="时间" />
-                    <el-table-column prop="state" label="状态"/>
+                    <el-table-column prop="state" label="状态" :filters="[{ text: '未统计', value: '未统计' },
+                    { text: '已统计', value: '已统计' }]" :filter-method="filterHandler"/>
                 </el-table>
 
                 <!-- 分页工具栏 -->
@@ -201,7 +205,6 @@
 import commissionApi from "@/api/commissionApi";
 //先导入systemDialog组件
 import SystemDialog from "@/components/system/SystemDialog.vue";
-import objCopy from "@/utils/objCopy";
 export default {
     name: "commission",
     //注册组件
@@ -321,7 +324,7 @@ export default {
                 salesPrice: "",
                 salesTime: "",
                 brand: "",
-                state:""
+                state: ""
             }
         };
     },
@@ -547,28 +550,34 @@ export default {
                 }
             });
         },
-        
+        filterHandler(value, row) {
+            console.log(value, row)
+            return row.state === value
+        },
+
+
+
         async handleDownload() {
-        let confirm = await this.$myconfirm("确定要导出吗?")
-            if(confirm){
-            this.downloadLoading = true
-            import('@/vendor/Export2Excel').then(excel => {
-                const tHeader = ['销售人员名称', '销售人员电话', '销售人员部门', '私教课程提成', '普通课程提成','团操课程提成','商品提成','总提成','最后统计时间'] 
-                const filterVal = ['empName', 'empPhone', 'departmentName', 'commissionSj', 'commissionPt','commissionTc','commissionSp','commissionPrice','commTime'] 
-                const list = this.tableData 
-                const data = this.formatJson(filterVal, list)
-                excel.export_json_to_excel({
-                    header: tHeader,
-                    data,
-                    filename: this.filename, 
-                    autoWidth: this.autoWidth,
-                    bookType: this.bookType
+            let confirm = await this.$myconfirm("确定要导出吗?")
+            if (confirm) {
+                this.downloadLoading = true
+                import('@/vendor/Export2Excel').then(excel => {
+                    const tHeader = ['销售人员名称', '销售人员电话', '销售人员部门', '私教课程提成', '普通课程提成', '团操课程提成', '商品提成', '总提成', '最后统计时间']
+                    const filterVal = ['empName', 'empPhone', 'departmentName', 'commissionSj', 'commissionPt', 'commissionTc', 'commissionSp', 'commissionPrice', 'commTime']
+                    const list = this.tableData
+                    const data = this.formatJson(filterVal, list)
+                    excel.export_json_to_excel({
+                        header: tHeader,
+                        data,
+                        filename: this.filename,
+                        autoWidth: this.autoWidth,
+                        bookType: this.bookType
+                    })
+                    this.downloadLoading = false
                 })
-                this.downloadLoading = false
-            })
-            this.$message.success("导出成功")
-        }
-    },
+                this.$message.success("导出成功")
+            }
+        },
         formatJson(filterVal, jsonData) {
             return jsonData.map(v => filterVal.map(j => {
                 if (j === 'timestamp') {

@@ -13,4 +13,8 @@ export default {
   async updateLoseState(params) {
     return await request.post("/api/lose/updateLoseState", params);
   },
+  //删除
+  async deleteLose(params) {
+    return await request.delete("/api/lose/deleteLose", params);
+  },
 };

@@ -24,11 +24,11 @@
         <!-- 数据表格 -->
         <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="id"
             default-expand-all :tree-props="{ children: 'children' }">
-            <el-table-column prop="memberName" label="会员姓名"></el-table-column>
-            <el-table-column prop="memberSex" label="会员性别" :formatter="playbackFormat"></el-table-column>
-            <el-table-column prop="memberPhone" label="会员电话"></el-table-column>
-            <el-table-column prop="memberAddress" label="地址"></el-table-column>
-            <el-table-column prop="memberType" label="状态" :formatter="playbackFormat2"></el-table-column>
+            <el-table-column prop="memberName" label="会员姓名" align="center"></el-table-column>
+            <el-table-column prop="memberSex" label="会员性别" :formatter="playbackFormat" align="center"></el-table-column>
+            <el-table-column prop="memberPhone" label="会员电话" align="center"></el-table-column>
+            <el-table-column prop="memberAddress" label="地址" align="center"></el-table-column>
+            <el-table-column prop="memberType" label="状态" :formatter="playbackFormat2" align="center"></el-table-column>
             <el-table-column label="套餐操作" width="280" align="center">
                 <template slot-scope="scope">
                     <el-button icon="el-icon-edit-outline" plain type="primary" size="small"
@@ -77,7 +77,8 @@
                     </el-table-column>
                     <el-table-column label="操作" align="center">
                         <template slot-scope="scope">
-                            <el-button type="success" plain icon="el-icon-plus" @click="addMmId(scope.row)">选择</el-button>
+                            <el-button type="success" plain icon="el-icon-plus" @click="addMmId(scope.row)">选择
+                            </el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -136,10 +137,11 @@ export default {
             pageNo: 1,//当前页码
             total: 0,//数据总数量
             pageSize: 10,//每页显示数量
-            //表格数据列表
-            tableData: [],
-            //套餐查询数据
-            ptMeal:[],
+            tableData: [],//表格数据列表
+            ptMeal: [],//套餐查询数据
+            mealList: [],//套餐数据
+            mealSJ: [],//详情数据
+            memberId: {},
             //查询参数
             phone: {
                 memberPhone: "",
@@ -147,13 +149,6 @@ export default {
                 mealId: "",
                 pageNo: 1,//当前页码
                 pageSize: 10,//每页显示数量
-            },
-            //新增窗口
-            ptmbDialog: {
-                title: "",//窗口标题
-                visible: false,//是否显示窗口
-                width: 350,//窗口宽度
-                height: 250//窗口高度
             },
             //新增窗口绑定数据（传给后端的数据），
             member: {
@@ -169,6 +164,13 @@ export default {
                 { pattern: new RegExp(/^((1[34578]\d{9}))$/), message: '请正确输入电话号码' }],
                 mealId: [{ required: true, message: '请选择套餐', trigger: 'change' }],
             },
+            //新增窗口属性
+            ptmbDialog: {
+                title: "",//窗口标题
+                visible: false,//是否显示窗口
+                width: 350,//窗口宽度
+                height: 250//窗口高度
+            },
             //选择套餐的窗口属性
             parentDialog: {
                 title: "选择套餐",//窗口标题
@@ -176,8 +178,6 @@ export default {
                 width: 600,//窗口宽度
                 height: 500//窗口高度
             },
-            //套餐数据
-            mealList: [],
             //套餐详情的属性
             mealDialog: {
                 title: "套餐详情",//窗口标题
@@ -185,10 +185,6 @@ export default {
                 width: 1000,//窗口宽度
                 height: 800//窗口高度
             },
-            //详情数据
-            mealSJ: [],
-            memberId: {},
-
         }
     },
     created() {
@@ -196,39 +192,6 @@ export default {
         this.selctMeal();
     },
     methods: {
-        playbackFormat(row, column) {
-            if (row.memberSex == 0) {
-                return '女'
-            } else if (row.memberSex == 1) {
-                return '男'
-            }
-
-        },
-        playbackFormat2(row, column) {
-            if (row.memberType == 0) {
-                return '体验会员'
-            } else if (row.memberType == 1) {
-                return '正式会员'
-            }
-        },
-        //判断到期状态
-        time(row, column) {
-            let date = new Date();  // Mon Oct 11 2021 08:39:50 GMT+0800 (中国标准时间)
-            let afterDate = this.formateDate(date);  // 2021-10-11 
-            if (row.mmDate >= afterDate) {
-                return '未过期'
-            } else if (row.mmDate <= afterDate) {
-                return '已过期'
-            }
-        },
-        // 格式化日期
-        formateDate(date) {
-            let year = date.getFullYear();
-            let month = (date.getMonth() + 1).toString().padStart(2, '0');  // 月要+1
-            let day = date.getDate().toString().padStart(2, '0');  // 获取天是getDate，而不是 getDay
-            let createTime = year + '-' + month + '-' + day;
-            return createTime;
-        },
         //查询普通会员列表
         async search(pageNo, pageSize) {
             //修改当前页码
@@ -244,13 +207,12 @@ export default {
                 //当前数据数量
                 this.total = res.data.total;
             }
-
         },
         //查询套餐列表
-        async selctMeal(){
+        async selctMeal() {
             let res = await CommonMember.getCommenMealList();
-            if(res.success){
-                this.ptMeal=res.data
+            if (res.success) {
+                this.ptMeal = res.data
             }
         },
         //打开添加窗口
@@ -260,20 +222,18 @@ export default {
             this.ptmbDialog.title = '新增普通会员',
                 this.ptmbDialog.visible = true
         },
-        //窗口关闭事件
+        //添加窗口关闭事件
         onClose() {
             this.ptmbDialog.visible = false
         },
-        //窗口确认事件
+        //添加窗口确认事件
         onConfirm() {
             //进行表单验证
-            console.log(this.member);
             this.$refs.memberForm.validate(async (valid) => {
                 //如果验证通过
                 if (valid) {
                     let res = null;
                     //发送添加请求
-                    console.log(this.member);
                     res = await CommonMember.getAddCommonMember(this.member)
                     //判断是否成功
                     if (res.success) {
@@ -314,7 +274,23 @@ export default {
             this.member.mealId = row.cmId
             this.member.mealName = row.cmName
             this.parentDialog.visible = false
-            console.log(this.member.mealId)
+        },
+        //查看套餐详情窗口
+        async selectCommonMeal(row) {
+            //通过会员id查询办理的私教套餐
+            let res = await CommonMember.findCommonByMemberId({ memberId: row.memberId })
+            this.mealSJ = res.data
+            //储存memberId
+            this.memberId = row.memberId
+            this.mealDialog.visible = true
+        },
+        //查看套餐详情窗口关闭事件 
+        pageClose() {
+            this.mealDialog.visible = false
+        },
+        //查看套餐详情窗口确认事件
+        pageConfirm() {
+            this.mealDialog.visible = false
         },
         //根据会员办理套餐id删除
         async del(row) {
@@ -337,30 +313,9 @@ export default {
                 }
             }
         },
-
-        //查看套餐详情窗口
-        async selectCommonMeal(row) {
-            console.log("---", row);
-            //通过会员id查询办理的私教套餐
-            let res = await CommonMember.findCommonByMemberId({ memberId: row.memberId })
-            this.mealSJ = res.data
-            //储存memberId
-            this.memberId = row.memberId
-            this.mealDialog.visible = true
-        },
-
-        //查看套餐详情窗口关闭事件 
-        pageClose() {
-            this.mealDialog.visible = false
-        },
-        //查看套餐详情窗口确认事件
-        pageConfirm() {
-            this.mealDialog.visible = false
-        },
         //续费
         async renew(row) {
             row.memberId = this.memberId;
-            console.log("ssssssssss", row);
             let confirm = await this.$myconfirm("确定续费吗?")//await代表同步
             if (confirm) {
                 //发送续费请求
@@ -379,8 +334,39 @@ export default {
                 }
             }
         },
-
-
+        //转换
+        playbackFormat(row, column) {
+            if (row.memberSex == 0) {
+                return '女'
+            } else if (row.memberSex == 1) {
+                return '男'
+            }
+        },
+        playbackFormat2(row, column) {
+            if (row.memberType == 0) {
+                return '体验会员'
+            } else if (row.memberType == 1) {
+                return '正式会员'
+            }
+        },
+        //判断到期状态
+        time(row, column) {
+            let date = new Date();  // Mon Oct 11 2021 08:39:50 GMT+0800 (中国标准时间)
+            let afterDate = this.formateDate(date);  // 2021-10-11 
+            if (row.mmDate >= afterDate) {
+                return '未过期'
+            } else if (row.mmDate <= afterDate) {
+                return '已过期'
+            }
+        },
+        // 格式化日期
+        formateDate(date) {
+            let year = date.getFullYear();
+            let month = (date.getMonth() + 1).toString().padStart(2, '0');  // 月要+1
+            let day = date.getDate().toString().padStart(2, '0');  // 获取天是getDate，而不是 getDay
+            let createTime = year + '-' + month + '-' + day;
+            return createTime;
+        },
         handleSizeChange(size) {
             //修改每页显示数量
             this.pageSize = size
@@ -398,8 +384,8 @@ export default {
             this.search(page, this.pageSize)
         },
         /**
-    * 重置查询条件
-    */
+        * 重置查询条件
+        */
         resetValue() {
             //清空数据
             this.phone.memberPhone = ""
