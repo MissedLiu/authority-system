@@ -6,6 +6,9 @@
                 <el-input placeholder="请输入电话" v-model="emp.empPhone"></el-input>
             </el-form-item>
             <el-form-item>
+                <el-input placeholder="请输入姓名" v-model="emp.empName"></el-input>
+            </el-form-item>
+            <el-form-item>
                 <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
                 <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
             </el-form-item>
@@ -13,14 +16,14 @@
         <!-- 数据表格 -->
         <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="id"
             default-expand-all :tree-props="{ children: 'children' }">
-            <el-table-column prop="empName" label="教练姓名"></el-table-column>
-            <el-table-column prop="empAge" label="年龄"></el-table-column>
-            <el-table-column prop="empSex" label="性别"></el-table-column>
-            <el-table-column prop="empPhone" label="电话"></el-table-column>
-            <el-table-column prop="empAddress" label="住址"></el-table-column>
-            <el-table-column prop="emil" label="邮箱"></el-table-column>
-            <el-table-column prop="qq" label="qq"></el-table-column>
-            <el-table-column prop="weix" label="微信"></el-table-column>
+            <el-table-column prop="empName" label="教练姓名" align="center"></el-table-column>
+            <el-table-column prop="empAge" label="年龄" align="center"></el-table-column>
+            <el-table-column prop="empSex" label="性别" align="center"></el-table-column>
+            <el-table-column prop="empPhone" label="电话" align="center"></el-table-column>
+            <el-table-column prop="empAddress" label="住址" align="center"></el-table-column>
+            <el-table-column prop="emil" label="邮箱" align="center"></el-table-column>
+            <el-table-column prop="qq" label="qq" align="center"></el-table-column>
+            <el-table-column prop="weix" label="微信" align="center"></el-table-column>
             <el-table-column label="操作" width="420" align="center">
                 <template slot-scope="scope">
                     <el-button icon="el-icon-edit-outline"  plain  type="primary" @click="openupdwindow(scope.row)"
@@ -143,6 +146,7 @@ export default {
             tableData: [],//表格数据列表
             emp: {
                 empPhone: "",//教练电话
+                empName:"",
                 pageNo: 1,//当前页码
                 pageSize: 10,//每页显示数量
             },
@@ -404,16 +408,13 @@ export default {
             }
         },
 
-
-
-
-
         /**
         * 重置查询条件
         */
         resetValue() {
             //清空数据
             this.emp.empPhone = "";
+            this.emp.empName="";
             //调用查询方法
             this.search()
         },

@@ -13,7 +13,7 @@
         <!-- 数据表格 -->
         <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="id"
             default-expand-all :tree-props="{ children: 'children' }">
-            <el-table-column prop="empName" label="客服姓名"></el-table-column>
+            <el-table-column prop="empName" label="客服姓名" ></el-table-column>
             <el-table-column prop="empAge" label="年龄"></el-table-column>
             <el-table-column prop="empSex" label="性别"></el-table-column>
             <el-table-column prop="empPhone" label="电话"></el-table-column>

@@ -16,15 +16,15 @@
     <!-- 数据表格 -->
     <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="id" default-expand-all
       :tree-props="{ children: 'children' }">
-      <el-table-column prop="memberName" label="会员姓名"></el-table-column>
-      <el-table-column prop="memberSex" label="会员性别" :formatter="playbackFormat"></el-table-column>
-      <el-table-column prop="memberPhone" label="会员电话"></el-table-column>
-      <el-table-column prop="memberDate" label="出生日期"></el-table-column>
-      <el-table-column prop="memberAge" label="年龄"></el-table-column>
-      <el-table-column prop="memberAddress" label="地址"></el-table-column>
-      <el-table-column prop="memberType" label="状态" :formatter="playbackFormat2"></el-table-column>
-      <el-table-column prop="createTime" label="拉黑时间"></el-table-column>
-      <el-table-column prop="why" label="拉黑原因" width="200"></el-table-column>
+      <el-table-column prop="memberName" label="会员姓名" align="center" ></el-table-column>
+      <el-table-column prop="memberSex" label="会员性别" :formatter="playbackFormat" align="center" width="80"></el-table-column>
+      <el-table-column prop="memberPhone" label="会员电话" width="110" align="center" ></el-table-column>
+      <el-table-column prop="memberDate" label="出生日期" align="center" width="100"></el-table-column>
+      <el-table-column prop="memberAge" label="年龄" align="center" width="60"></el-table-column>
+      <el-table-column prop="memberAddress" label="地址" align="center"></el-table-column>
+      <el-table-column prop="memberType" label="状态" :formatter="playbackFormat2" align="center"></el-table-column>
+      <el-table-column prop="createTime" label="拉黑时间" align="center"></el-table-column>
+      <el-table-column prop="why" label="拉黑原因" width="300" align="center"></el-table-column>
       <el-table-column label="操作" width="250" align="center">
         <template slot-scope="scope">
           <el-button icon="el-icon-close" plain type="danger" size="small" @click="openTF(scope.row)">
@@ -142,7 +142,6 @@ export default {
         this.total = res.data.total;
       }
     },
-
     //移出黑名单
     async del(row) {
       //提示是否确认删除
@@ -193,6 +192,7 @@ export default {
     TFClose() {
       this.TFDialog.visible = false
     },
+
 
     //转换显示
     playbackFormat(row, column) {

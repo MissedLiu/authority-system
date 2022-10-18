@@ -24,13 +24,13 @@
       <!-- 数据表格 -->
       <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="id" default-expand-all
         :tree-props="{ children: 'children' }">
-        <el-table-column prop="memberName" label="会员名称" :formatter="playbackFormat"></el-table-column>
-        <el-table-column prop="memberPhone" label="会员电话"></el-table-column>
-        <el-table-column prop="mealName" label="套餐名称"></el-table-column>
-        <el-table-column prop="mealType" label="套餐类型"></el-table-column>
-        <el-table-column prop="ptpName" label="项目名称"></el-table-column>
-        <el-table-column prop="comsunePrice" label="消费金额"></el-table-column>
-        <el-table-column prop="comsuneDate" label="消费时间"></el-table-column>
+        <el-table-column prop="memberName" label="会员名称" align="center"></el-table-column>
+        <el-table-column prop="memberPhone" label="会员电话" align="center"></el-table-column>
+        <el-table-column prop="mealName" label="套餐名称" align="center"></el-table-column>
+        <el-table-column prop="mealType" label="套餐类型" align="center"></el-table-column>
+        <el-table-column prop="ptpName" label="项目名称" align="center"></el-table-column>
+        <el-table-column prop="comsunePrice" label="消费金额" align="center"></el-table-column>
+        <el-table-column prop="comsuneDate" label="消费时间" align="center"></el-table-column>
       </el-table>
   
       <!-- 分页组件 -->

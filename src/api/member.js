@@ -8,8 +8,6 @@ export default {
   async getMemberList(params) {
     return await request.get("/api/member/listMemberAll", params);
   },
-
-  
   /**
    * 查询会员列表无分页
    * @returns

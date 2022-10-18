@@ -3,7 +3,7 @@
         <!-- 查询条件 -->
         <el-form ref="searchForm" label-width="80px" :inline="true" size="small">
             <el-form-item>
-                <el-input placeholder="请输入名字" v-model="lose.itemName"></el-input>
+                <el-input placeholder="请输入物品名字" v-model="lose.itemName"></el-input>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo ,pageSize)">查询</el-button>
@@ -16,17 +16,20 @@
         <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="id"
             default-expand-all :tree-props="{ children: 'children' }">
             <el-table-column label="编号" type="index" align="center" width="100"></el-table-column>
-            <el-table-column prop="itemName" label="物品名称"></el-table-column>
-            <el-table-column prop="createTtime" label="添加时间"></el-table-column>
-            <el-table-column prop="state" label="领取状态"></el-table-column>
-            <el-table-column prop="uname" label="领取人"></el-table-column>
-            <el-table-column prop="phone" label="领取人电话"></el-table-column>
-            <el-table-column prop="addTime" label="领取时间"></el-table-column>
+            <el-table-column prop="itemName" label="物品名称" align="center"></el-table-column>
+            <el-table-column prop="createTtime" label="添加时间" align="center"></el-table-column>
+            <el-table-column prop="state" label="领取状态" align="center"></el-table-column>
+            <el-table-column prop="uname" label="领取人" align="center"></el-table-column>
+            <el-table-column prop="phone" label="领取人电话" align="center"></el-table-column>
+            <el-table-column prop="addTime" label="领取时间" align="center"></el-table-column>
             <el-table-column label="操作" width="200" align="center">
                 <template slot-scope="scope">
                     <el-button type="success" plain icon="el-icon-plus" size="small" @click="openReceive(scope.row)"
                         v-if="hasPermission('loses:lose:get')">
                         领取
+                    </el-button>
+                    <el-button icon="el-icon-close" type="danger" plain size="small" @click="deleteLose(scope.row)">
+                        删除
                     </el-button>
                 </template>
             </el-table-column>
@@ -181,14 +184,14 @@ export default {
 
         //打开领取窗口
         openReceive(row) {
-            if (row.state!="已领取") {
+            if (row.state != "已领取") {
                 this.receiveDialog.visible = true
                 this.receive.id = row.id
                 this.receive.itemName = row.itemName
                 this.receive.createTtime = row.createTtime
-            }else{
-                 //提示失败
-                 this.$message.error("该物品已被领取")
+            } else {
+                //提示失败
+                this.$message.error("该物品已被领取")
             }
 
 
@@ -223,6 +226,24 @@ export default {
         //领取窗口取消事件
         receiveClose() {
             this.receiveDialog.visible = false
+        },
+        //删除
+        async deleteLose(row) {
+            let confirm = await this.$myconfirm("确定要删除该数据嘛?")//await代表同步
+            if (confirm) {
+                //发送请求
+                let res = await LoseApi.deleteLose({ id: row.id })
+                //判断是否成功
+                if (res.success) {
+                    //提示成功
+                    this.$message.success(res.message)
+                    //刷新数据
+                    this.search(this.pageNo, this.size)
+                } else {
+                    //提示失败
+                    this.$message.error(res.message)
+                }
+            }
         },
 
 

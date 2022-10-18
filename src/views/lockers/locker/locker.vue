@@ -18,12 +18,12 @@
     <!-- 数据表格 -->
     <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="id" default-expand-all
       :tree-props="{ children: 'children' }">
-      <el-table-column prop="lockerId" label="储物柜编号"></el-table-column>
-      <el-table-column prop="lockerState" label="储物柜状态" :formatter="playbackFormat"></el-table-column>
-      <el-table-column prop="memberName" label="会员姓名"></el-table-column>
-      <el-table-column prop="memberPhone" label="会员电话"></el-table-column>
-      <el-table-column prop="createTime" label="办理时间"></el-table-column>
-      <el-table-column prop="endTime" label="到期时间"></el-table-column>
+      <el-table-column prop="lockerId" label="储物柜编号" align="center"></el-table-column>
+      <el-table-column prop="lockerState" label="储物柜状态" :formatter="playbackFormat" align="center"></el-table-column>
+      <el-table-column prop="memberName" label="会员姓名" align="center"></el-table-column>
+      <el-table-column prop="memberPhone" label="会员电话" align="center"></el-table-column>
+      <el-table-column prop="createTime" label="办理时间" align="center"></el-table-column>
+      <el-table-column prop="endTime" label="到期时间" align="center"></el-table-column>
       <el-table-column label="操作" width="350" align="center">
         <template slot-scope="scope">
           <el-button type="success" plain icon="el-icon-plus" :disabled="item2(scope.$index, scope.row)" size="small"
