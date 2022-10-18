@@ -2,35 +2,31 @@
     <el-main>
         <!-- 条件查询区 -->
         <el-form ref="searchForm" label-width="80px" :inline="true" size="small">
-            <el-row>
-                <el-col :span="8">
+ 
                     <el-form-item>
-                        <el-input v-model="searchModel.stockinName" placeholder="请输入物品名" />
+                        <el-input v-model="searchModel.stockinName" size="small" placeholder="请输入物品名" />
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" icon="el-icon-search" @click="search(pageNo, pageSize)">查询</el-button>
-                        <el-button icon="el-icon-refresh-right" @click="resetValue()">重置</el-button>
+                        <el-button type="primary" icon="el-icon-search" size="small" @click="search(pageNo, pageSize)">查询</el-button>
+                        <el-button icon="el-icon-refresh-right" size="small" @click="resetValue()">重置</el-button>
                     </el-form-item>
-                </el-col>
+     
 
-                <el-col :span="8">
+          
                     <el-form-item>
                         <el-date-picker v-model="searchModel.changeTime" type="month" placeholder="请选择要查询的月份"
                             @change="changeTimeb(pageNo,pageSize)" value-format="yyyy-MM" />
                         <el-button type="success" plain @click="toFile" style="margin-left:10px">归档</el-button>
                         <el-button type="success" plain @click="handleDownload">导出当页数据到Excel表格</el-button>
                     </el-form-item>
-                </el-col>
-                <el-col :span="4">
-                    <el-button type="primary" plain @click="handleGetForms">查看报表</el-button>
-                    <el-button type="primary" plain @click="handleGetOnFile(pageNo,pageSize)">查看归档记录</el-button>
-                </el-col>
-                <el-col :span="4">
+             
+                    <el-button type="primary" plain size="small" @click="handleGetForms">查看报表</el-button>
+                    <el-button type="primary" plain size="small" @click="handleGetOnFile(pageNo,pageSize)">查看归档记录</el-button>
+
                     <el-select v-model="tjType" class="m-2" placeholder="统计销售总值" size="small" @change="selectChange">
                         <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
                     </el-select>
-                </el-col>
-            </el-row>
+        
 
 
         </el-form>
