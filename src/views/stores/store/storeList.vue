@@ -32,7 +32,8 @@
                     <el-button icon="el-icon-edit-outline" type="primary" size="small"
                         @click="handleToOutStock(scope.row)" v-if="hasPermission('stores:store:outStock')">出库
                     </el-button>
-                    <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete(scope.row)" v-if="hasPermission('stores:store:delete')">删除
+                    <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete(scope.row)"
+                        v-if="hasPermission('stores:store:delete')">删除
                     </el-button>
                 </template>
             </el-table-column>
@@ -41,7 +42,7 @@
         <system-dialog :title="storeDialog.title" :visible="storeDialog.visible" :width="storeDialog.width"
             :height="storeDialog.height" @onClose="onClose" @onConfirm="toOutStock">
             <div slot="content">
-                <el-form :model="store" ref="storeForm" label-width="80px" :inline="true" size="small">
+                <el-form :model="store" ref="storeForm" label-width="80px" :inline="true" size="small" :rules="rules">
                     <el-form-item label="出库数量" prop="outStockNum">
                         <el-input v-model="store.outStockNum"></el-input>
                     </el-form-item>
@@ -106,10 +107,14 @@ export default {
                 brand: "", //品牌
                 stockinTime: "", //最后一次操作时间
                 outStockNum: "", //出库数量
-                empName:"",//领取人
+                empName: "",//领取人
             },
 
-            //选择所属部门的属性
+            rules: {
+                outStockNum: [{ type: 'number', message: '请正确输入出库数', trigger: 'blur', transform: (value) => Number(value)}],
+                empName: [{ required: true, message: '请输入领取人姓名', trigger: 'blur' }],
+            },
+
             parentDialog: {
                 title: "", //窗口标题
                 visible: false, //是否显示窗口
@@ -180,22 +185,29 @@ export default {
             //显示窗口
             this.storeDialog.visible = true;
         },
+
         toOutStock() {
             console.log(this.store);
-            storeApi.toOutStock(this.store).then((res) => {
-                if (res.success) {
-                    //提示成功
-                    this.$message.success(res.message);
-                    //刷新数据
-                    this.search();
-                    //关闭窗口事件
-                    this.storeDialog.visible = false;
-                } else {
-                    //提示失败
-                    this.$message.error(res.message);
+            this.$refs.storeForm.validate(async (valid) => {
+                //如果验证通过
+                if (valid) {
+                    storeApi.toOutStock(this.store).then((res) => {
+                        if (res.success) {
+                            //提示成功
+                            this.$message.success(res.message);
+                            //刷新数据
+                            this.search();
+                            //关闭窗口事件
+                            this.storeDialog.visible = false;
+                        } else {
+                            //提示失败
+                            this.$message.error(res.message);
+                        }
+                        this.search(this.pageNo, this.pageSize);
+                    })
                 }
-                this.search(this.pageNo, this.pageSize);
-            });
+            })
+
         },
         //删除按钮实现
         async handleDelete(row) {
@@ -216,27 +228,27 @@ export default {
             }
         },
 
-     async handleDownload() {
-        let confirm = await this.$myconfirm("确定要导出吗?")
-            if(confirm){
-            this.downloadLoading = true
-            import('@/vendor/Export2Excel').then(excel => {
-                const tHeader = ['物品名称', '最近入库数', '库存数', '物品类型', '品牌','最近入库时间'] 
-                const filterVal = ['stockinName', 'stockinNum', 'storeNum', 'stockinType', 'brand','stockinTime'] 
-                const list = this.tableData 
-                const data = this.formatJson(filterVal, list)
-                excel.export_json_to_excel({
-                    header: tHeader,
-                    data,
-                    filename: this.filename, 
-                    autoWidth: this.autoWidth,
-                    bookType: this.bookType
+        async handleDownload() {
+            let confirm = await this.$myconfirm("确定要导出吗?")
+            if (confirm) {
+                this.downloadLoading = true
+                import('@/vendor/Export2Excel').then(excel => {
+                    const tHeader = ['物品名称', '最近入库数', '库存数', '物品类型', '品牌', '最近入库时间']
+                    const filterVal = ['stockinName', 'stockinNum', 'storeNum', 'stockinType', 'brand', 'stockinTime']
+                    const list = this.tableData
+                    const data = this.formatJson(filterVal, list)
+                    excel.export_json_to_excel({
+                        header: tHeader,
+                        data,
+                        filename: this.filename,
+                        autoWidth: this.autoWidth,
+                        bookType: this.bookType
+                    })
+                    this.downloadLoading = false
                 })
-                this.downloadLoading = false
-            })
-            this.$message.success("导出成功")
-        }
-    },
+                this.$message.success("导出成功")
+            }
+        },
         formatJson(filterVal, jsonData) {
             return jsonData.map(v => filterVal.map(j => {
                 if (j === 'timestamp') {

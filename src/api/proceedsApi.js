@@ -11,11 +11,18 @@ export default {
   async selectList(params) {
     return await http.get("/api/proceeds/list", params);
   },
-  async getSumPrice(params){
-    return await http.get("api/proceeds/sumPrice",params)
+  async getSumPrice(params) {
+    return await http.get("api/proceeds/sumPrice", params)
   },
-  async delete(params){
-    return await http.delete("/api/proceeds/delete",params)
-  }
-  
+  async delete(params) {
+    return await http.delete("/api/proceeds/delete", params)
+  },
+  async getCountPrice() {
+    return await http.get("/api/proceeds/CountPrice")
+  },
+
+  async getCountPriceYear() {
+    return await http.get("/api/proceeds/CountPriceYear")
+  },
+
 };
