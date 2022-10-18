@@ -43,7 +43,7 @@
                         @click="handleEdit(scope.row)">编辑
                     </el-button>
                     <el-button icon="el-icon-close" type="danger" size="small"
-                        v-if="scope.row.scheduleState=='未审核' ||  scope.row.scheduleState=='已撤销'||  scope.row.scheduleState=='已执行'  "
+                        v-if="scope.row.scheduleState!='待审核'"
                         @click="handleDelete(scope.row)" plain>删除
                     </el-button>
                     <el-button type="success" plain icon="el-icon-plus" size="small"
