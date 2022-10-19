@@ -383,7 +383,7 @@ export default {
                         //提示成功
                         this.$message.success(res.message)
                         //刷新数据
-                        this.search(this.pageNo, this.pageSize)
+                        this.search(this.departmentId,this.pageNo, this.pageSize)
                         //关闭窗口事件
                         this.userDialog.visible = false
                     } else {
@@ -439,7 +439,7 @@ export default {
                         //提示成功
                         this.$message.success(res.message)
                         //刷新数据
-                        this.search(this.pageNo, this.pageSize)
+                        this.search(this.departmentId,this.pageNo, this.pageSize)
                     } else {
                         //提示失败
                         this.$message.error(res.message)
@@ -487,6 +487,7 @@ export default {
         async assignRole(row) {
             //防止回显出现问题
             this.selectedIds = [];
+            this.selectedUserId = "";
             //被分配用户的id
             this.selectedUserId = row.id;
             this.userId=row.id
@@ -510,6 +511,8 @@ export default {
          * @param {*} pageSize 
          */
         async getAssignRoleList(pageNo = 1, pageSize = 10) {
+            // this.selectedUserId = "";
+            this.selectedIds = [];
             //封装查询条件
             this.roleVo.userId = this.$store.getters.userId;
             this.roleVo.pageNo = pageNo;
