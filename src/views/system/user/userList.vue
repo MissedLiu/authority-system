@@ -314,6 +314,7 @@ export default {
                 pageNo: 1,
                 pageSize: 10,
                 userId: "",
+                createUser:"",//当前创建人账户id
                 total: 0,
             },
             assignUserList: [], //角色列表
@@ -578,7 +579,7 @@ export default {
             this.userVo.pageNo = this.pageNo2
             //修改每页显示条数
             this.userVo.pageSize = this.pageSize2
-            
+            this.userVo.createUser=this.$store.getters.userId;//当前账号id
             this.pageSize2 = 10;
             let res = await empApi.getUserAllPage(this.userVo);
             this.total2 = res.data.total;
