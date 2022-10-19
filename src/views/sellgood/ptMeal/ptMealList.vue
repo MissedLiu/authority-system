@@ -8,7 +8,8 @@
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="search(pageNo,pageSize)">查询</el-button>
         <el-button icon="el-icon-refresh-right " @click="resetValue()">重置</el-button>
-        <el-button type="success" icon="el-icon-plus" @click="openAddwindow" v-if="hasPermission('sellgood:ptMeal:add')" >新增</el-button>
+        <el-button type="success" icon="el-icon-plus" @click="openAddwindow"
+          v-if="hasPermission('sellgood:ptMeal:add')">新增</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="ptId"
@@ -21,11 +22,14 @@
       <el-table-column prop="ptIs" label="状态" />
       <el-table-column label="操作" width="300" align="center">
         <template slot-scope="scope">
-          <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handleEdit(scope.row)" v-if="hasPermission('sellgood:ptMeal:edit')">编辑
+          <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handleEdit(scope.row)"
+            v-if="hasPermission('sellgood:ptMeal:edit')">编辑
           </el-button>
-          <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete(scope.row)" v-if="hasPermission('sellgood:ptMeal:delete')">删除
+          <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete(scope.row)"
+            v-if="hasPermission('sellgood:ptMeal:delete')">删除
           </el-button>
-          <el-button icon="el-icon-plus" type="success" size="small" @click="assignPt(scope.row)" v-if="hasPermission('sellgood:ptMeal:xuanze')">选择项目
+          <el-button icon="el-icon-plus" type="success" size="small" @click="assignPt(scope.row)"
+            v-if="hasPermission('sellgood:ptMeal:xuanze')">选择项目
           </el-button>
         </template>
       </el-table-column>
@@ -45,8 +49,8 @@
           </el-form-item>
           <el-form-item label="套餐时长" prop="ptTime">
             <el-select v-model="ptMeal.ptTime" placeholder="请选择时长">
-            <el-option v-for="time in times" :label="time.name" :value="time.name" :key="time.name"></el-option>
-          </el-select>
+              <el-option v-for="time in times" :label="time.name" :value="time.name" :key="time.name"></el-option>
+            </el-select>
           </el-form-item>
           <el-form-item label="套餐价格" prop="ptPrice">
             <el-input v-model="ptMeal.ptPrice"></el-input>
@@ -66,10 +70,9 @@
       :visible="assignPtDialog.visible" @onClose="onAssignClose" @onConfirm="onAssignConfirm">
       <div slot="content">
         <!-- 分配私教项目数据列表 -->
-        <el-table ref="assignPtTable"  :row-key="getRowKeys" :data="assignPtList" border stripe :height="assignHeight"
-          style="width: 100%; margin-bottom: 10px"   @selection-change="handleSelectionChange">
-          <el-table-column type="selection" width="55" align="center"  
-              :reserve-selection="true"></el-table-column>
+        <el-table ref="assignPtTable" :row-key="getRowKeys" :data="assignPtList" border stripe :height="assignHeight"
+          style="width: 100%; margin-bottom: 10px" @selection-change="handleSelectionChange">
+          <el-table-column type="selection" width="55" align="center" :reserve-selection="true"></el-table-column>
           <el-table-column prop="ptpId" label="项目编号" />
           <el-table-column prop="ptpName" label="项目名称" />
         </el-table>
@@ -150,7 +153,7 @@ export default {
       assignHeight: 500, //分配角色表格高度
       selectedIds: [], //被选中的角色id
       selectedPtId: "", //被分配角色的用户ID
-      ptid:"",
+      ptid: "",
       //添加套餐时长
       times: [
         {
@@ -339,6 +342,10 @@ export default {
        * 分配角色取消事件
        */
     onAssignClose() {
+      //弹框表格复选框清空 
+      this.$nextTick(() => {
+        this.$refs.assignPtTable.clearSelection();
+      })
       //隐藏窗口
       this.assignPtDialog.visible = false;
     },
@@ -368,8 +375,8 @@ export default {
     async assignPt(row) {
       //防止回显出现问题
       this.selectedIds = [];
-      this.selectedPtId="", //被分配角色的用户ID
-      this.ptId=row.ptId
+      this.selectedPtId = "", //被分配角色的用户ID
+        this.ptId = row.ptId
       //被分配用户的id
       this.selectedPtId = row.ptId;
       this.PtVo.PtId = row.ptId;
@@ -380,22 +387,22 @@ export default {
       //调用查询角色列表
       // await this.getAssignRoleList();
       await this.getAssignPtList();
-     
+
     },
-    getRowKeys(row){
+    getRowKeys(row) {
       return row.ptpId;
     },
-     /**
-       * @selectable 设置不可点击的状态
-       * @param row.pay_status === 0 是未支付的状态，这样的状态是可以选择的。未支付的是可以被选中的，已支付的是不可以被选中的
-       */
-      //  selectable(row,index){
-      //   console.log("row=",row)
-      //   if(row.ptpId === 0){
-      //      return true;
-      //   }else{
-      //      return false;
-      //   }},
+    /**
+      * @selectable 设置不可点击的状态
+      * @param row.pay_status === 0 是未支付的状态，这样的状态是可以选择的。未支付的是可以被选中的，已支付的是不可以被选中的
+      */
+    //  selectable(row,index){
+    //   console.log("row=",row)
+    //   if(row.ptpId === 0){
+    //      return true;
+    //   }else{
+    //      return false;
+    //   }},
     /**
     * 查询当前用户所拥有的所有角色信息
     * @param {*} pageNo 
@@ -413,28 +420,28 @@ export default {
         this.assignPtList = ress.data.records;
         this.PtVo.total = ress.data.total;
         console.log("=", ress.data.records);
-         //封装查询条件
-      let params = { PtId: this.ptId }
-      //发送根据私教套餐ID查询套餐项目列表的请求
-      let res = await ptApi.getPtpIdByPtId(params);
-      console.log("角色列表=", res.data);
-      // /如果存在相关的角色数据
-      if (res.success) {
-        //将查询道德角色Id列表赋值给选中的角色数组
-        this.selectedIds = res.data;
-        //循环遍历
-        //查询数据库中已存在的角色id
-        this.selectedIds.forEach((key) => {
-          //查询表格显示的角色id
-          this.assignPtList.forEach((item) => {
-            
-            if (key === item.ptpId) {
-              //如果相等则复选框选中
-              this.$refs.assignPtTable.toggleRowSelection(item, true)
-            }
+        //封装查询条件
+        let params = { PtId: this.ptId }
+        //发送根据私教套餐ID查询套餐项目列表的请求
+        let res = await ptApi.getPtpIdByPtId(params);
+        console.log("角色列表=", res.data);
+        // /如果存在相关的角色数据
+        if (res.success) {
+          //将查询道德角色Id列表赋值给选中的角色数组
+          this.selectedIds = res.data;
+          //循环遍历
+          //查询数据库中已存在的角色id
+          this.selectedIds.forEach((key) => {
+            //查询表格显示的角色id
+            this.assignPtList.forEach((item) => {
+
+              if (key === item.ptpId) {
+                //如果相等则复选框选中
+                this.$refs.assignPtTable.toggleRowSelection(item, true)
+              }
+            })
           })
-        })
-      }
+        }
       }
     },
     /**
@@ -457,6 +464,10 @@ export default {
       //判断是否成功
       if (res.success) {
         this.$message.success(res.message);
+        //弹框表格复选框清空 
+        this.$nextTick(() => {
+          this.$refs.assignPtTable.clearSelection();
+        })
         //隐藏窗口
         this.assignPtDialog.visible = false;
       } else {
@@ -472,7 +483,7 @@ export default {
       //拿到选中的ID 值
       this.selectedIds = rows.map(item => item.ptpId);
     },
-   
+
   },
 };
 </script>

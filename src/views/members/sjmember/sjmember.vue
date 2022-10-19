@@ -226,7 +226,7 @@ export default {
             mbrules: {
                 memberName: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
                 memberPhone: [{ required: true, message: '请输入电话', trigger: 'blur' },
-                { pattern: new RegExp(/^((1[34578]\d{9}))$/), message: '请正确输入电话号码' }],
+                { pattern: new RegExp(/^((1[3456789]\d{9}))$/), message: '请正确输入电话号码' }],
                 mealId: [{ required: true, message: '请选择套餐', trigger: 'change' }],
                 empId: [{ required: true, message: '请选择教练', trigger: 'change' }],
                 projectId: [{ required: true, message: '请选择项目', trigger: 'change' }],

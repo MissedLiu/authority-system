@@ -22,8 +22,7 @@
          -->
         <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="eeId"
             default-expand-all>
-            <el-table-column prop="stockinId" label="器材/物品编号" />
-            <el-table-column prop="edName" label="器材/物品名称" />
+            <el-table-column prop="edName" label="器材名称" />
             <el-table-column prop="brand" label="品牌" />
             <el-table-column prop="edTime" label="开始使用时间" />
             <el-table-column prop="edCode" label="器材标识编码" />
@@ -245,7 +244,7 @@ export default {
                         this.search(this.pageNo, this.pageSize)
                             //关闭窗口事件
                             this.editDetailsDialog.visible = false;
-                             this.search(this.pageNo, this.pageSize)
+                            
                         } else {
                             //提示失败
                             this.$message.error(res.message);
@@ -264,7 +263,6 @@ export default {
                     if (res.success) {
                         //提示成功
                         this.$message.success(res.message);
-                        
                         //关闭窗口事件
                         this.detailsDialog.visible = false;
                         this.search(this.pageNo, this.pageSize)
