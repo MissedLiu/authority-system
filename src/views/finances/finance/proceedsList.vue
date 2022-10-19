@@ -2,8 +2,7 @@
     <el-main>
         <!-- 条件查询区 -->
         <el-form ref="searchForm" label-width="80px" :inline="true" size="small">
-            <el-row>
-                <el-col :span="8">
+           
                     <el-form-item>
                         <el-select v-model="searchModel.typee" class="m-2" placeholder="输入统计时间段" size="small">
                             <el-option v-for="item in options" :key="item.value" :label="item.label"
@@ -16,22 +15,18 @@
                         </el-select>
                         <el-button type="primary" icon="el-icon-search" @click="toSumPrice()" plain>统计</el-button>
                     </el-form-item>
-                </el-col>
-                <el-col :span="4">
+                
                     <el-button type="primary" plain @click="handleGetForms">查看报表</el-button>
-                </el-col>
-                <el-col :span="4">
-                    <el-button type="primary" plain @click="handleGetOnFile(pageNo,pageSize)">查看归档记录</el-button>
-                </el-col>
-                <el-col :span="8">
+                
+                    <el-button type="primary" plain size="small" @click="handleGetOnFile(pageNo,pageSize)">查看归档记录</el-button>
+               
                     <el-form-item>
                         <el-date-picker v-model="searchModel.changeTime" type="month" placeholder="请选择要查询的月份"
                             @change="changeTimeb(pageNo, pageSize)" value-format="yyyy-MM" />
-                        <el-button type="success" plain @click="toFile">归档</el-button>
-                        <el-button type="success" plain @click="handleDownload">导出当页数据到Excel表格</el-button>
+                        <el-button type="success" plain size="small" @click="toFile">归档</el-button>
+                        <el-button type="success" plain size="small" @click="handleDownload">导出当页数据到Excel表格</el-button>
                     </el-form-item>
-                </el-col>
-            </el-row>
+               
         </el-form>
 
         <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="poId"
@@ -88,9 +83,11 @@
             <div slot="content">
                 <el-row>
                     <el-col :span="12">
+                        今年每月套餐收入情况
                         <BarChart v-if="flag" :TbData="this.TbData"></BarChart>
                     </el-col>
                     <el-col :span="12">
+                        历年套餐收入情况
                         <BarChartA v-if="flag" :TbDataA="this.TbDataA"></BarChartA>
                     </el-col>
                 </el-row>
@@ -390,7 +387,7 @@ export default {
         },
 
         handleGetForms() {
-            this.DialogConfig2.title = "🐂";
+            this.DialogConfig2.title = "报表";
             this.DialogConfig2.visible = true;
         },
 

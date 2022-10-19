@@ -38,9 +38,11 @@
       <div slot="content">
         <el-row>
           <el-col :span="12">
+            今年每月支出情况
             <BarChart v-if="flag" :TbData="this.TbData"></BarChart>
           </el-col>
           <el-col :span="12">
+            历年支出情况
             <BarChartA v-if="flag" :TbDataA="this.TbDataA"></BarChartA>
           </el-col>
         </el-row>

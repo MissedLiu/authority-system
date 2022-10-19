@@ -231,7 +231,7 @@ export default {
         },
         // 将已购表的数据入库（添加到入库表、入库记录表、报溢报损表）
         async toStock() {
-            this.$refs.planForm.validate(async (valid) => {
+            this.$refs.poForm.validate(async (valid) => {
                 //如果验证通过
                 if (valid) {
                     let res = await poApi.toStock(this.po);

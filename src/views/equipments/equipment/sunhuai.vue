@@ -228,6 +228,8 @@ export default {
         },
 
         handleToEm(row) {
+             //清空表单数据
+             this.$restForm("toEmForm",  this.repair);
             this.falg = 1;
             console.log(row)
             this.repair.eeId = row.eeId//上报编号
@@ -247,6 +249,8 @@ export default {
         },
 
         handleToEm2(row) {
+             //清空表单数据
+             this.$restForm("toEmForm",  this.repair);
             this.falg = 2;
             console.log(row)
             this.repair.eeId = row.eeId//上报编号
