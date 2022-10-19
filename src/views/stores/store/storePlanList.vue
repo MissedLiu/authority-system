@@ -42,8 +42,7 @@
                         v-if="scope.row.scheduleState=='未审核'||scope.row.scheduleState=='已撤销'"
                         @click="handleEdit(scope.row)">编辑
                     </el-button>
-                    <el-button icon="el-icon-close" type="danger" size="small"
-                        v-if="scope.row.scheduleState!='待审核'"
+                    <el-button icon="el-icon-close" type="danger" size="small" v-if="scope.row.scheduleState!='待审核'"
                         @click="handleDelete(scope.row)" plain>删除
                     </el-button>
                     <el-button type="success" plain icon="el-icon-plus" size="small"
@@ -54,7 +53,8 @@
                         v-if="scope.row.scheduleState=='待审核'" @click="romve(scope.row)">撤销
                     </el-button>
                     <el-button type="warning" plain icon="el-icon-plus" size="small"
-                        v-if="scope.row.scheduleState=='待审核'||scope.row.scheduleState=='审核不通过'" @click="jindu(scope.row)">审核进度
+                        v-if="scope.row.scheduleState=='待审核'||scope.row.scheduleState=='审核不通过'"
+                        @click="jindu(scope.row)">审核进度
                     </el-button>
                 </template>
             </el-table-column>
@@ -122,13 +122,14 @@
                 <template>
                     <el-steps :active="active" align-center>
                         <el-step :title="item.empName" :description="item.result" :key="item.id"
-                            v-for="item in singleStepData" :status="item.state==1?'success':'error' && item.state==2?'error':'wait '  ">
+                            v-for="item in singleStepData"
+                            :status="item.state==1?'success':'error' && item.state==2?'error':'wait '  ">
                         </el-step>
                     </el-steps>
                 </template>
             </div>
         </system-dialog>
-          <!-- <el-table ref="jinduTable" :data="jinduList" border stripe :height="jinduHeight"
+        <!-- <el-table ref="jinduTable" :data="jinduList" border stripe :height="jinduHeight"
                     style="width: 100%; margin-bottom: 10px">
                     <el-table-column prop="emp.empName" label="审核人" />
                     <el-table-column prop="emp.empName" label="审核状态" />
@@ -164,14 +165,14 @@ export default {
             filename: "采购计划表",
             autoWidth: true,
             bookType: "xlsx",
-            active:0,//步骤显示
+            active: 0,//步骤显示
             tableData: [],//表格数据
 
             //分页组件所需的属性
             pageNo: 1,//当前页码
             total: 0,//数据总数量
             pageSize: 10,//每页显示数量
-            state:"wait ",
+            state: "wait ",
             //新增或编辑的表单属性
             planDialog: {
                 title: "",//窗口标题
@@ -272,6 +273,7 @@ export default {
         async search(pageNo, pageSize) {
             //修改当前页码
             this.searchModel.pageNo = pageNo
+            console.log( this.searchModel.pageNo )
             //修改每页显示条数
             this.searchModel.pageSize = pageSize
             this.searchModel.scheduleempId = this.$store.getters.userId;
@@ -281,7 +283,6 @@ export default {
             if (res.success) {
                 this.tableData = res.data.records
                 this.total = res.data.total;
-                console.log(this.tableData)
                 for (let i = 0; i < res.data.records.length; i++) {
                     if (res.data.records[i].scheduleState == 0) {
                         res.data.records[i].scheduleState = "未审核"
@@ -328,11 +329,12 @@ export default {
                     if (this.plan.scheduleId === "") {
                         //发送添加请求
                         res = await planApi.addPlan(this.plan)
-
+                       
                     } else {
                         this.plan.scheduleState = 0
                         //发送修改请求
                         res = await planApi.updatePlan(this.plan)
+                       
                     }
 
                     //判断是否成功
@@ -340,7 +342,8 @@ export default {
                         //提示成功
                         this.$message.success(res.message)
                         //刷新数据
-                        this.search()
+                        console.log(this.pageNo,"==", this.pageSize)
+                        this.search(this.pageNo, this.pageSize)
                         //关闭窗口事件
                         this.planDialog.visible = false
                     } else {
@@ -355,7 +358,6 @@ export default {
         },
         //修改按钮实现
         async handleEdit(row) {
-            console.log(row)
             let res = await planApi.checkJihua({ id: row.scheduleId })
             if (res.success) {
                 //数据回显
@@ -364,6 +366,7 @@ export default {
                 this.planDialog.title = '编辑库存'
                 //显示窗口
                 this.planDialog.visible = true
+
             } else {
                 //提示失败
                 this.$message.error(res.message)
@@ -415,12 +418,12 @@ export default {
                     //提示成功
                     this.$message.success(res.message)
                     //刷新数据
-                    this.search()
+                    this.search(this.pageNo, this.pageSize)
 
                 } else {
                     console.log(this.plan);
-                    //刷新数据                
-                    this.search()
+                    //刷新数据
+                    this.search(this.pageNo, this.pageSize)
                     //提示失败
                     this.$message.error(res.message)
 
@@ -436,10 +439,10 @@ export default {
             console.log(res1);
             if (res1.success) {
                 this.scheduleId = row.scheduleId;
-                let res = await planApi.findcaiwuEmp();   
+                let res = await planApi.findcaiwuEmp();
                 if (res.success) {
-                  
-                   
+
+
                     this.shenheList = res.data;
                     //将查询出来财务部经理的id获取出来
                     for (const key in this.shenheList) {
@@ -555,8 +558,8 @@ export default {
         async jindu(row) {
             let res = await caigouShenHeApi.fingShengheJiHua({ id: row.scheduleId })
             this.singleStepData = res.data
-            console.log("长度=",res.data)
-            this.active=res.data.length           
+            console.log("长度=", res.data)
+            this.active = res.data.length
             console.log(res.data)
             this.jinduDialog.visible = true;
         },
@@ -567,7 +570,7 @@ export default {
         //审核进度弹框确认事件
         onjinduConfirm() {
             this.jinduDialog.visible = false;
-      
+
         }
     },
 

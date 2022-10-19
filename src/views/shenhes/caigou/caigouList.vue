@@ -73,7 +73,7 @@
                 </el-table-column>
             </el-table>
             <!-- 分页工具栏 -->
-            <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange"
+            <el-pagination background @size-change="handleSizeChange2" @current-change="handleCurrentChange2"
                 :current-page="pageNo2" :page-sizes="[10, 20, 30, 40, 50]" :page-size="10"
                 layout="total, sizes, prev, pager, next, jumper" :total="total2">
             </el-pagination>
@@ -195,7 +195,22 @@ export default {
             //调用查询方法
             this.search1(page, this.pageSize1)
         },
+        handleSizeChange2(size) {
+            //修改每页显示数量
+            this.pageSize2 = size
+            //调用查询方法
+            this.getNotExecuted(this.pageNo2, size)
+        },
 
+        /**
+        * 当页码发生变化时触发该事件
+        */
+        handleCurrentChange2(page) {
+            //修改当前页码
+            this.pageNo2 = page
+            //调用查询方法
+            this.getNotExecuted(page, this.pageSize2)
+        },
         /**
          * 查询采购计划列表
          */
@@ -217,6 +232,7 @@ export default {
                         res.data.records[i].caigouShenhe.state = "待审"
                     }
                 }
+                console.log("==1", this.tableData1)
             }
         },
         //已审批事件
@@ -239,6 +255,7 @@ export default {
                         res.data.records[i].caigouShenhe.state = "已拒绝"
                     }
                 }
+               
             }
         },
 
@@ -250,6 +267,8 @@ export default {
         },
         //同意事件
         handle1(row) {
+             //清空表单数据
+             this.$restForm("beizhuForm",   this.params);
             this.falgDelete = "同意";
             this.params.id = row.caigouShenhe.id;
             this.params.scheduleId = row.caigouShenhe.scheduleId;
@@ -289,6 +308,8 @@ export default {
         },
         //拒绝按钮实现
         handleDelete1(row) {
+            //清空表单数据
+            this.$restForm("beizhuForm",   this.params);
             this.falgDelete = "拒绝"
 
             this.params.id = row.caigouShenhe.id;

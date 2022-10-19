@@ -66,9 +66,10 @@
       :visible="assignPtDialog.visible" @onClose="onAssignClose" @onConfirm="onAssignConfirm">
       <div slot="content">
         <!-- 分配私教项目数据列表 -->
-        <el-table ref="assignPtTable" :data="assignPtList" border stripe :height="assignHeight"
-          style="width: 100%; margin-bottom: 10px" @selection-change="handleSelectionChange">
-          <el-table-column type="selection" width="55" align="center"></el-table-column>
+        <el-table ref="assignPtTable"  :row-key="getRowKeys" :data="assignPtList" border stripe :height="assignHeight"
+          style="width: 100%; margin-bottom: 10px"   @selection-change="handleSelectionChange">
+          <el-table-column type="selection" width="55" align="center"  
+              :reserve-selection="true"></el-table-column>
           <el-table-column prop="ptpId" label="项目编号" />
           <el-table-column prop="ptpName" label="项目名称" />
         </el-table>
@@ -149,6 +150,7 @@ export default {
       assignHeight: 500, //分配角色表格高度
       selectedIds: [], //被选中的角色id
       selectedPtId: "", //被分配角色的用户ID
+      ptid:"",
       //添加套餐时长
       times: [
         {
@@ -364,9 +366,10 @@ export default {
 
     //分配角色
     async assignPt(row) {
-      console.log("row=", row)
       //防止回显出现问题
       this.selectedIds = [];
+      this.selectedPtId="", //被分配角色的用户ID
+      this.ptId=row.ptId
       //被分配用户的id
       this.selectedPtId = row.ptId;
       this.PtVo.PtId = row.ptId;
@@ -377,8 +380,41 @@ export default {
       //调用查询角色列表
       // await this.getAssignRoleList();
       await this.getAssignPtList();
+     
+    },
+    getRowKeys(row){
+      return row.ptpId;
+    },
+     /**
+       * @selectable 设置不可点击的状态
+       * @param row.pay_status === 0 是未支付的状态，这样的状态是可以选择的。未支付的是可以被选中的，已支付的是不可以被选中的
+       */
+      //  selectable(row,index){
+      //   console.log("row=",row)
+      //   if(row.ptpId === 0){
+      //      return true;
+      //   }else{
+      //      return false;
+      //   }},
+    /**
+    * 查询当前用户所拥有的所有角色信息
+    * @param {*} pageNo 
+    * @param {*} pageSize 
+    */
+    async getAssignPtList(pageNo = 1, pageSize = 10) {
       //封装查询条件
-      let params = { PtId: row.ptId }
+      // this.ptVo.PtId = this.$store.getters.userId;
+      this.PtVo.pageNo = pageNo;
+      this.PtVo.pageSize = pageSize;
+      //发送查询请求
+      let ress = await ptApi.getAssignPtList(this.PtVo);
+      if (ress.success) {
+        //赋值
+        this.assignPtList = ress.data.records;
+        this.PtVo.total = ress.data.total;
+        console.log("=", ress.data.records);
+         //封装查询条件
+      let params = { PtId: this.ptId }
       //发送根据私教套餐ID查询套餐项目列表的请求
       let res = await ptApi.getPtpIdByPtId(params);
       console.log("角色列表=", res.data);
@@ -391,9 +427,7 @@ export default {
         this.selectedIds.forEach((key) => {
           //查询表格显示的角色id
           this.assignPtList.forEach((item) => {
-            console.log(key)
-            console.log(item)
-            console.log(item.id)
+            
             if (key === item.ptpId) {
               //如果相等则复选框选中
               this.$refs.assignPtTable.toggleRowSelection(item, true)
@@ -401,25 +435,6 @@ export default {
           })
         })
       }
-    },
-
-    /**
-    * 查询当前用户所拥有的角色信息
-    * @param {*} pageNo 
-    * @param {*} pageSize 
-    */
-    async getAssignPtList(pageNo = 1, pageSize = 10) {
-      //封装查询条件
-      // this.ptVo.PtId = this.$store.getters.userId;
-      this.PtVo.pageNo = pageNo;
-      this.PtVo.pageSize = pageSize;
-      //发送查询请求
-      let res = await ptApi.getAssignPtList(this.PtVo);
-      if (res.success) {
-        //赋值
-        this.assignPtList = res.data.records;
-        this.PtVo.total = res.data.total;
-        console.log("=", res.data.records);
       }
     },
     /**
@@ -457,6 +472,7 @@ export default {
       //拿到选中的ID 值
       this.selectedIds = rows.map(item => item.ptpId);
     },
+   
   },
 };
 </script>

@@ -109,9 +109,9 @@
                 :visible="assignDialog.visible" @onClose="onAssignClose" @onConfirm="onAssignConfirm">
                 <div slot="content">
                     <!-- 分配角色数据列表 -->
-                    <el-table ref="assignRoleTable" :row-key="getRowKeys"  :data="assignRoleList" border stripe :height="assignHeight"
+                    <el-table ref="assignRoleTable" :data="assignRoleList" border stripe :height="assignHeight"
                         style="width: 100%; margin-bottom: 10px" @selection-change="handleSelectionChange">
-                        <el-table-column type="selection"  :reserve-selection="true" width="55" align="center"></el-table-column>
+                        <el-table-column type="selection" width="55" align="center"></el-table-column>
                         <el-table-column prop="roleCode" label="角色编码" />
                         <el-table-column prop="roleName" label="角色名称" />
                         <el-table-column prop="remark" label="角色备注" />
@@ -242,8 +242,7 @@ export default {
             assignHeight: 500, //分配角色表格高度
             selectedIds: [], //被选中的角色id
             selectedUserId: "", //被分配角色的用户ID
-            userId:"",//当前账户id
-            falg:0,
+
 
         }
     },
@@ -475,44 +474,27 @@ export default {
 
         //分配角色
         async assignRole(row) {
+            console.log("row=", row.emp.empName)
             //防止回显出现问题
             this.selectedIds = [];
             //被分配用户的id
             this.selectedUserId = row.id;
-            this.userId=row.id
             let checkName = await userApi.checkEmpName({ id: row.id });
             if (!checkName.success) {//返回为false
                 //提示警告不能分配权限
                 this.$message.warning(checkName.message);
+
             } else {
+
+
                 //显示窗口
                 this.assignDialog.visible = true;
                 //设置标题
                 this.assignDialog.title = `给【${row.emp.empName}】分配角色`;
                 //调用查询角色列表
                 await this.getAssignRoleList();
-               
-            }
-        },
-        /**
-         * 查询当前用户所拥有的角色信息
-         * @param {*} pageNo 
-         * @param {*} pageSize 
-         */
-        async getAssignRoleList(pageNo = 1, pageSize = 10) {
-            //封装查询条件
-            this.roleVo.userId = this.$store.getters.userId;
-            this.roleVo.pageNo = pageNo;
-            this.roleVo.pageSize = pageSize;
-            //发送查询请求
-            let ress = await userApi.getAssignRoleList(this.roleVo);
-                //赋值
-                this.assignRoleList = ress.data.records;
-                this.roleVo.total = ress.data.total;
-                console.log("角色=", ress.data.records);   
-               
-                     //封装查询条件
-                 let params = { userId: this.userId }
+                //封装查询条件
+                let params = { userId: row.id }
                 //发送根据用户ID查询用户角色列表的请求
                 let res = await userApi.getRoleIdByUserId(params);
                 console.log("角色列表=", res.data);
@@ -532,9 +514,26 @@ export default {
                         })
                     })
                 }
-                
-                      
-           
+            }
+        },
+        /**
+         * 查询当前用户所拥有的角色信息
+         * @param {*} pageNo 
+         * @param {*} pageSize 
+         */
+        async getAssignRoleList(pageNo = 1, pageSize = 10) {
+            //封装查询条件
+            this.roleVo.userId = this.$store.getters.userId;
+            this.roleVo.pageNo = pageNo;
+            this.roleVo.pageSize = pageSize;
+            //发送查询请求
+            let res = await userApi.getAssignRoleList(this.roleVo);
+            if (res.success) {
+                //赋值
+                this.assignRoleList = res.data.records;
+                this.roleVo.total = res.data.total;
+                console.log("角色=", res.data.records);
+            }
         },
         /**
         * 分配角色取消事件
@@ -591,15 +590,10 @@ export default {
          */
         assignCurrentChange(page) {
             this.roleVo.pageNo = page;
-           
             //调用查询方法
             this.getAssignRoleList(page, this.roleVo.pageSize);
 
         },
-        getRowKeys(row){
-            console.log("=",row)
-      return row.id;
-    },
     },
 }
 </script>

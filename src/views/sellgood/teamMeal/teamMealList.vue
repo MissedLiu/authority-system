@@ -61,14 +61,14 @@
         </el-form>
       </div>
     </system-dialog>
-     <!-- 分配私教项目窗口 -->
+     <!-- 分配团操项目窗口 -->
      <system-dialog :title="assigntpDialog.title" :height="assigntpDialog.height" :width="assigntpDialog.width"
       :visible="assigntpDialog.visible" @onClose="onAssignClose" @onConfirm="onAssignConfirm">
       <div slot="content">
-        <!-- 分配私教项目数据列表 -->
-        <el-table ref="assigntpTable" :data="assigntpList" border stripe :height="assignHeight"
+        <!-- 分配团操项目数据列表 -->
+        <el-table ref="assigntpTable" :row-key="getRowKeys" :data="assigntpList" border stripe :height="assignHeight"
           style="width: 100%; margin-bottom: 10px" @selection-change="handleSelectionChange">
-          <el-table-column type="selection" width="55" align="center"></el-table-column>
+          <el-table-column type="selection" :reserve-selection="true" width="55" align="center"></el-table-column>
           <el-table-column prop="tpId" label="项目编号" />
           <el-table-column prop="tpName" label="项目名称" />
         </el-table>
@@ -148,6 +148,7 @@ export default {
             assignHeight: 500, //分配角色表格高度
             selectedIds: [], //被选中的团操项目id
             selectedteamId: "", //被分配团操套餐ID
+            teamId:"",
             //添加套餐时长
       times: [
         {
@@ -370,7 +371,9 @@ export default {
             this.getAssigntpList(page, this.tpVo.pageSize);
 
         },
-        
+        getRowKeys(row){
+      return row.teamId;
+    },
         //分配角色
       async  assigntp(row) {
              console.log("row=", row)
@@ -378,7 +381,8 @@ export default {
             this.selectedIds = [];
             //被分配用户的id
             this.selectedteamId = row.teamId;
-              this.tpVo.teamId =row.teamId;           
+              this.tpVo.teamId =row.teamId;   
+              this.teamId=row.teamId; 
                 //显示窗口
                 this.assigntpDialog.visible = true;
                 //设置标题
@@ -386,8 +390,28 @@ export default {
                 //调用查询角色列表
                 // await this.getAssignRoleList();
                 await this.getAssigntpList();
-                //封装查询条件
-                let params = { teamId: row.teamId }
+               
+            },
+        
+         /**
+         * 查询当前用户所拥有的角色信息
+         * @param {*} pageNo 
+         * @param {*} pageSize 
+         */
+         async getAssigntpList(pageNo = 1, pageSize = 10) {
+            //封装查询条件
+            // this.ptVo.PtId = this.$store.getters.userId;
+            this.tpVo.pageNo = pageNo;
+            this.tpVo.pageSize = pageSize;
+            //发送查询请求
+            let ress = await teamApi.getAssigntpList(this.tpVo);
+        
+                //赋值
+                this.assigntpList = ress.data.records;
+                this.tpVo.total = ress.data.total;
+                console.log("11=");
+                 //封装查询条件
+                 let params = { teamId: this.teamId }
                 //发送根据团操套餐ID查询套餐项目列表的请求
                 let res = await teamApi.gettpIdByTeamId(params);
                 console.log("角色列表=", res.data);
@@ -409,26 +433,7 @@ export default {
                         })
                     })
                 }
-            },
-        
-         /**
-         * 查询当前用户所拥有的角色信息
-         * @param {*} pageNo 
-         * @param {*} pageSize 
-         */
-         async getAssigntpList(pageNo = 1, pageSize = 10) {
-            //封装查询条件
-            // this.ptVo.PtId = this.$store.getters.userId;
-            this.tpVo.pageNo = pageNo;
-            this.tpVo.pageSize = pageSize;
-            //发送查询请求
-            let res = await teamApi.getAssigntpList(this.tpVo);
-            if (res.success) {
-                //赋值
-                this.assigntpList = res.data.records;
-                this.tpVo.total = res.data.total;
-                console.log("11=");
-            }
+            
         },
             /**
             * 分配项目确认事件
