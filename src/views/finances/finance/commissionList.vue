@@ -14,16 +14,16 @@
 
         <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="eeId"
             default-expand-all>
-            <el-table-column prop="empName" label="销售人员名称" />
-            <el-table-column prop="empPhone" label="销售人员电话" />
-            <el-table-column prop="departmentName" label="销售人员部门" />
-            <el-table-column prop="commissionSj" label="私教课程提成" />
-            <el-table-column prop="commissionPt" label="普通课程提成" />
-            <el-table-column prop="commissionTc" label="团操课程提成" />
-            <el-table-column prop="commissionSp" label="商品提成" />
-            <el-table-column prop="commissionPrice" label="总提成" />
-            <el-table-column prop="commTime" label="最后统计时间" />
-            <el-table-column label="操作" width="470" align="center">
+            <el-table-column prop="empName" label="销售人" />
+            <el-table-column prop="empPhone"  label="电话" />
+            <el-table-column prop="departmentName"  label="部门" />
+            <el-table-column prop="commissionSj" align="center" width="120" label="私教课程提成" />
+            <el-table-column prop="commissionPt" align="center" width="120" label="普通课程提成" />
+            <el-table-column prop="commissionTc" align="center" width="120" label="团操课程提成" />
+            <el-table-column prop="commissionSp" align="center"  label="商品提成" />
+            <el-table-column prop="commissionPrice" align="center" label="总提成" />
+            <el-table-column prop="commTime"  width="120" label="最后统计时间" />
+            <el-table-column label="操作" width="380" align="center">
                 <template slot-scope="scope">
                     <el-button type="primary" plain size="small" @click="handlePtStatistics(scope.row)">
                         普通提成
