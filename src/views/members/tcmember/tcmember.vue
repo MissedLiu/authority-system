@@ -222,7 +222,7 @@ export default {
         memberPhone: [
           { required: true, message: "请输入电话", trigger: "blur" },
           {
-            pattern: new RegExp(/^((1[34578]\d{9}))$/),
+            pattern: new RegExp(/^((1[3456789]\d{9}))$/),
             message: "请正确输入电话号码",
           },
         ],
