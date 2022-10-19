@@ -155,6 +155,7 @@ export default {
             //查询条件
             searchModel: {
                 username: "", //用户名   
+                createUser:"",//当前创建人账户id
                 pageNo: 1,//当前页码
                 pageSize: 10,//每页显示条数
                 departmentId: "",//所属部门id
@@ -184,7 +185,9 @@ export default {
                 username: "",//账户名
                 password: "",//密码
                 departmentId: "",//所属部门id
-                departmentName: ""//所属部门
+                departmentName: "",//所属部门
+                createUser:"",//当前创建人账户id
+                
             },
             //分配权限窗口属性
             assignDialog: {
@@ -305,6 +308,7 @@ export default {
             this.searchModel.pageSize = pageSize
             //所属部门id
             this.searchModel.departmentId = departmentId
+            this.searchModel.createUser=this.$store.getters.userId;//当前账号id
             //发送查询请求
             let res = await userApi.getUserAllPage(this.searchModel)
             //判断是否发送成功
@@ -369,6 +373,8 @@ export default {
             this.$refs.userForm.validate(async (valid) => {
                 if (valid) {
                     let res = null;
+                    this.user.createUser=this.$store.getters.userId;//当前账号id
+                    console.log( this.user.createUser)
                     //判断是添加还是修改操作(依据id是否为空,为空则为添加操作)
                     if (this.user.id === "") {
                         //发送添加请求
