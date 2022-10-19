@@ -54,9 +54,6 @@
                 <el-table border style="margin-top: 50px;" :data="memberMessage"
                     @selection-change="handleSelectionChange">
                     <el-table-column type='selection' width="55" />
-
-                    <el-table-column label="会员编号" align="center" prop="memberId">
-                    </el-table-column>
                     <el-table-column label="会员名称" align="center" prop="memberName">
                     </el-table-column>
                     <el-table-column label="会员性别" align="center" prop="memberSex" :formatter="playbackFormat">
@@ -75,9 +72,6 @@
                 <el-table border style="margin-top: 50px;" :data="prosperctMessage"
                     @selection-change="handleSelectionChange2">
                     <el-table-column type='selection' width="55" />
-
-                    <el-table-column label="潜在用户编号" align="center" prop="prospectId">
-                    </el-table-column>
                     <el-table-column label="潜在用户名称" align="center" prop="prospectName">
                     </el-table-column>
                     <el-table-column label="潜在用户性别" align="center" prop="prospectSex">
@@ -96,8 +90,6 @@
             @onClose="openmemberMessageDialog2Close" @onConfirm="openmemberMessageDialog2Confirm">
             <div slot="content">
                 <el-table border style="margin-top: 50px;" :data="memberMessagelook">
-                    <el-table-column label="会员编号" align="center" prop="memberId">
-                    </el-table-column>
                     <el-table-column label="会员名称" align="center" prop="memberName">
                     </el-table-column>
                     <el-table-column label="会员性别" align="center" prop="memberSex" :formatter="playbackFormat">
@@ -121,8 +113,6 @@
             @onConfirm="prosperctConfirm2">
             <div slot="content">
                 <el-table border style="margin-top: 50px;" :data="prosperctMessagelook">
-                    <el-table-column label="会员编号" align="center" prop="prospectId">
-                    </el-table-column>
                     <el-table-column label="会员名称" align="center" prop="prospectName">
                     </el-table-column>
                     <el-table-column label="会员性别" align="center" prop="prospectSex">

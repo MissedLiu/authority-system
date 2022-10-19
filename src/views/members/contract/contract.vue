@@ -20,20 +20,14 @@
             default-expand-all :tree-props="{ children: 'children' }">
             <el-table-column prop="memberName" label="会员姓名" align="center"></el-table-column>
             <el-table-column prop="memberPhone" label="会员电话" align="center"></el-table-column>
-            <el-table-column prop="createDate" label="签订日期" align="center"></el-table-column>
-            <el-table-column prop="endDate" label="结束日期" align="center"></el-table-column>
-            <el-table-column label="到期状态" align="center" :formatter="time"></el-table-column>
-            <el-table-column prop="compactType" label="合同类型" align="center"></el-table-column>
-            <el-table-column prop="salesman" label="业务员" align="center"></el-table-column>
+            <el-table-column prop="memberSex" label="性别" align="center" :formatter="playbackFormat"></el-table-column>
+            <el-table-column prop="memberDate" label="出生日期" align="center"></el-table-column>
+            <el-table-column prop="memberAddress" label="地址" align="center"></el-table-column>
             <el-table-column label="操作" width="250" align="center">
                 <template slot-scope="scope">
                     <el-button icon="el-icon-edit-outline" plain type="primary" size="small"
-                        @click="detialwindow(scope.row)">
-                        合同详情
-                    </el-button>
-                    <el-button type="danger" plain size="small" @click="delDetial(scope.row)"
-                        v-if="hasPermission('members:contract:delete')">
-                        删除合同
+                        @click="mealdetialwindow(scope.row)">
+                        详情
                     </el-button>
                 </template>
             </el-table-column>
@@ -248,6 +242,42 @@
         <el-dialog :visible.sync="dialogVisible">
             <img width="100%" :src="dialogImageUrl">
         </el-dialog>
+
+        <!-- 详情窗口 -->
+        <system-dialog :title="mealdetial.title" :visible="mealdetial.visible" :width="mealdetial.width"
+            :height="mealdetial.height" @onClose="compactClose" @onConfirm="compactConfirm">
+            <div slot="content">
+                <el-table border :data="mealdetialData">
+                    <el-table-column label="套餐名称" align="center" prop="mealName">
+                    </el-table-column>
+                    <el-table-column label="套餐类型" align="center" prop="mealType">
+                    </el-table-column>
+                    <el-table-column label="项目名称" align="center" prop="projectName">
+                    </el-table-column>
+                    <el-table-column label="教练名称" align="center" prop="empName">
+                    </el-table-column>
+                    <el-table-column label="合同签订时间" align="center" prop="createDate">
+                    </el-table-column>
+                    <el-table-column label="合同到期时间" align="center" prop="endDate">
+                    </el-table-column>
+                    <el-table-column label="到期状态" align="center" :formatter="time">
+                    </el-table-column>
+                    <el-table-column prop="salesman" label="业务员" align="center">
+                    </el-table-column>
+                    <el-table-column label="操作" align="center" width="300">
+                        <template slot-scope="scope">
+                            <el-button type="primary" plain icon="el-icon-search" size="small" @click="detialwindow(scope.row)">
+                            合同图片
+                            </el-button>
+                            <el-button icon="el-icon-close" plain type="danger" size="small" @click="delDetial(scope.row)">
+                            删除合同
+                            </el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+        </system-dialog>
+
     </el-main>
 </template>
   
@@ -352,6 +382,17 @@ export default {
             //放大照片URL
             dialogImageUrl: "",
             dialogVisible: false,
+            //详情框属性
+            mealdetial: {
+                title: "",//窗口标题
+                visible: false,//是否显示窗口
+                width: 1200,//窗口宽度
+                height: 600//窗口高度
+            },
+            //详情数据
+            mealdetialData: [],
+            //删除的id
+            memberId:"",
         };
     },
     created() {
@@ -370,7 +411,6 @@ export default {
             this.phone.pageSize = pageSize;
             //发送查询请求
             let res = await contractApi.findCompactList(this.phone);
-
             //判断是否存在数据
             if (res.success) {
                 //获取数据
@@ -439,7 +479,6 @@ export default {
         },
         //签约框确定事件
         async signingConfirm() {
-
             //进行表单验证
             this.$refs.signingForm.validate(async (valid) => {
                 //如果验证通过
@@ -476,18 +515,23 @@ export default {
                 }
 
             })
-
         },
-
 
         //打开未签订合同的套餐框
         async openMealWindow() {
             this.parentDialog.title = "需签订合同的套餐"
-            this.parentDialog.visible = true
             let res = await contractApi.findMemberMeal({ memberId: this.signing.memberId })
             if (res.success) {
-                console.log("-=-=-=-=-=-=-=--=-=-=-=", res);
-                this.mealList = res.data
+                console.log(res.data);
+                if (res.data.length == 0) {
+                    let mess = await this.$myconfirm("该会员暂无需要签订合同的套餐!")
+                    if (mess) {
+                        this.signingDialog.visible = false
+                    }
+                } else {
+                    this.mealList = res.data
+                    this.parentDialog.visible = true
+                }
             }
         },
         //确定未签订合同的套餐框
@@ -504,6 +548,27 @@ export default {
             this.signing.compactType = row.mealType
             this.signing.endDate = row.mmDate
             this.parentDialog.visible = false
+        },
+
+        //打开详情框
+        async mealdetialwindow(row) {
+            this.memberId=row.memberId
+            this.mealdetial.title = "合同详情"
+            //发送请求
+            let res = await contractApi.findCompact({ memberId: row.memberId })
+            if (res.success) {
+                this.mealdetialData = res.data
+                console.log(this.mealdetialData);
+            }
+            this.mealdetial.visible = true
+        },
+        //确定详情框
+        compactConfirm() {
+            this.mealdetial.visible = false
+        },
+        //取消详情框
+        compactClose() {
+            this.mealdetial.visible = false
         },
 
 
@@ -550,12 +615,12 @@ export default {
         async delDetial(row) {
             let confirm = await this.$myconfirm("确定删除该记录吗?")//await代表同步
             if (confirm) {
-                let res = await contractApi.delDetial({ compactId: row.compactId })
+                let res = await contractApi.delDetial({compactId : row.compactId})
                 if (res.success) {
                     //提示成功
                     this.$message.success(res.message)
                     //关闭窗口事件
-                    this.signingDialog.visible = false
+                    this.mealdetial.visible = false
                     //刷新数据
                     this.search(this.pageNo, this.pageSize);
                 } else {
@@ -585,12 +650,22 @@ export default {
             let createTime = year + '-' + month + '-' + day;
             return createTime;
         },
+
+        //转换显示
+        playbackFormat(row) {
+            if (row.memberSex == 0) {
+                return '女'
+            } else if (row.memberSex == 1) {
+                return '男'
+            }
+        },
         handleSizeChange(size) {
             //修改每页显示数量
             this.pageSize = size;
             //调用查询方法
             this.search(this.pageNo, size);
         },
+
 
         /**
          * 当页码发生变化时触发该事件
@@ -607,6 +682,7 @@ export default {
         resetValue() {
             //清空数据
             this.phone.memberPhone = "";
+            this.phone.memberName = "";
             //调用查询方法
             this.search()
         },

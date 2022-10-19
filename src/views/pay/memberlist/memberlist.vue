@@ -122,6 +122,7 @@ export default {
         addCallBack(row) {
             this.callBackDialog.title = "回访记录"
             this.callBack.memberId = row.memberId
+            this.callBack.callbackContent = ""
             this.callBackDialog.visible = true
         },
         //关闭事件

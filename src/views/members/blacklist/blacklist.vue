@@ -154,7 +154,7 @@ export default {
           //提示成功
           this.$message.success(res.message);
           //刷新数据
-          this.resetValue()
+          this.search(this.pageNo, this.pageSize)
         } else {
           //提示失败
           this.$message.error(res.message);
@@ -165,7 +165,6 @@ export default {
     async openTF(row) {
       this.TFDialog.title = "退费"
       let res = await BlackApi.findBlackMemberMeal({ memberId: row.memberId })
-      console.log("sssssssssssssss", res);
       if (res.success) {
         this.returnPremium.memberId = row.memberId
         this.mealSJ = res.data
