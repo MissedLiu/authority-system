@@ -8,7 +8,8 @@
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" @click="search(pageNo,pageSize)">查询</el-button>
         <el-button icon="el-icon-refresh-right " @click="resetValue()">重置</el-button>
-        <el-button type="success" icon="el-icon-plus" @click="openAddwindow" v-if="hasPermission('sellgood:teamMeal:add')">新增</el-button>
+        <el-button type="success" icon="el-icon-plus" @click="openAddwindow"
+          v-if="hasPermission('sellgood:teamMeal:add')">新增</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="tableData" border stripe style="width: 100%; margin-bottom: 20px" row-key="teamId"
@@ -21,11 +22,14 @@
       <el-table-column prop="teamIs" label="状态" />
       <el-table-column label="操作" width="300" align="center">
         <template slot-scope="scope">
-          <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handleEdit(scope.row)" v-if="hasPermission('sellgood:teamMeal:edit')">编辑
+          <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handleEdit(scope.row)"
+            v-if="hasPermission('sellgood:teamMeal:edit')">编辑
           </el-button>
-          <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete(scope.row)" v-if="hasPermission('sellgood:teamMeal:delete')">删除
+          <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete(scope.row)"
+            v-if="hasPermission('sellgood:teamMeal:delete')">删除
           </el-button>
-          <el-button icon="el-icon-plus" type="success" size="small" @click="assigntp(scope.row)" v-if="hasPermission('sellgood:teamMeal:xuanze')">选择项目
+          <el-button icon="el-icon-plus" type="success" size="small" @click="assigntp(scope.row)"
+            v-if="hasPermission('sellgood:teamMeal:xuanze')">选择项目
           </el-button>
         </template>
       </el-table-column>
@@ -53,16 +57,16 @@
           </el-form-item>
           <el-form-item label="状态" prop="teamIs">
             <el-radio-group v-model="teamMeal.teamIs">
-                <el-radio-button label="启用" />
-                <el-radio-button label="禁用" />
-              </el-radio-group>
-           
+              <el-radio-button label="启用" />
+              <el-radio-button label="禁用" />
+            </el-radio-group>
+
           </el-form-item>
         </el-form>
       </div>
     </system-dialog>
-     <!-- 分配团操项目窗口 -->
-     <system-dialog :title="assigntpDialog.title" :height="assigntpDialog.height" :width="assigntpDialog.width"
+    <!-- 分配团操项目窗口 -->
+    <system-dialog :title="assigntpDialog.title" :height="assigntpDialog.height" :width="assigntpDialog.width"
       :visible="assigntpDialog.visible" @onClose="onAssignClose" @onConfirm="onAssignConfirm">
       <div slot="content">
         <!-- 分配团操项目数据列表 -->
@@ -98,7 +102,7 @@ export default {
       searchModel: {
         teamName: "", //套餐名字
         pageNo: 1,//当前页码
-      
+
         pageSize: 10,//每页显示数量
       },
       pageNo: 1,//当前页码
@@ -132,24 +136,24 @@ export default {
       },
       //分配权限窗口属性
       assigntpDialog: {
-                title: '',
-                visible: false,
-                height: 450,
-                width: 600
-            },
-             //角色对象
-             tpVo: {
-                pageNo: 1,
-                pageSize: 10,
-                teamId: "",
-                total: 0,
-            },
-            assigntpList: [], //角色列表
-            assignHeight: 500, //分配角色表格高度
-            selectedIds: [], //被选中的团操项目id
-            selectedteamId: "", //被分配团操套餐ID
-            teamId:"",
-            //添加套餐时长
+        title: '',
+        visible: false,
+        height: 450,
+        width: 600
+      },
+      //角色对象
+      tpVo: {
+        pageNo: 1,
+        pageSize: 10,
+        teamId: "",
+        total: 0,
+      },
+      assigntpList: [], //角色列表
+      assignHeight: 500, //分配角色表格高度
+      selectedIds: [], //被选中的团操项目id
+      selectedteamId: "", //被分配团操套餐ID
+      teamId: "",
+      //添加套餐时长
       times: [
         {
           name: "一天"
@@ -234,11 +238,11 @@ export default {
     /**
      * 查询列表
      */
-    async search(pageNo,pageSize) {
-       //修改当前页码
-       this.searchModel.pageNo=pageNo
-        //修改每页显示条数
-        this.searchModel.pageSize=pageSize
+    async search(pageNo, pageSize) {
+      //修改当前页码
+      this.searchModel.pageNo = pageNo
+      //修改每页显示条数
+      this.searchModel.pageSize = pageSize
       //发送查询请求
       let res = await teamApi.getTeamlist(this.searchModel);
       //判断是否成功
@@ -246,30 +250,30 @@ export default {
         console.log(res.data);
         console.log(res.data);
         this.tableData = res.data.records;
-        this.total=res.data.total
+        this.total = res.data.total
         for (let i = 0; i < res.data.records.length; i++) {
           res.data.records[i].teamIs = res.data.records[i].teamIs == 0 ? "启用" : "禁用";
         }
       }
     },
-     /**
-        * 当每页数量发生变化时触发该事件
-        */
-        handleSizeChange(size) {
-            //修改每页显示数量
-            this.pageSize=size
-            //调用查询方法
-            this.search(this.pageNo,size)
-        },
-        /**
-        * 当页码发生变化时触发该事件
-        */
-        handleCurrentChange(page) {
-            //修改当前页码
-            this.pageNo=page
-            //调用查询方法
-            this.search(page,this.pageSize)
-        },
+    /**
+       * 当每页数量发生变化时触发该事件
+       */
+    handleSizeChange(size) {
+      //修改每页显示数量
+      this.pageSize = size
+      //调用查询方法
+      this.search(this.pageNo, size)
+    },
+    /**
+    * 当页码发生变化时触发该事件
+    */
+    handleCurrentChange(page) {
+      //修改当前页码
+      this.pageNo = page
+      //调用查询方法
+      this.search(page, this.pageSize)
+    },
     //打开添加窗口
     openAddwindow() {
       //
@@ -289,7 +293,7 @@ export default {
         //如果验证通过
         if (valid) {
           let res = null;
-        this.teamMeal.teamIs =   this.teamMeal.teamIs =="启用" ? 0 : 1;
+          this.teamMeal.teamIs = this.teamMeal.teamIs == "启用" ? 0 : 1;
           //判断是添加还是修改操作(依据id是否为空,为空则为添加操作)
           if (this.teamMeal.teamId === "") {
             console.log("ssss", this.teamMeal.teamId)
@@ -305,7 +309,7 @@ export default {
             //提示成功
             this.$message.success(res.message);
             //刷新数据
-            this.search(this.pageNo,this.pageSize);
+            this.search(this.pageNo, this.pageSize);
             //关闭窗口事件
             this.teamDialog.visible = false;
           } else {
@@ -335,7 +339,7 @@ export default {
           //提示成功
           this.$message.success(res.message);
           //刷新数据
-          this.search(this.pageNo,this.pageSize);
+          this.search(this.pageNo, this.pageSize);
         } else {
           //提示失败
           this.$message.error(res.message);
@@ -343,133 +347,142 @@ export default {
       }
     },
 
-     /**
-        * 分配角色取消事件
-        */
-        onAssignClose() {
-            //隐藏窗口
-            this.assigntpDialog.visible = false;
-        },
-        
-       
-        /**
-         * 当每页数量发生变化时触发该事件
-         * @param  size 
-         */
-        assignSizeChange(size) {
-            this.tpVo.pageSize = size; //将每页显示的数量交给成员变量
-            this.getAssigntpList(this.tpVo.pageNo, size);
-
-        },
-        /**
-         *  当页码发生变化时触发该事件
-         * @param page 
-         */
-        assignCurrentChange(page) {
-            this.tpVo.pageNo = page;
-            //调用查询方法
-            this.getAssigntpList(page, this.tpVo.pageSize);
-
-        },
-        getRowKeys(row){
-      return row.teamId;
+    /**
+       * 分配角色取消事件
+       */
+    onAssignClose() {
+      //弹框表格复选框清空 
+      this.$nextTick(() => {
+          this.$refs.assigntpTable.clearSelection();
+        })
+      //隐藏窗口
+      this.assigntpDialog.visible = false;
     },
-        //分配角色
-      async  assigntp(row) {
-             console.log("row=", row)
-            //防止回显出现问题
-            this.selectedIds = [];
-            //被分配用户的id
-            this.selectedteamId = row.teamId;
-              this.tpVo.teamId =row.teamId;   
-              this.teamId=row.teamId; 
-                //显示窗口
-                this.assigntpDialog.visible = true;
-                //设置标题
-                this.assigntpDialog.title = `给【${row.teamName}】分配角色`;
-                //调用查询角色列表
-                // await this.getAssignRoleList();
-                await this.getAssigntpList();
-               
-            },
-        
-         /**
-         * 查询当前用户所拥有的角色信息
-         * @param {*} pageNo 
-         * @param {*} pageSize 
-         */
-         async getAssigntpList(pageNo = 1, pageSize = 10) {
-            //封装查询条件
-            // this.ptVo.PtId = this.$store.getters.userId;
-            this.tpVo.pageNo = pageNo;
-            this.tpVo.pageSize = pageSize;
-            //发送查询请求
-            let ress = await teamApi.getAssigntpList(this.tpVo);
-        
-                //赋值
-                this.assigntpList = ress.data.records;
-                this.tpVo.total = ress.data.total;
-                console.log("11=");
-                 //封装查询条件
-                 let params = { teamId: this.teamId }
-                //发送根据团操套餐ID查询套餐项目列表的请求
-                let res = await teamApi.gettpIdByTeamId(params);
-                console.log("角色列表=", res.data);
-                // /如果存在相关的角色数据
-                if (res.success) {
-                    //将查询道德角色Id列表赋值给选中的角色数组
-                    this.selectedIds = res.data;
-                    console.log("12=",this.selectedIds)
-                    //循环遍历
-                    //查询数据库中已存在的团操套餐id
-                    this.selectedIds.forEach((key) => {
-                        //查询表格显示的角色id
-                        this.assigntpList.forEach((item) => {
-                          console.log("13",item)
-                            if (key === item.tpId) {
-                                //如果相等则复选框选中
-                                this.$refs.assigntpTable.toggleRowSelection(item, true)
-                            }
-                        })
-                    })
-                }
-            
-        },
-            /**
-            * 分配项目确认事件
-            */
-           async  onAssignConfirm() {
-                //判断当前是否有选中项目
-                if(this.selectedIds.length=== 0){
-                    this.$message.warning("请选择要分配的团操项目!")
-                    return
-                }
 
-                let params={
-                    teamId:this.selectedteamId,
-                    tpId:this.selectedIds
-                }
-                console.log(params)
-               // 发送保存分配项目数据的请求
-                let res=await teamApi.assigntpProjectSave(params)
-                //判断是否成功
-                if(res.success){
-                    this.$message.success(res.message);
-                     //隐藏窗口
-                this.assigntpDialog.visible = false;
-                }else{
-                     this.$message.error(res.message);
-                }
-               
-            },
-            /**
-             * 复选框选中事件
-             * @param  rows 
-             */
-            handleSelectionChange(rows){
-               //拿到选中的ID 值
-               this.selectedIds=rows.map(item=>item.tpId);     
-            },
+
+    /**
+     * 当每页数量发生变化时触发该事件
+     * @param  size 
+     */
+    assignSizeChange(size) {
+      this.tpVo.pageSize = size; //将每页显示的数量交给成员变量
+      this.getAssigntpList(this.tpVo.pageNo, size);
+
+    },
+    /**
+     *  当页码发生变化时触发该事件
+     * @param page 
+     */
+    assignCurrentChange(page) {
+      this.tpVo.pageNo = page;
+      //调用查询方法
+      this.getAssigntpList(page, this.tpVo.pageSize);
+
+    },
+    getRowKeys(row) {
+      console.log("===>",row)
+      return row.tpId;
+    },
+    //分配角色
+    async assigntp(row) {
+      console.log("row=", row)
+      //防止回显出现问题
+      this.selectedIds = [];
+      //被分配用户的id
+      this.selectedteamId = row.teamId;
+      this.tpVo.teamId = row.teamId;
+      this.teamId = row.teamId;
+      //显示窗口
+      this.assigntpDialog.visible = true;
+      //设置标题
+      this.assigntpDialog.title = `给【${row.teamName}】分配角色`;
+      //调用查询角色列表
+      // await this.getAssignRoleList();
+      await this.getAssigntpList();
+
+    },
+
+    /**
+    * 查询当前用户所拥有的角色信息
+    * @param {*} pageNo 
+    * @param {*} pageSize 
+    */
+    async getAssigntpList(pageNo = 1, pageSize = 10) {
+      //封装查询条件
+      // this.ptVo.PtId = this.$store.getters.userId;
+      this.tpVo.pageNo = pageNo;
+      this.tpVo.pageSize = pageSize;
+      //发送查询请求
+      let ress = await teamApi.getAssigntpList(this.tpVo);
+
+      //赋值
+      this.assigntpList = ress.data.records;
+      this.tpVo.total = ress.data.total;
+      console.log("11=");
+      //封装查询条件
+      let params = { teamId: this.teamId }
+      //发送根据团操套餐ID查询套餐项目列表的请求
+      let res = await teamApi.gettpIdByTeamId(params);
+      console.log("角色列表=", res.data);
+      // /如果存在相关的角色数据
+      if (res.success) {
+        //将查询道德角色Id列表赋值给选中的角色数组
+        this.selectedIds = res.data;
+        console.log("12=", this.selectedIds)
+        //循环遍历
+        //查询数据库中已存在的团操套餐id
+        this.selectedIds.forEach((key) => {
+          //查询表格显示的角色id
+          this.assigntpList.forEach((item) => {
+            console.log("13", item)
+            if (key === item.tpId) {
+              //如果相等则复选框选中
+              this.$refs.assigntpTable.toggleRowSelection(item, true)
+            }
+          })
+        })
+      }
+
+    },
+    /**
+    * 分配项目确认事件
+    */
+    async onAssignConfirm() {
+      //判断当前是否有选中项目
+      if (this.selectedIds.length === 0) {
+        this.$message.warning("请选择要分配的团操项目!")
+        return
+      }
+
+      let params = {
+        teamId: this.selectedteamId,
+        tpId: this.selectedIds
+      }
+      console.log(params)
+      // 发送保存分配项目数据的请求
+      let res = await teamApi.assigntpProjectSave(params)
+      //判断是否成功
+      if (res.success) {
+        this.$message.success(res.message);
+        //弹框表格复选框清空 
+        this.$nextTick(() => {
+          this.$refs.assigntpTable.clearSelection();
+        })
+        //隐藏窗口
+        this.assigntpDialog.visible = false;
+      } else {
+        this.$message.error(res.message);
+      }
+
+    },
+    /**
+     * 复选框选中事件
+     * @param  rows 
+     */
+    handleSelectionChange(rows) {
+      //拿到选中的ID 值
+      this.selectedIds = rows.map(item => item.tpId);
+    },
   },
 };
 </script>
