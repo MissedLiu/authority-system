@@ -8,7 +8,8 @@
             <el-form-item>
                 <el-button type="primary" icon="el-icon-search" @click="search(pageNo, pageSize)">查询</el-button>
                 <el-button icon="el-icon-refresh-right " @click="resetValue()">重置</el-button>
-                <el-button type="success" icon="el-icon-plus" @click="openAddwindow()" v-if="hasPermission('equipments:details:add')">新增</el-button>
+                <el-button type="success" icon="el-icon-plus" @click="openAddwindow()"
+                    v-if="hasPermission('equipments:details:add')">新增</el-button>
             </el-form-item>
         </el-form>
         <!-- 
@@ -30,10 +31,11 @@
             <el-table-column prop="edState" label="状态" />
             <el-table-column label="操作" width="300" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handleEdit(scope.row)" v-if="hasPermission('equipments:details:edit') && scope.row.edState!='无法使用'" 
-                    >编辑
+                    <el-button icon="el-icon-edit-outline" type="primary" size="small" @click="handleEdit(scope.row)"
+                        v-if="hasPermission('equipments:details:edit') && scope.row.edState!='无法使用'">编辑
                     </el-button>
-                    <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete(scope.row)" v-if="hasPermission('equipments:details:delete')">删除
+                    <el-button icon="el-icon-close" type="danger" size="small" @click="handleDelete(scope.row)"
+                        v-if="hasPermission('equipments:details:delete')">删除
                     </el-button>
                 </template>
             </el-table-column>
@@ -84,7 +86,7 @@
                             <el-radio-button label="使用中" />
                             <el-radio-button label="未使用" />
                         </el-radio-group>
-                        
+
                     </el-form-item>
                 </el-form>
             </div>
@@ -147,9 +149,9 @@ export default {
         };
     },
 
-    computed:{
-        butten(){
-            return 
+    computed: {
+        butten() {
+            return
         }
     },
     //初始化时调用
@@ -220,7 +222,7 @@ export default {
                             this.tableData[i].edState = "使用中";
                         } else if (this.tableData[i].edState == 0) {
                             this.tableData[i].edState = "未使用";
-                        }else if(this.tableData[i].edState == 2){
+                        } else if (this.tableData[i].edState == 2) {
                             this.tableData[i].edState = "无法使用";
                         }
                     }
@@ -232,10 +234,9 @@ export default {
 
         //编辑器材状态、备注、标识编码
         async editDetails(row) {
-            console.log(this.details)
             this.$refs.detailsForm.validate(async (valid) => {
                 if (valid) {
-                    this.details.edState =   this.details.edState =="使用中" ? 1 : 0;
+                    this.details.edState = this.details.edState == "使用中" ? 1 : 0;
                     await detailsApi.updateDetails(this.details).then(res => {
                         if (res.success) {
                             //提示成功
@@ -266,6 +267,7 @@ export default {
                         this.search();
                         //关闭窗口事件
                         this.detailsDialog.visible = false;
+                        this.search(this.pageNo, this.pageSize)
                     } else {
                         //提示失败
                         this.$message.error(res.message);
