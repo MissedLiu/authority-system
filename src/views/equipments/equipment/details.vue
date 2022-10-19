@@ -242,9 +242,10 @@ export default {
                             //提示成功
                             this.$message.success(res.message);
                             //刷新数据
-                            this.search();
+                        this.search(this.pageNo, this.pageSize)
                             //关闭窗口事件
                             this.editDetailsDialog.visible = false;
+                             this.search(this.pageNo, this.pageSize)
                         } else {
                             //提示失败
                             this.$message.error(res.message);
@@ -263,8 +264,7 @@ export default {
                     if (res.success) {
                         //提示成功
                         this.$message.success(res.message);
-                        //刷新数据
-                        this.search();
+                        
                         //关闭窗口事件
                         this.detailsDialog.visible = false;
                         this.search(this.pageNo, this.pageSize)

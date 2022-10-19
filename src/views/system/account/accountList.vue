@@ -51,7 +51,7 @@
                             v-if="hasPermission('sys:account:delete')">删除
                         </el-button>
                         <el-button icon="el-icon-setting" type="primary" size="small" @click="assignRole(scope.row)"
-                            v-if="hasPermission('sys:account:role')">分配角色
+                            v-if="hasPermission('sys:account:role') && scope.row.id!=1">分配角色
                         </el-button>
                     </template>
                 </el-table-column>
@@ -111,7 +111,7 @@
                     <!-- 分配角色数据列表 -->
                     <el-table ref="assignRoleTable" :row-key="getRowKeys"  :data="assignRoleList" border stripe :height="assignHeight"
                         style="width: 100%; margin-bottom: 10px" @selection-change="handleSelectionChange">
-                        <el-table-column type="selection"  :reserve-selection="true" width="55" align="center"></el-table-column>
+                        <el-table-column type="selection"  :selectable="selectable"  :reserve-selection="true" width="55" align="center"></el-table-column>
                         <el-table-column prop="roleCode" label="角色编码" />
                         <el-table-column prop="roleName" label="角色名称" />
                         <el-table-column prop="remark" label="角色备注" />
@@ -407,7 +407,17 @@ export default {
             //显示编辑角色窗口
             this.userDialog.visible = true;
         },
-
+ /**
+       * @selectable 设置不可点击的状态
+       * @param row.pay_status === 0 是未支付的状态，这样的状态是可以选择的。未支付的是可以被选中的，已支付的是不可以被选中的
+       */
+       selectable(row,index){
+        if(row.id === 1){
+           return false;
+        }else{
+           return true;
+        }
+      },
         /**
         * 删除
         */
