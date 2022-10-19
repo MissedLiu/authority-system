@@ -17,6 +17,10 @@ export default {
   async delDetial(params){
     return await request.delete("/api/compact/delDetial",params);
   },
+  //查询详情
+  async findCompact(params) {
+    return await request.get("/api/compact/findCompact", params);
+  },
 
 
 }

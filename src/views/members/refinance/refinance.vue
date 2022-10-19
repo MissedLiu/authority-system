@@ -170,7 +170,7 @@ export default {
                 memberName: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
                 memberSex: [{ required: true, message: '请选择性别', trigger: 'change' }],
                 memberDate: [{ required: true, message: '请选择出生日期', trigger: 'change' }],
-                memberPhone: [{ required: true, message: '请输入电话', trigger: 'blur' }, { pattern: new RegExp(/^((1[34578]\d{9}))$/), message: '请正确输入电话号码' }],
+                memberPhone: [{ required: true, message: '请输入电话', trigger: 'blur' }, { pattern: new RegExp(/^((1[3456789]\d{9}))$/), message: '请正确输入电话号码' }],
                 memberAge: [{ required: true, message: '请输入年龄', trigger: 'blur' }, { pattern: new RegExp(/^(?:[1-9][0-9]?|1[01][0-9]|100)$/), message: '请正确输入年龄' }],
                 memberAddress: [{ required: true, message: '请输入地址', trigger: 'blur' }, { pattern: new RegExp(/^[\u4e00-\u9fa5|0-9]{0,20}$/), message: '请正确输入地址' }],
                 memberType: [{ required: true, message: '请选择会员状态', trigger: 'change' }],

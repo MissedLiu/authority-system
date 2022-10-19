@@ -9,9 +9,9 @@
         <el-button type="primary" plain icon="el-icon-search" @click="search(pageNo, pageSize)">查询</el-button>
         <el-button type="primary" plain icon="el-icon-search" @click="selectNullLocker(pageNo, pageSize)">查询空储物柜
         </el-button>
-        <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow()" 
-        v-if="hasPermission('members:locker:add')" >
-        新增储物柜</el-button>
+        <el-button type="success" plain icon="el-icon-plus" @click="openAddwindow()"
+          v-if="hasPermission('members:locker:add')">
+          新增储物柜</el-button>
         <el-button icon="el-icon-refresh-right" @click="resetValue()">返回</el-button>
       </el-form-item>
     </el-form>
@@ -31,11 +31,13 @@
           <el-button type="danger" plain icon="el-icon-minus" :disabled="item(scope.$index, scope.row)" size="small"
             @click="updeteClose(scope.row)" v-if="scope.row.lockerState==1">禁用</el-button>
           <el-button icon="el-icon-close" type="warning" plain size="small" @click="del(scope.row)"
-          v-if="hasPermission('members:locker:delete') && scope.row.lockerState!=0">删除储物柜</el-button>
+            v-if="hasPermission('members:locker:delete') && scope.row.lockerState!=0">删除储物柜</el-button>
           <el-button type="success" plain icon="el-icon-plus" :disabled="item(scope.$index, scope.row)" size="small"
-            @click="openMemwindow(scope.row)" v-if="hasPermission('members:locker:addmember') && scope.row.lockerState==1">添加会员</el-button>
+            @click="openMemwindow(scope.row)"
+            v-if="hasPermission('members:locker:addmember') && scope.row.lockerState==1">添加会员</el-button>
           <el-button type="danger" plain icon="el-icon-minus" :disabled="item(scope.$index, scope.row)" size="small"
-            @click="deleteMember(scope.row)" v-if="hasPermission('members:locker:deletemember') && scope.row.lockerState==0">移除会员</el-button>
+            @click="deleteMember(scope.row)"
+            v-if="hasPermission('members:locker:deletemember') && scope.row.lockerState==0">移除会员</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -129,7 +131,7 @@ export default {
       memberLocker: {
         memberPhone: "",
         memberName: "",
-        lockerId2: ""
+        lockerId: ""
       },
 
     };
@@ -265,6 +267,8 @@ export default {
     },
     //打开添加窗口
     openAddwindow() {
+      //清空表单数据
+      this.$restForm("addLockerForm", this.locker)
       //设置属性
       this.addLockerDialog.visible = true
     },
@@ -302,7 +306,6 @@ export default {
     openMemwindow(row) {
       this.memberLocker.memberName = ""
       this.memberLocker.memberPhone = ""
-      //this.memberLocker.lockerId = ""
       this.memberLocker.lockerId = row.lockerId
       //设置属性
       this.memDialog.visible = true

@@ -22,7 +22,7 @@
             <el-table-column prop="prospectIs" label="是否分配" :formatter="playbackFormat"></el-table-column>
             <el-table-column label="操作" width="200" align="center">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-edit-outline" type="primary" plain size="small"
+                    <el-button  size="small" icon="el-icon-edit-outline" plain type="success"
                         @click="selectCommonMeal(scope.row)" v-if="hasPermission('pay:counsult:add')">
                         修改
                     </el-button>
