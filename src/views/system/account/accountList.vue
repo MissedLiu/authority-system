@@ -109,9 +109,11 @@
                 :visible="assignDialog.visible" @onClose="onAssignClose" @onConfirm="onAssignConfirm">
                 <div slot="content">
                     <!-- 分配角色数据列表 -->
-                    <el-table ref="assignRoleTable" :row-key="getRowKeys"  :data="assignRoleList" border stripe :height="assignHeight"
-                        style="width: 100%; margin-bottom: 10px" @selection-change="handleSelectionChange">
-                        <el-table-column type="selection"  :selectable="selectable"  :reserve-selection="true" width="55" align="center"></el-table-column>
+                    <el-table ref="assignRoleTable" :row-key="getRowKeys" :data="assignRoleList" border stripe
+                        :height="assignHeight" style="width: 100%; margin-bottom: 10px"
+                        @selection-change="handleSelectionChange">
+                        <el-table-column type="selection" :selectable="selectable" :reserve-selection="true" width="55"
+                            align="center"></el-table-column>
                         <el-table-column prop="roleCode" label="角色编码" />
                         <el-table-column prop="roleName" label="角色名称" />
                         <el-table-column prop="remark" label="角色备注" />
@@ -155,7 +157,7 @@ export default {
                 username: "", //用户名   
                 pageNo: 1,//当前页码
                 pageSize: 10,//每页显示条数
-                departmentId:"",//所属部门id
+                departmentId: "",//所属部门id
             },
             userList: [],//角色列表
             tableHeight: 0,//表格高度
@@ -242,8 +244,8 @@ export default {
             assignHeight: 500, //分配角色表格高度
             selectedIds: [], //被选中的角色id
             selectedUserId: "", //被分配角色的用户ID
-            userId:"",//当前账户id
-            falg:0,
+            userId: "",//当前账户id
+            falg: 0,
 
         }
     },
@@ -281,9 +283,9 @@ export default {
         handleNodeClick(data) {
             //将当前选中的节点Id 赋值给departmentId
             this.departmentId = data.id
-            console.log( this.departmentId);
+            console.log(this.departmentId);
             //查询用户信息
-             this.search(this.departmentId)
+            this.search(this.departmentId)
         },
         /**
     * 点击树节点时触发
@@ -296,7 +298,7 @@ export default {
         /**
         * 查询
         */
-        async search( departmentId,pageNo, pageSize) {
+        async search(departmentId, pageNo, pageSize) {
             //修改当前页码
             this.searchModel.pageNo = pageNo
             //修改每页显示条数
@@ -407,17 +409,17 @@ export default {
             //显示编辑角色窗口
             this.userDialog.visible = true;
         },
- /**
-       * @selectable 设置不可点击的状态
-       * @param row.pay_status === 0 是未支付的状态，这样的状态是可以选择的。未支付的是可以被选中的，已支付的是不可以被选中的
-       */
-       selectable(row,index){
-        if(row.id === 1){
-           return false;
-        }else{
-           return true;
-        }
-      },
+        /**
+              * @selectable 设置不可点击的状态
+              * @param row.pay_status === 0 是未支付的状态，这样的状态是可以选择的。未支付的是可以被选中的，已支付的是不可以被选中的
+              */
+        selectable(row, index) {
+            if (row.id === 1) {
+                return false;
+            } else {
+                return true;
+            }
+        },
         /**
         * 删除
         */
@@ -490,7 +492,7 @@ export default {
             this.selectedUserId = "";
             //被分配用户的id
             this.selectedUserId = row.id;
-            this.userId=row.id
+            this.userId = row.id
             let checkName = await userApi.checkEmpName({ id: row.id });
             if (!checkName.success) {//返回为false
                 //提示警告不能分配权限
@@ -502,7 +504,7 @@ export default {
                 this.assignDialog.title = `给【${row.emp.empName}】分配角色`;
                 //调用查询角色列表
                 await this.getAssignRoleList();
-               
+
             }
         },
         /**
@@ -519,40 +521,44 @@ export default {
             this.roleVo.pageSize = pageSize;
             //发送查询请求
             let ress = await userApi.getAssignRoleList(this.roleVo);
-                //赋值
-                this.assignRoleList = ress.data.records;
-                this.roleVo.total = ress.data.total;
-                console.log("角色=", ress.data.records);   
-               
-                     //封装查询条件
-                 let params = { userId: this.userId }
-                //发送根据用户ID查询用户角色列表的请求
-                let res = await userApi.getRoleIdByUserId(params);
-                console.log("角色列表=", res.data);
-                //如果存在想关的角色数据
-                if (res.success) {
-                    //将查询道德角色Id列表赋值给选中的角色数组
-                    this.selectedIds = res.data;
-                    //循环遍历
-                    //查询数据库中已存在的角色id
-                    this.selectedIds.forEach((key) => {
-                        //查询表格显示的角色id
-                        this.assignRoleList.forEach((item) => {
-                            if (key === item.id) {
-                                //如果相等则复选框选中
-                                this.$refs.assignRoleTable.toggleRowSelection(item, true)
-                            }
-                        })
+            //赋值
+            this.assignRoleList = ress.data.records;
+            this.roleVo.total = ress.data.total;
+            console.log("角色=", ress.data.records);
+
+            //封装查询条件
+            let params = { userId: this.userId }
+            //发送根据用户ID查询用户角色列表的请求
+            let res = await userApi.getRoleIdByUserId(params);
+            console.log("角色列表=", res.data);
+            //如果存在想关的角色数据
+            if (res.success) {
+                //将查询道德角色Id列表赋值给选中的角色数组
+                this.selectedIds = res.data;
+                //循环遍历
+                //查询数据库中已存在的角色id
+                this.selectedIds.forEach((key) => {
+                    //查询表格显示的角色id
+                    this.assignRoleList.forEach((item) => {
+                        if (key === item.id) {
+                            //如果相等则复选框选中
+                            this.$refs.assignRoleTable.toggleRowSelection(item, true)
+                        }
                     })
-                }
-                
-                      
-           
+                })
+            }
+
+
+
         },
         /**
         * 分配角色取消事件
         */
         onAssignClose() {
+            //弹框表格复选框清空 
+            this.$nextTick(() => {
+                this.$refs.assignRoleTable.clearSelection();
+            })
             //隐藏窗口
             this.assignDialog.visible = false;
         },
@@ -574,6 +580,10 @@ export default {
             //判断是否成功
             if (res.success) {
                 this.$message.success(res.message);
+                //弹框表格复选框清空 
+                this.$nextTick(() => {
+                    this.$refs.assignRoleTable.clearSelection();
+                })
                 //隐藏窗口
                 this.assignDialog.visible = false;
             } else {
@@ -604,15 +614,15 @@ export default {
          */
         assignCurrentChange(page) {
             this.roleVo.pageNo = page;
-           
+
             //调用查询方法
             this.getAssignRoleList(page, this.roleVo.pageSize);
 
         },
-        getRowKeys(row){
-            console.log("=",row)
-      return row.id;
-    },
+        getRowKeys(row) {
+            console.log("=", row)
+            return row.id;
+        },
     },
 }
 </script>
