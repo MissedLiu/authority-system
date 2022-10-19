@@ -117,8 +117,6 @@ export default {
         width: 900,//窗口宽度
         height: 500//窗口高度
       },
-
-
     };
   },
   created() {
@@ -164,6 +162,9 @@ export default {
     //打开退费框
     async openTF(row) {
       this.TFDialog.title = "退费"
+      //清空数据
+      this.returnPremium.disbursePrice = "" 
+      this.returnPremium.beizhu = ""
       let res = await BlackApi.findBlackMemberMeal({ memberId: row.memberId })
       if (res.success) {
         this.returnPremium.memberId = row.memberId
@@ -173,14 +174,18 @@ export default {
     },
     //退费功能
     async tuiFei() {
-      let res = await BlackApi.delMemberAllMeal(this.returnPremium)
-      if (res.success) {
-        //提示成功
-        this.$message.success(res.message);
-        this.TFDialog.visible = false
+      if (this.returnPremium.disbursePrice == "" || this.returnPremium.beizhu == "") {
+        this.$myconfirm("请填全退费信息?")
       } else {
-        //提示失败
-        this.$message.error(res.message);
+        let res = await BlackApi.delMemberAllMeal(this.returnPremium)
+        if (res.success) {
+          //提示成功
+          this.$message.success(res.message);
+          this.TFDialog.visible = false
+        } else {
+          //提示失败
+          this.$message.error(res.message);
+        }
       }
     },
     // 退费框确定
