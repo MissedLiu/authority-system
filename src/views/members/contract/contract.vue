@@ -608,8 +608,9 @@ export default {
             if (!isLt2M) {
                 this.$message.error('上传合同图片大小不能超过 10MB!')
             }
-            return isJPG && isLt2M 
             
+            return isJPG && isLt2M 
+
         },
 
         //删除合同
