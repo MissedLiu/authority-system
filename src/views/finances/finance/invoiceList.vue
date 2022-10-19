@@ -65,9 +65,11 @@
             <div slot="content">
                 <el-row>
                     <el-col :span="12">
+                        今年每月商品收入情况
                         <BarChart v-if="flag" :TbData="this.TbData"></BarChart>
                     </el-col>
                     <el-col :span="12">
+                        历年商品收入情况
                         <BarChartA v-if="flag" :TbDataA="this.TbDataA"></BarChartA>
                     </el-col>
                 </el-row>
@@ -248,23 +250,23 @@ export default {
             this.DialogConfig.visible = true;
             switch (this.tjType) {
                 case "1":
-                    this.DialogConfig.title = "🐕";
+                    this.DialogConfig.title = "销售额";
                     this.xinxi = "近七天的销售总额为：";
                     break;
                 case "2":
-                    this.DialogConfig.title = "🐕";
+                    this.DialogConfig.title = "销售额";
                     this.xinxi = "近一个月的销售总额为：";
                     break;
                 case "3":
-                    this.DialogConfig.title = "🐕";
+                    this.DialogConfig.title = "销售额";
                     this.xinxi = "当前季度的销售总额为：";
                     break;
                 case "4":
-                    this.DialogConfig.title = "🐕";
+                    this.DialogConfig.title = "销售额";
                     this.xinxi = "上季度的销售总额为：";
                     break;
                 case "5":
-                    this.DialogConfig.title = "🐕";
+                    this.DialogConfig.title = "销售额";
                     this.xinxi = "本年的销售总额为：";
                     break;
             }
@@ -406,7 +408,7 @@ export default {
         },
 
         handleGetForms() {
-            this.DialogConfig2.title = "🐂";
+            this.DialogConfig2.title = "报表";
             this.DialogConfig2.visible = true;
         },
 

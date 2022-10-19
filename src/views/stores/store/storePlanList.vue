@@ -68,7 +68,9 @@
                         <el-input v-model="plan.scheduleName"></el-input>
                     </el-form-item>
                     <el-form-item label="物品类型" prop="scheduleType">
-                        <el-input v-model="plan.scheduleType"></el-input>
+                        <el-select v-model="plan.scheduleType">
+                            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                        </el-select>
                     </el-form-item>
                     <el-form-item label="供货名称" prop="scheduleSupplier">
                         <el-input v-model="plan.scheduleSupplier"></el-input>
@@ -177,8 +179,8 @@ export default {
             planDialog: {
                 title: "",//窗口标题
                 visible: false,//是否显示窗口
-                width: 560,//窗口宽度
-                height: 210,//窗口高度
+                width: 622,//窗口宽度
+                height: 250,//窗口高度
             },
             //已购弹窗的表单属性
             toPoDialog: {
@@ -212,6 +214,26 @@ export default {
                 schedulePrice: [{ required: true, message: '请输入物品单价', trigger: 'blur', }],
                 brand: [{ required: true, message: '请输入品牌', trigger: 'blur', }],
             },
+
+            options: [
+                {
+                    value: '补剂',
+                    label: '补剂',
+                },
+                {
+                    value: '器械',
+                    label: '器械',
+                },
+                {
+                    value: '生活用品',
+                    label: '生活用品',
+                },
+                {
+                    value: '其他用品',
+                    label: '其他用品',
+                },
+            ],
+
             //新增或编辑的表单属性
             shenheDialog: {
                 title: "审核窗口",//窗口标题
