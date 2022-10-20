@@ -696,6 +696,7 @@ export default {
             this.TeamShuju.mealName = row.teamName;
             this.TeamShuju.salesPrice = row.teamPrice;
             this.TeamShuju.mealTime = row.teamTime;
+            this.$restForm("buyTeamTreeForm", this.buyTeamTreeList);
             let res = await salesApi.findTeamName({ teamId: row.teamId });
             if (res.success) {
                 this.buyTeamTowList = res.data;

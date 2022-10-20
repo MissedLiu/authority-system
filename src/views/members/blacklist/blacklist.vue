@@ -176,7 +176,9 @@ export default {
     async tuiFei() {
       if (this.returnPremium.disbursePrice == "" || this.returnPremium.beizhu == "") {
         this.$myconfirm("请填全退费信息?")
-      } else {
+      }else if(this.mealSJ.length==0){
+          this.$myconfirm("该黑名单用户暂无可退费项目!")
+      } else {
         let res = await BlackApi.delMemberAllMeal(this.returnPremium)
         if (res.success) {
           //提示成功

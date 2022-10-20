@@ -307,7 +307,7 @@ export default {
             //修改每页显示条数
             this.searchModel.pageSize = pageSize
             //所属部门id
-            this.searchModel.departmentId = departmentId
+            this.searchModel.departmentId =  this.departmentId
             this.searchModel.createUser=this.$store.getters.userId;//当前账号id
             //发送查询请求
             let res = await userApi.getUserAllPage(this.searchModel)

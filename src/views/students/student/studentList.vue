@@ -159,7 +159,7 @@
           <el-table-column prop="mealType" label="套餐类型"></el-table-column>
           <el-table-column label="操作" width="300" align="center">
             <template slot-scope="scope">
-             
+
               <el-button plain icon="el-icon-edit-outline" type="primary" size="small" @click="fantan(scope.row)">
                 添加访谈
               </el-button>
@@ -182,7 +182,7 @@
           <el-table-column prop="mealType" label="套餐类型"></el-table-column>
           <el-table-column label="操作" width="300" align="center">
             <template slot-scope="scope">
-             
+
               <el-button plain icon="el-icon-edit-outline" type="primary" size="small" @click="fantan(scope.row)">
                 添加访谈
               </el-button>
@@ -227,6 +227,7 @@ export default {
         mealType: "",
       },
       mealType: "私教",
+      mealType2: "",
       //表格显示数据
       tableData: [],
       //表格显示数据
@@ -332,7 +333,8 @@ export default {
       tmSearchModel: {
         memberIds: "",//会员id,
         empId: "",//教练id
-      }
+      },
+      station:"",//岗位
     }
   },
   created() {
@@ -346,6 +348,7 @@ export default {
     async search(pageNo, pageSize) {
       let userId = this.$store.getters.userId;
       let res2 = await userApi.empByUserId({ id: userId });
+      this.station=res2.data.emp.station
       this.searchModel.empId = res2.data.empId
       this.ptSearchModel.empId = res2.data.empId
       this.tmSearchModel.empId = res2.data.empId
@@ -355,7 +358,14 @@ export default {
       console.log("cc=", this.searchModel.empId)//账号id
       this.searchModel.mealType = "私教";
       console.log(this.searchModel)
-      let res = await xueyuanApi.findAll(this.searchModel);
+      
+      let res =null;
+      if(this.station=="教练部经理"){
+        //查询所有
+        res=await xueyuanApi.findAllByStation(this.searchModel);
+      }else{
+         res = await xueyuanApi.findAll(this.searchModel);
+      }
       if (res.success) {
         this.tableData = res.data.records
         this.total = res.data.total
@@ -376,6 +386,7 @@ export default {
     pt() {
       this.falg1 = true;
       this.falg2 = false;
+      this.mealType2 = "私教"
       this.search()
     },
     //团操
@@ -387,10 +398,17 @@ export default {
       this.searchModel2.empId = res2.data.empId
       this.searchModel2.pageNo = pageNo2;
       this.searchModel2.pageSize = pageSize2;
-
+      this.mealType2 = "团操"
       this.searchModel2.mealType = "团操";
       console.log(this.searchModel2)
-      let res = await xueyuanApi.findAll(this.searchModel2);
+      let res =null;
+      if(this.station=="教练部经理"){
+        //查询所有
+        res=await xueyuanApi.findAllByStation(this.searchModel2);
+      }else{
+         res = await xueyuanApi.findAll(this.searchModel2);
+      }
+      
       if (res.success) {
         this.tableData2 = res.data.records
         this.total2 = res.data.total
@@ -404,9 +422,11 @@ export default {
     //添加体检单
     selectPtMeal(row) {
       console.log(row)
+      this.$restForm("TiForm", this.Ti);
       this.Ti.memberId = row.memberId;
       this.Ti.memberName = row.memberName;
       this.TiDialog.title = "体检单"
+     
       this.TiDialog.visible = true;
     },
     //体检单确认按钮
@@ -418,9 +438,12 @@ export default {
           if (res.success) {
             //提示成功
             this.$message.success(res.message)
-            //刷新数据
-            this.tm(this.pageNo2, this.pageSize2)
-            this.pt(this.pageNo1, this.pageSize1)
+            if (this.mealType2 == "团操") {
+              //刷新数据
+              this.tm(this.pageNo2, this.pageSize2)
+            }else if(this.mealType2 == "私教"){
+              this.pt(this.pageNo1, this.pageSize1)
+            }
             //关闭窗口事件
             this.TiDialog.visible = false
           } else {
@@ -498,9 +521,13 @@ export default {
           if (res.success) {
             //提示成功
             this.$message.success(res.message)
-            //刷新数据
-            this.tm(this.pageNo2, this.pageSize2)
-            this.pt(this.pageNo1, this.pageSize1)
+            if (this.mealType2 == "团操") {
+              //刷新数据
+              this.tm(this.pageNo2, this.pageSize2)
+            }else if(this.mealType2 == "私教"){
+              this.pt(this.pageNo1, this.pageSize1)
+            }
+           
             //关闭窗口事件
             this.tanDialog.visible = false
           } else {
@@ -534,7 +561,7 @@ export default {
     },
     //团操详情弹框
     async tmxiangqing(row) {
-      this.tmSearchModel.memberIds = row.memberId; 
+      this.tmSearchModel.memberIds = row.memberId;
       console.log(this.tmSearchModel)
       let res = await xueyuanApi.findMealTm(this.tmSearchModel)
       if (res.success) {

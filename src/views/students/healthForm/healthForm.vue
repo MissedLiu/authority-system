@@ -1,11 +1,11 @@
 <template>
 
   <el-main>
-    
+
     <el-row>
       <el-col :span="12">
-         <!-- 查询条件 -->
-         <el-form :model="searchModel" ref="searchForm" label-width="80px" :inline="true" size="small">
+        <!-- 查询条件 -->
+        <el-form :model="searchModel" ref="searchForm" label-width="80px" :inline="true" size="small">
           <el-form-item>
             <el-input v-model="searchModel.memberName" placeholder="请输入会员名称" />
           </el-form-item>
@@ -17,8 +17,8 @@
         </el-form>
         <!-- 数据表格 -->
 
-        <el-table :data="userList" :height="tableHeight"  stripe style="width: 100%;  margin-bottom: 10px">
-          <el-table-column prop="healthformId" label="体检编号"  align="center"></el-table-column>
+        <el-table :data="userList" :height="tableHeight" stripe style="width: 100%;  margin-bottom: 10px">
+          <el-table-column prop="healthformId" label="体检编号" align="center"></el-table-column>
           <el-table-column prop="memberName" label="会员姓名"></el-table-column>
           <el-table-column prop="weight" label="体重" width="50" align="center"></el-table-column>
           <el-table-column prop="height" label="身高" width="50" align="center"></el-table-column>
@@ -29,8 +29,7 @@
               <el-button icon="el-icon-delete" type="danger" plain size="small" @click="handleEdit(scope.row)"
                 v-if="hasPermission('healthForm:healthForm:delete')">删除
               </el-button>
-              <el-button icon=" el-icon-s-unfold" type="success" plain size="small" @click="xingqing(scope.row)"
-               >详情
+              <el-button icon=" el-icon-s-unfold" type="success" plain size="small" @click="xingqing(scope.row)">详情
               </el-button>
             </template>
           </el-table-column>
@@ -41,14 +40,14 @@
           layout="total, sizes, prev, pager, next, jumper" :total="total">
         </el-pagination>
       </el-col>
-     
-        <el-col :span="12" >    
-          <div >         
-              <ti-jian v-if="flag" :tijian="this.xueYuan"></ti-jian>         
-          </div>
+
+      <el-col :span="12">
+        <div>
+          <ti-jian v-if="flag" :tijian="this.xueYuan"></ti-jian>
+        </div>
       </el-col>
-    
-      
+
+
     </el-row>
   </el-main>
 
@@ -56,8 +55,9 @@
 <script>
 import healthform from '@/api/healthform'
 import TiJian from './TiJian.vue'
+import userApi from '@/api/userApi';
 export default {
-  components:{
+  components: {
     TiJian
   },
   data() {
@@ -74,8 +74,9 @@ export default {
       pageNo: 1,//当前页码
       total: 0,//数据总数量
       pageSize: 10,//每页显示数量
-      flag:false,
-      xueYuan:{},
+      flag: false,
+      xueYuan: {},
+      station: "",
 
     }
   },
@@ -90,10 +91,18 @@ export default {
   },
   methods: {
     async search(pageNo, pageSize) {
+      let userId = this.$store.getters.userId;
+      let res2 = await userApi.empByUserId({ id: userId });
+      this.station = res2.data.emp.station
       this.searchModel.pageNo = pageNo;
       this.searchModel.pageSize = pageSize;
       this.searchModel.empId = this.$store.getters.userId;
-      let res = await healthform.listByEmpId(this.searchModel);
+      let res =null;
+      if(this.station=="教练部经理"){
+          res=await healthform.listAllStation(this.searchModel);
+      }else{
+        res = await healthform.listByEmpId(this.searchModel);
+      }
       if (res.success) {
         this.userList = res.data.records
         this.total = res.data.total
@@ -131,7 +140,7 @@ export default {
       if (confirm) {
         //发送删除请求
         let res = await healthform.delete({ id: row.healthformId });
-        this.flag=false;
+        this.flag = false;
         //判断是否发送成功
         if (res.success) {
           //提示成功
@@ -148,17 +157,17 @@ export default {
     },
     //详情按钮
     //根据id查询所有会员体检
-   async xingqing(row){
-    this.flag=false;
+    async xingqing(row) {
+      this.flag = false;
       console.log(row)
-      let res=await healthform.healthform({id:row.healthformId})
-      this.xueYuan=res.data
-      console.log("s=",this.xueYuan)
+      let res = await healthform.healthform({ id: row.healthformId })
+      this.xueYuan = res.data
+      console.log("s=", this.xueYuan)
       this.$nextTick(() => {
-        this.flag=true
-    })
-    
-     
+        this.flag = true
+      })
+
+
     }
   }
 }

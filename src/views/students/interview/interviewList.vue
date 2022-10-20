@@ -20,7 +20,8 @@
             <el-table-column prop="interview" label="访谈内容"></el-table-column>
             <el-table-column label="操作" align="center" width="290">
                 <template slot-scope="scope">
-                    <el-button icon="el-icon-delete" type="danger" size="small" @click="handleDelete(scope.row)" v-if="hasPermission('coachs:interview:delete')">删除
+                    <el-button icon="el-icon-delete" type="danger" size="small" @click="handleDelete(scope.row)"
+                        v-if="hasPermission('coachs:interview:delete')">删除
                     </el-button>
 
                 </template>
@@ -36,6 +37,7 @@
 
 <script>
 import interviewApi from "@/api/interview"
+import userApi from '@/api/userApi';
 export default {
     data() {
         return {
@@ -49,6 +51,7 @@ export default {
             pageSize: 10,
             total: 0,
             userList: [],
+            station:"",
         }
     },
     created() {
@@ -60,11 +63,20 @@ export default {
         })
     },
     methods: {
-        async search(pageNo,pageSize) {
-            this.searchModel.pageNo=pageNo
-            this.searchModel.pageSize=pageSize
+        async search(pageNo, pageSize) {
+            let userId = this.$store.getters.userId;
+            let res2 = await userApi.empByUserId({ id: userId });
+            this.station = res2.data.emp.station
+            this.searchModel.pageNo = pageNo
+            this.searchModel.pageSize = pageSize
             this.searchModel.empId = this.$store.getters.userId;
-            let res = await interviewApi.listInterview(this.searchModel);
+            let res =null;
+            if(this.station=="教练部经理"){
+                    res=await interviewApi.listInterviewStation(this.searchModel);
+            }else{
+                 res = await interviewApi.listInterview(this.searchModel);
+            }
+           
             if (res.success) {
                 this.userList = res.data.records
                 this.total = res.data.total
@@ -76,7 +88,7 @@ export default {
             }
         },
         resetValue() {
-            this.searchModel.memberName=""
+            this.searchModel.memberName = ""
             this.search()
         },
 
@@ -99,18 +111,18 @@ export default {
             this.search(page, this.pageSize)
         },
         //删除功能
-       async handleDelete(row){
-          console.log(row)
+        async handleDelete(row) {
+            console.log(row)
             let confirm = await this.$myconfirm("确定要删除该数据嘛?")//await代表同步
             if (confirm) {
                 //发送删除请求
-                let res=await interviewApi.delete({id:row.interviewId})
+                let res = await interviewApi.delete({ id: row.interviewId })
                 //判断是否发送成功
                 if (res.success) {
                     //提示成功
                     this.$message.success(res.message)
                     //刷新数据
-                    this.search(this.pageNo,this.pageSize);
+                    this.search(this.pageNo, this.pageSize);
                 } else {
                     //提示失败
                     this.$message.error(res.message)

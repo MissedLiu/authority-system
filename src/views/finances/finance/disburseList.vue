@@ -18,12 +18,12 @@
       <el-table-column prop="disburseTime" label="支出时间" />
       <el-table-column prop="disbursePrice" label="支出金额" />
       <el-table-column prop="beizhu" label="备注" />
-      <el-table-column label="操作" width="300" align="center">
+      <!-- <el-table-column label="操作" width="300" align="center">
         <template slot-scope="scope">
-          <el-button icon="el-icon-close" type="danger" size="small" plain @click="handleDelete(scope.row)">删除
+          <el-button icon="el-icon-close" type="danger" v-if="false" size="small" plain @click="handleDelete(scope.row)">删除
           </el-button>
         </template>
-      </el-table-column>
+      </el-table-column> -->
     </el-table>
 
     <!-- 分页工具栏 -->

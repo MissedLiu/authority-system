@@ -36,12 +36,12 @@
             <el-table-column prop="pname" label="项目名称" />
             <el-table-column prop="proceedsPrice" label="消费金额" />
             <el-table-column prop="proceedsTime" label="消费时间" />
-            <el-table-column label="操作" align="center">
+            <!-- <el-table-column label="操作" align="center">
                 <template slot-scope="scope">
                     <el-button icon="el-icon-close" type="danger" size="small" plain @click="handleDelete(scope.row)">删除
                     </el-button>
                 </template>
-            </el-table-column>
+            </el-table-column> -->
         </el-table>
 
         <system-dialog :title="DialogConfig.title" :visible="DialogConfig.visible" :width="DialogConfig.width"
@@ -397,22 +397,18 @@ export default {
                 this.downloadLoading = true;
                 import("@/vendor/Export2Excel").then((excel) => {
                     const tHeader = [
-                        "会员名称",
-                        "会员电话",
                         "套餐名称",
                         "套餐类型",
-                        "项目名称",
+                        "项目名称",      
                         "消费金额",
                         "消费时间",
                     ];
                     const filterVal = [
-                        "memberName",
-                        "memberPhone",
                         "mealName",
                         "mealType",
-                        "ptpName",
-                        "comsunePrice",
-                        "comsuneDate",
+                        "pname",
+                        "proceedsPrice",
+                        "proceedsTime",
                     ];
                     const list = this.tableData;
                     const data = this.formatJson(filterVal, list);

@@ -19,7 +19,7 @@ export default {
   },
   created() {
     this.xiaoshou2 = this.xiaoshou
-    console.log("emp=", this.xiaoshou2)
+    console.log("xiaoshou2=", this.xiaoshou2)
     this.showMain();
   },
 

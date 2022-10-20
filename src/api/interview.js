@@ -22,6 +22,14 @@ export default {
    * @param {*} params 
    * @returns 
    */
+     async listInterviewStation(params) {
+      return await http.get("/api/interview/listInterviewStation", params);
+    },
+    /**
+   * 查询所有访谈记录
+   * @param {*} params 
+   * @returns 
+   */
      async delete(params) {
         return await http.getRestApi("/api/interview/delete", params);
       },

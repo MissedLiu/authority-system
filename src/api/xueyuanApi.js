@@ -4,6 +4,10 @@ export default {
   async findAll(params) {
     return await http.get("/api/XueYuan/xueyuanlist", params);
   },
+   //查询学员
+   async findAllByStation(params) {
+    return await http.get("/api/XueYuan/xueyuanlistAll", params);
+  },
   //添加体检记录单
   async addTiJian(params) {
     return await http.post("/api/XueYuan/addTiJian", params);

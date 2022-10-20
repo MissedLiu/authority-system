@@ -17,7 +17,7 @@
     <div class="user-bio">
       <div class="user-education user-bio-section">
         <div class="user-bio-section-header"><span>用户:{{user.name}}</span></div>
-        <div class="user-bio-section-header">  <span>邮箱:</span> {{user.email}} </div>
+        <!-- <div class="user-bio-section-header">  <span>邮箱:</span> {{user.email}} </div> -->
       </div>
 
       <div class="user-skills user-bio-section">
